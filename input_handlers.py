@@ -46,6 +46,9 @@ def handle_player_move_keys(user_input):
     return {}
 
 def handle_player_attack_keys(user_input):
+    if user_input.key == 'ENTER':
+        return {'attack': True}
+
     if user_input.key == 'ENTER' and user_input.alt:
         # Alt+Enter: toggle full screen
         return {'fullscreen': True}

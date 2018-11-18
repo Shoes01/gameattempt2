@@ -1,5 +1,6 @@
 import tdl
 
+from components.mech import Mech
 from entity import Entity
 from game_messages import MessageLog, Message
 from game_states import GameStates
@@ -30,10 +31,12 @@ def main():
         'red': (255, 0, 0),
         'orange': (255, 127, 0),
         'light_red': (255, 114, 114),
-        'darker_red': (127, 0, 0)
+        'darker_red': (127, 0, 0),
+        'lime_green': (199, 234, 70)
     }
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255), "player")
+    mech_component = Mech(hp=30, max_momentum=6)
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255), "player", mech=mech_component)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', (255, 255, 0), "NPC")
     entities = [npc, player]
 
@@ -51,7 +54,7 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYERS_TURN
-
+    
     while not tdl.event.is_window_closed():
         render_all(con, panel, entities, game_map, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors)
 
@@ -76,22 +79,46 @@ def main():
         move = action.get('move')
         exit = action.get('exit')
         continue_ = action.get('continue')
+        attack = action.get('attack')
         fullscreen = action.get('fullscreen')
 
         if game_state == GameStates.PLAYERS_TURN:
             message_log.add_message(Message('It is your turn! Press ENTER to go to Movement Phase.', colors.get('white')))
         elif game_state == GameStates.MOVEMENT_PHASE:
-            message_log.add_message(Message('You can move! When you are done, you will go to Attack Phase.', colors.get('white')))
+            message_log.add_message(Message('You can move! When you do, you will go to Attack Phase.', colors.get('white')))
+
+            """
+            Here is the code necessary to highlight lgeal moves
+
+            1) Read mech_momentum 
+                mech_momentum = 1 + abs(horizontal_momentum) + abs(vertical_momentum)
+            2) Highlight all the tiles around player where abs(x) + abs(y) <= mech_momentum
+            3) Unhighlight the tiles dictated by momentum direction.
+                3.1 If mech_momentum == 1 (which means the unit is only moving in one direction), unhighlight the tile next to the player in the opposite direction of the momentum
+                3.2 If mech_momentum > 1, unhighlight all tiles around the player where abs(x) 6 abs(y) <= mech_momentum - 2
+
+            """
+
+
+
         elif game_state == GameStates.ATTACK_PHASE:
-            message_log.add_message(Message('You are attacking! When you are done, it will be the enemy turn.', colors.get('white')))
+            message_log.add_message(Message('You are attacking! Press ENTER to go to Enemy Turn.', colors.get('white')))
 
         if continue_ and game_state == GameStates.PLAYERS_TURN:
-            game_state == GameStates.MOVEMENT_PHASE
+            game_state = GameStates.MOVEMENT_PHASE
+            message_log.add_message(Message('Going to Movement Phase.', colors.get('orange')))
 
         if move:
             dx, dy = move
             if game_map.walkable[player.x + dx, player.y + dy]:
                 player.move(dx, dy)
+            
+            game_state = GameStates.ATTACK_PHASE
+            message_log.add_message(Message('Going to Attack Phase.', colors.get('orange')))
+        
+        if attack:
+            game_state = GameStates.ENEMY_TURN
+            message_log.add_message(Message('Going to the Enemy Turn.', colors.get('orange')))
 
         if exit:
             return True
