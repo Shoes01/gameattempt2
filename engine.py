@@ -6,7 +6,7 @@ from entity import Entity
 from game_messages import MessageLog, Message
 from game_states import GameStates
 from input_handlers import handle_keys
-from map_utils import GameMap, make_map
+from map_utils import GameMap, make_map, reset_highlight
 from render_functions import clear_all, render_all
 
 def main():
@@ -39,7 +39,7 @@ def main():
         'orange': (255, 127, 0),
         'light_red': (255, 114, 114),
         'darker_red': (127, 0, 0),
-        'lime_green': (199, 234, 70)
+        'highlight': (199, 234, 70)
     }
 
     mech_component = Mech(hp=30, max_momentum=6)
@@ -148,11 +148,13 @@ def main():
                         # Highlight the tiles! (tiles aren't a thing yet, but when they are...)
                         coord_x = player.x + x
                         coord_y = player.y + y
-                        con.draw_char(coord_x,coord_y, 'X', fg=None, bg=colors.get('lime_green'))
+                        game_map.highlight[coord_x][coord_y] = True
                         print('Highlighting tile at coordinate ({0}, {1})'.format(str(coord_x), str(coord_y)))
                         
 
         elif game_state == GameStates.ATTACK_PHASE:
+            reset_highlight(game_map)
+            fov_recompute = True
             message_log.add_message(Message('You are attacking! Press ENTER to go to Enemy Turn.', colors.get('white')))
 
         if begin_movement_phase:

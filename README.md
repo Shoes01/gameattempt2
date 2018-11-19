@@ -4,6 +4,7 @@ Attempt 2 at making a game
 # ISSUES
 The Message log renders after the first click, which means it is one click behind what the player is doing.
 Fix: None. It's place holder code anyway...
+Things only refresh after a click is done.
 
 # TODO
 Add Tile logic
