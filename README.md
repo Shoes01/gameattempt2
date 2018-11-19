@@ -16,3 +16,4 @@ Allow the player to choose the tile to move to.
     Easy: the player doesn't decide, E-W moves first, then N-S. 
     Hard: the player draws the path they want.
 Unhighlight the tiles, move the mech to where it wants to go, update it's momentum, start a new turn.
+Wrap all this code around the FOV recompute stuff

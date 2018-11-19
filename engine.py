@@ -1,3 +1,4 @@
+import math
 import tdl
 
 from components.mech import Mech
@@ -78,8 +79,9 @@ def main():
 
         move = action.get('move')
         exit = action.get('exit')
-        continue_ = action.get('continue')
-        attack = action.get('attack')
+        begin_movement_phase = action.get('begin movement phase')
+        end_movement_phase = action.get('end movement phase')
+        end_attack_phase = action.get('end attack phase')
         fullscreen = action.get('fullscreen')
 
         if game_state == GameStates.PLAYERS_TURN:
@@ -92,33 +94,70 @@ def main():
 
             1) Read mech_momentum 
                 mech_momentum = 1 + abs(horizontal_momentum) + abs(vertical_momentum)
-            2) Highlight all the tiles around player where abs(x) + abs(y) <= mech_momentum
-            3) Unhighlight the tiles dictated by momentum direction.
-                3.1 If mech_momentum == 1 (which means the unit is only moving in one direction), unhighlight the tile next to the player in the opposite direction of the momentum
-                3.2 If mech_momentum > 1, unhighlight all tiles around the player where abs(x) 6 abs(y) <= mech_momentum - 2
+            2) Look at the tiles around the player in a range of mech_momentum.
+            3) Decide the direction of momentum for H and V.
+            4) Highlight if the following conditions are met:
+                4.1 Exceeds minimum move range
+                    if abs(x) + abs(y) >= mech_momentum - 2: highlight
+                4.2 Is less than the momentum for that axis:
+                    if abs(x) <= abs(h_mom) and abs(y) <= abs(v_mom)
+                4.3 Is in the correct direction
+                    h_direction: h_mom / abs(h_mom) // Pos: right
+                    v_direction: v_mom / abs(v_mom) // Pos: down
+                    x_direction: x / abs(x)
+                    y_direction: y / abs(y)
 
+                    if h_direction == x_direction and v_direction == y_direction
+                    
             """
 
+            h_mom = player.mech.horizontal_momentum
+            v_mom = player.mech.vertical_momentum
+            mech_momentum = 1 + abs(h_mom) + abs(v_mom)
 
+            h_direction = math.copysign(1, h_mom)
+            v_direction = math.copysign(1, v_mom)
+            
+            min_x = 0 - mech_momentum
+            max_x = 0 + mech_momentum
+            min_y = 0 - mech_momentum
+            max_y = 0 + mech_momentum
+
+            print('The player coordinates are ({0}, {1})'.format(str(player.x), str(player.y)))
+
+            for x in range(min_x, max_x + 1):
+                for y in range(min_y, max_y + 1):
+                    if (abs(x) + abs(y) >= mech_momentum - 2 and    # Ensure the tile exceeds the minimum.
+                        abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
+                        abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
+                        abs(x) + abs(y) <= mech_momentum and        # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
+                        (mech_momentum == 1 or (h_direction == math.copysign(1, x) and v_direction == math.copysign(1, y)))):  # Allow omnidirectional highlighting if momentum is 1 OR ensure the direction is correct.
+                        # Highlight the tiles! (tiles aren't a thing yet, but when they are...)
+                        coord_x = player.x + x
+                        coord_y = player.y + y
+                        con.draw_char(coord_x,coord_y, 'X', fg=None, bg=colors.get('lime_green'))
+                        print('Highlighting tile at coordinate ({0}, {1})'.format(str(coord_x), str(coord_y)))
+                        
 
         elif game_state == GameStates.ATTACK_PHASE:
             message_log.add_message(Message('You are attacking! Press ENTER to go to Enemy Turn.', colors.get('white')))
 
-        if continue_ and game_state == GameStates.PLAYERS_TURN:
+        if begin_movement_phase:
             game_state = GameStates.MOVEMENT_PHASE
             message_log.add_message(Message('Going to Movement Phase.', colors.get('orange')))
+
+        if end_movement_phase:
+            game_state = GameStates.ATTACK_PHASE
+            message_log.add_message(Message('Going to Attack Phase.', colors.get('orange')))
+
+        if end_attack_phase:
+            game_state = GameStates.ENEMY_TURN
+            message_log.add_message(Message('Going to the Enemy Turn.', colors.get('orange')))
 
         if move:
             dx, dy = move
             if game_map.walkable[player.x + dx, player.y + dy]:
                 player.move(dx, dy)
-            
-            game_state = GameStates.ATTACK_PHASE
-            message_log.add_message(Message('Going to Attack Phase.', colors.get('orange')))
-        
-        if attack:
-            game_state = GameStates.ENEMY_TURN
-            message_log.add_message(Message('Going to the Enemy Turn.', colors.get('orange')))
 
         if exit:
             return True

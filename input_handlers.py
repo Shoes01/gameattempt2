@@ -13,7 +13,7 @@ def handle_keys(user_input, game_state):
 
 def handle_player_turn_keys(user_input):
     if user_input.key == 'ENTER':
-        return {'continue': True}
+        return {'begin movement phase': True}
 
     if user_input.key == 'ENTER' and user_input.alt:
         # Alt+Enter: toggle full screen
@@ -26,6 +26,9 @@ def handle_player_turn_keys(user_input):
     return {}
 
 def handle_player_move_keys(user_input):
+    if user_input.key == 'ENTER':
+        return {'end movement phase': True}
+    
     # Movement keys
     if user_input.key == 'UP':
         return {'move': (0, -1)}
@@ -47,7 +50,7 @@ def handle_player_move_keys(user_input):
 
 def handle_player_attack_keys(user_input):
     if user_input.key == 'ENTER':
-        return {'attack': True}
+        return {'end attack phase': True}
 
     if user_input.key == 'ENTER' and user_input.alt:
         # Alt+Enter: toggle full screen
