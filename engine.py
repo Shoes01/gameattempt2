@@ -101,6 +101,7 @@ def main():
         elif game_state == GameStates.MOVEMENT_PHASE:
             message_log.add_message(Message('You can move! When you do, you will go to Attack Phase.', colors.get('white')))
             highlight_legal_moves(player, game_map)
+            fov_recompute = True
 
         elif game_state == GameStates.ATTACK_PHASE:
             reset_highlight(game_map)

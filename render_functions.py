@@ -91,7 +91,6 @@ def highlight_legal_moves(player, game_map):
     h_direction = math.copysign(1, h_mom)
     v_direction = math.copysign(1, v_mom)
 
-
     min_x = 0 - mech_momentum
     max_x = 0 + mech_momentum
     min_y = 0 - mech_momentum
@@ -106,7 +105,7 @@ def highlight_legal_moves(player, game_map):
                 abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
                 abs(x) + abs(y) <= mech_momentum and        # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
                 (mech_momentum == 1 or (h_direction == math.copysign(1, x) and v_direction == math.copysign(1, y)))):  # Allow omnidirectional highlighting if momentum is 1 OR ensure the direction is correct.
-                # Highlight the tiles! (tiles aren't a thing yet, but when they are...)
+                # Highlight the tiles!
                 coord_x = player.x + x
                 coord_y = player.y + y
                 game_map.highlight[coord_x][coord_y] = True

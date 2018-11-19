@@ -3,7 +3,6 @@ Attempt 2 at making a game
 
 # ISSUES
 Things only refresh after there is user_input.
-  * Move highlight code into render all.
   * Have a pre-phase where messages are displayed
 
 # TODO
