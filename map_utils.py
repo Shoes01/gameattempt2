@@ -1,3 +1,10 @@
+from tdl.map import Map
+
+class GameMap(Map):
+    def __init__(self, width, height):
+        super().__init__(width, height)
+        self.explored = [[False for y in range(height)] for x in range(width)]
+
 def make_map(game_map):
     for x, y in game_map:
         game_map.walkable[x, y] = True

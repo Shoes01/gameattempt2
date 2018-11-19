@@ -6,7 +6,7 @@ from entity import Entity
 from game_messages import MessageLog, Message
 from game_states import GameStates
 from input_handlers import handle_keys
-from map_utils import make_map
+from map_utils import GameMap, make_map
 from render_functions import clear_all, render_all
 
 def main():
@@ -24,9 +24,15 @@ def main():
     map_width = 80
     map_height = 43
 
+    fov_algorithm = 'BASIC'
+    fov_light_walls = True
+    fov_radius = 10
+
     colors = {
         'dark_wall': (0, 0, 100),
         'dark_ground': (50, 50, 150),
+        'light_wall': (130, 110, 50),
+        'light_ground': (200, 180, 50),
         'white': (255, 255, 255),
         'black': (0, 0, 0),
         'red': (255, 0, 0),
@@ -47,7 +53,7 @@ def main():
     con = tdl.Console(screen_width, screen_height)
     panel = tdl.Console(screen_width, panel_height)
 
-    game_map = tdl.map.Map(map_width, map_height)
+    game_map = GameMap(map_width, map_height)
     make_map(game_map)
 
     message_log = MessageLog(message_x, message_width, message_height)
@@ -55,13 +61,20 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYERS_TURN
+
+    fov_recompute = True
     
     while not tdl.event.is_window_closed():
-        render_all(con, panel, entities, game_map, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors)
+        if fov_recompute:
+            game_map.compute_fov(player.x, player.y, fov=fov_algorithm, radius=fov_radius, light_walls=fov_light_walls)
+
+        render_all(con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors)
 
         tdl.flush()
 
         clear_all(con, entities)
+
+        fov_recompute = False
 
         for event in tdl.event.get():
             if event.type == 'KEYDOWN':
@@ -158,6 +171,8 @@ def main():
             dx, dy = move
             if game_map.walkable[player.x + dx, player.y + dy]:
                 player.move(dx, dy)
+
+                fov_recompute = True
 
         if exit:
             return True
