@@ -1,3 +1,5 @@
+import math
+
 def get_names_under_mouse(mouse_coordinates, entities, game_map):
     x, y = mouse_coordinates
 
@@ -80,3 +82,32 @@ def draw_entity(con, entity, fov):
 def clear_entity(con, entity):
     # erase the character that represents this object
     con.draw_char(entity.x, entity.y, ' ', entity.color, bg=None)
+
+def highlight_legal_moves(player, game_map):
+    h_mom = player.mech.horizontal_momentum
+    v_mom = player.mech.vertical_momentum
+    mech_momentum = 1 + abs(h_mom) + abs(v_mom)
+
+    h_direction = math.copysign(1, h_mom)
+    v_direction = math.copysign(1, v_mom)
+
+
+    min_x = 0 - mech_momentum
+    max_x = 0 + mech_momentum
+    min_y = 0 - mech_momentum
+    max_y = 0 + mech_momentum
+
+    print('The player coordinates are ({0}, {1})'.format(str(player.x), str(player.y)))
+
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            if (abs(x) + abs(y) >= mech_momentum - 2 and    # Ensure the tile exceeds the minimum.
+                abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
+                abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
+                abs(x) + abs(y) <= mech_momentum and        # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
+                (mech_momentum == 1 or (h_direction == math.copysign(1, x) and v_direction == math.copysign(1, y)))):  # Allow omnidirectional highlighting if momentum is 1 OR ensure the direction is correct.
+                # Highlight the tiles! (tiles aren't a thing yet, but when they are...)
+                coord_x = player.x + x
+                coord_y = player.y + y
+                game_map.highlight[coord_x][coord_y] = True
+                print('Highlighting tile at coordinate ({0}, {1})'.format(str(coord_x), str(coord_y)))

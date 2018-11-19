@@ -1,4 +1,3 @@
-import math
 import tdl
 
 from components.mech import Mech
@@ -7,7 +6,7 @@ from game_messages import MessageLog, Message
 from game_states import GameStates
 from input_handlers import handle_keys
 from map_utils import GameMap, make_map, reset_highlight
-from render_functions import clear_all, render_all
+from render_functions import clear_all, highlight_legal_moves, render_all
 
 def main():
     screen_width = 80
@@ -101,56 +100,7 @@ def main():
             message_log.add_message(Message('It is your turn! Press ENTER to go to Movement Phase.', colors.get('white')))
         elif game_state == GameStates.MOVEMENT_PHASE:
             message_log.add_message(Message('You can move! When you do, you will go to Attack Phase.', colors.get('white')))
-
-            """
-            Here is the code necessary to highlight lgeal moves
-
-            1) Read mech_momentum 
-                mech_momentum = 1 + abs(horizontal_momentum) + abs(vertical_momentum)
-            2) Look at the tiles around the player in a range of mech_momentum.
-            3) Decide the direction of momentum for H and V.
-            4) Highlight if the following conditions are met:
-                4.1 Exceeds minimum move range
-                    if abs(x) + abs(y) >= mech_momentum - 2: highlight
-                4.2 Is less than the momentum for that axis:
-                    if abs(x) <= abs(h_mom) and abs(y) <= abs(v_mom)
-                4.3 Is in the correct direction
-                    h_direction: h_mom / abs(h_mom) // Pos: right
-                    v_direction: v_mom / abs(v_mom) // Pos: down
-                    x_direction: x / abs(x)
-                    y_direction: y / abs(y)
-
-                    if h_direction == x_direction and v_direction == y_direction
-                    
-            """
-
-            h_mom = player.mech.horizontal_momentum
-            v_mom = player.mech.vertical_momentum
-            mech_momentum = 1 + abs(h_mom) + abs(v_mom)
-
-            h_direction = math.copysign(1, h_mom)
-            v_direction = math.copysign(1, v_mom)
-            
-            min_x = 0 - mech_momentum
-            max_x = 0 + mech_momentum
-            min_y = 0 - mech_momentum
-            max_y = 0 + mech_momentum
-
-            print('The player coordinates are ({0}, {1})'.format(str(player.x), str(player.y)))
-
-            for x in range(min_x, max_x + 1):
-                for y in range(min_y, max_y + 1):
-                    if (abs(x) + abs(y) >= mech_momentum - 2 and    # Ensure the tile exceeds the minimum.
-                        abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
-                        abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
-                        abs(x) + abs(y) <= mech_momentum and        # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
-                        (mech_momentum == 1 or (h_direction == math.copysign(1, x) and v_direction == math.copysign(1, y)))):  # Allow omnidirectional highlighting if momentum is 1 OR ensure the direction is correct.
-                        # Highlight the tiles! (tiles aren't a thing yet, but when they are...)
-                        coord_x = player.x + x
-                        coord_y = player.y + y
-                        game_map.highlight[coord_x][coord_y] = True
-                        print('Highlighting tile at coordinate ({0}, {1})'.format(str(coord_x), str(coord_y)))
-                        
+            highlight_legal_moves(player, game_map)
 
         elif game_state == GameStates.ATTACK_PHASE:
             reset_highlight(game_map)

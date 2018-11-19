@@ -2,14 +2,11 @@
 Attempt 2 at making a game
 
 # ISSUES
-The Message log renders after the first click, which means it is one click behind what the player is doing.
-Fix: None. It's place holder code anyway...
-Things only refresh after a click is done.
+Things only refresh after there is user_input.
+  * Move highlight code into render all.
+  * Have a pre-phase where messages are displayed
 
 # TODO
-Add Tile logic
-  * Allow tiles to be highlighted
-Add FOV logic
 Add more phases (ex: pre-movement phase)
   * pre-* phases will print messages once
   * post-* phases will clear highlighted tiles and the like
