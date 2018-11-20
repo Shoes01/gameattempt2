@@ -84,7 +84,7 @@ def main():
         else:
             user_input = None
                 
-        if not user_input:
+        if not user_input and not fov_recompute:
             continue
 
         action = handle_keys(user_input, game_state)
