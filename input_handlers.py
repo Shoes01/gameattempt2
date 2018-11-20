@@ -26,6 +26,8 @@ def handle_player_pre_movement_keys(user_input):
     return {}
 
 def handle_player_movement_keys(user_input):
+    if user_input.key == 'ENTER':                       return {'next_turn_phase': True}
+    
     # Movement keys
     if user_input.key == 'UP':                          return {'move': (0, -1)}
     elif user_input.key == 'DOWN':                      return {'move': (0, 1)}

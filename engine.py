@@ -59,7 +59,7 @@ def main():
 
     mouse_coordinates = (0, 0)
 
-    game_state = GameStates.PLAYERS_TURN
+    game_state = GameStates.PLAYER_TURN
     turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
     fov_recompute = True
@@ -73,8 +73,6 @@ def main():
         tdl.flush()
 
         clear_all(con, entities)
-
-        fov_recompute = False
 
         for event in tdl.event.get():
             if event.type == 'KEYDOWN':
@@ -91,10 +89,13 @@ def main():
         if not user_input and not fov_recompute:
             continue
 
+        fov_recompute = False
+
         action = handle_keys(user_input, game_state, turn_state)
 
         move = action.get('move')
         exit = action.get('exit')
+        next_turn_phase = action.get('next_turn_phase')
         fullscreen = action.get('fullscreen')
         
         if exit:
@@ -107,8 +108,11 @@ def main():
             # See game_states.py for the turn structure.
 
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
                 highlight_legal_moves(player, game_map)
                 fov_recompute = True
+
+                turn_state = TurnStates.MOVEMENT_PHASE
             
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if move:
@@ -117,22 +121,38 @@ def main():
                         player.move(dx, dy)
 
                         fov_recompute = True
+                    
+                if next_turn_phase:
+                    turn_state = TurnStates.POST_MOVEMENT_PHASE
+
 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 reset_highlight(game_map)
                 fov_recompute = True
+
+                turn_state = TurnStates.PRE_ATTACK_PHASE
             
             if turn_state == TurnStates.PRE_ATTACK_PHASE:
-                # Do nothing
+                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
+
+                turn_state = TurnStates.ATTACK_PHASE
             
             if turn_state == TurnStates.ATTACK_PHASE:
                 # Do nothing
+
+                turn_state = TurnStates.POST_MOVEMENT_PHASE
             
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
+
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
-            game_state = GameStates.PLAYERS_TURN
+            message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
+            fov_recompute = True
+
+            game_state = GameStates.PLAYER_TURN
 
 if __name__ == '__main__':
     main()
