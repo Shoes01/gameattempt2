@@ -2,11 +2,17 @@ from enum import Enum, auto
 
 
 class GameStates(Enum):
+   PLAYER_TURN = auto()
+   ENEMY_TURN = auto()
+
+class TurnStates(Enum):
     """
     
     Structure of a turn
 
-    PLAYER_TURN begins. 
+
+    PLAYER_TURN begins.
+
     PRE_MOMVEMENT_PHASE
     1) The player is informed of what attack the enemy is preparing.
     2) The player is informed of any other relevant information, such as reminders of how the game is played.
@@ -41,8 +47,7 @@ class GameStates(Enum):
     The enemy AI goes through the same hoops.
 
     """
-    PLAYERS_TURN = auto()        # Player sees what the enemy mech will fire
-    ENEMY_TURN = auto()          # Enemy sees what the player mech will fire
+
     PRE_MOVEMENT_PHASE = auto()  # Messages are displayed for the player, legal tiles are highlighted for the player    
     MOVEMENT_PHASE = auto()      # Mech moves to a permitted position, projectiles move as well
     POST_MOVEMENT_PHASE = auto() # Legal tiles are unhighlighted

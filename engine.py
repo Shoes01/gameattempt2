@@ -3,7 +3,7 @@ import tdl
 from components.mech import Mech
 from entity import Entity
 from game_messages import MessageLog, Message
-from game_states import GameStates
+from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
 from map_utils import GameMap, make_map, reset_highlight
 from render_functions import clear_all, highlight_legal_moves, render_all
@@ -60,6 +60,7 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYERS_TURN
+    turn_state = GameStates.PRE_MOVEMENT_PHASE
 
     fov_recompute = True
     
@@ -83,11 +84,14 @@ def main():
                 mouse_coordinates = event.cell
         else:
             user_input = None
-                
+
+        # FIX: user_input double dips, key is CHAR once and then TEXT, with the same input.
+        # The event type KEYDOWN is triggered twice when clicking a key once. The key is CHAR first, and then TEXT. 
+
         if not user_input and not fov_recompute:
             continue
 
-        action = handle_keys(user_input, game_state)
+        action = handle_keys(user_input, game_state, turn_state)
 
         move = action.get('move')
         exit = action.get('exit')

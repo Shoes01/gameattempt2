@@ -7,6 +7,7 @@ Things only refresh after there is user_input.
 
 # TODO
 Use new phases.
+  * Rebuild how the keys are handled (to limit code duplication, have "generic" key handlers?)
 Allow player to change their momentum delta during the pre-movement phase
   * This means the "speed" of movement and a tick is determined before the player starts to move
   * This affects the "+1" in the mech_momentum code
@@ -25,3 +26,4 @@ Things currently missing from the Turn Structure comment in game_states.py
   * How radar detection will work.
   * How stagger / falling will work.
   * How damage will work.
+Once enemies are a thing, split GameStates into GameStates (PLAYER/ENEMY TURN) and TurnStates
