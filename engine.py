@@ -60,7 +60,7 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYERS_TURN
-    turn_state = GameStates.PRE_MOVEMENT_PHASE
+    turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
     fov_recompute = True
     
@@ -95,53 +95,43 @@ def main():
 
         move = action.get('move')
         exit = action.get('exit')
-        begin_movement_phase = action.get('begin movement phase')
-        end_movement_phase = action.get('end movement phase')
-        end_attack_phase = action.get('end attack phase')
         fullscreen = action.get('fullscreen')
-
-        if game_state == GameStates.PLAYERS_TURN:
-            message_log.add_message(Message('It is your turn! Press ENTER to go to Movement Phase.', colors.get('white')))
-        elif game_state == GameStates.MOVEMENT_PHASE:
-            message_log.add_message(Message('You can move! When you do, you will go to Attack Phase.', colors.get('white')))
-            highlight_legal_moves(player, game_map)
-            fov_recompute = True
-
-        elif game_state == GameStates.ATTACK_PHASE:
-            reset_highlight(game_map)
-            fov_recompute = True
-            message_log.add_message(Message('You are attacking! Press ENTER to go to Enemy Turn.', colors.get('white')))
-
-        if begin_movement_phase:
-            game_state = GameStates.MOVEMENT_PHASE
-            message_log.add_message(Message('Going to Movement Phase.', colors.get('orange')))
-
-        if end_movement_phase:
-            game_state = GameStates.ATTACK_PHASE
-            message_log.add_message(Message('Going to Attack Phase.', colors.get('orange')))
-
-        if end_attack_phase:
-            game_state = GameStates.ENEMY_TURN
-            message_log.add_message(Message('Going to the Enemy Turn.', colors.get('orange')))
-
-        if move:
-            dx, dy = move
-            if game_map.walkable[player.x + dx, player.y + dy]:
-                player.move(dx, dy)
-
-                fov_recompute = True
-
+        
         if exit:
             return True
 
         if fullscreen:
             tdl.set_fullscreen(not tdl.get_fullscreen())
 
-        if game_state == GameStates.ENEMY_TURN:
-            for entity in entities:
-                if entity != player:
-                    print('The ' + entity.name + ' ponders the meaning of its existence.')
+        if game_state == GameStates.PLAYER_TURN:
+            # See game_states.py for the turn structure.
 
+            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                highlight_legal_moves(player, game_map)
+                fov_recompute = True
+            
+            if turn_state == TurnStates.MOVEMENT_PHASE:
+                if move:
+                    dx, dy = move
+                    if game_map.walkable[player.x + dx, player.y + dy]:
+                        player.move(dx, dy)
+
+                        fov_recompute = True
+
+            if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
+                reset_highlight(game_map)
+                fov_recompute = True
+            
+            if turn_state == TurnStates.PRE_ATTACK_PHASE:
+                # Do nothing
+            
+            if turn_state == TurnStates.ATTACK_PHASE:
+                # Do nothing
+            
+            if turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                game_state = GameStates.ENEMY_TURN
+
+        if game_state == GameStates.ENEMY_TURN:
             game_state = GameStates.PLAYERS_TURN
 
 if __name__ == '__main__':

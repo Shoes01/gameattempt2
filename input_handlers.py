@@ -16,19 +16,21 @@ def handle_keys(user_input, game_state, turn_state):
 def handle_enemy_turn_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
 
 def handle_player_pre_movement_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
 
 def handle_player_movement_keys(user_input):
     # Movement keys
-    if user_input.key == 'UP':      return {'move': (0, -1)}
-    elif user_input.key == 'DOWN':  return {'move': (0, 1)}
-    elif user_input.key == 'LEFT':  return {'move': (-1, 0)}
-    elif user_input.key == 'RIGHT': return {'move': (1, 0)}
+    if user_input.key == 'UP':                          return {'move': (0, -1)}
+    elif user_input.key == 'DOWN':                      return {'move': (0, 1)}
+    elif user_input.key == 'LEFT':                      return {'move': (-1, 0)}
+    elif user_input.key == 'RIGHT':                     return {'move': (1, 0)}
 
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
@@ -38,19 +40,23 @@ def handle_player_movement_keys(user_input):
 def handle_player_post_movement_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
 
 def handle_player_pre_attack_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
 
 def handle_player_attack_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
 
 def handle_player_post_attack_keys(user_input):
     if user_input.key == 'ENTER' and user_input.alt:    return {'fullscreen': True}
     elif user_input.key == 'ESCAPE':                    return {'exit': True}
+    
     return {}
