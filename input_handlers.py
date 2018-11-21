@@ -16,6 +16,11 @@ def handle_enemy_turn_keys(user_input):
 def handle_player_turn_keys(user_input):
     if user_input.key == 'ENTER':                       return {'next_turn_phase': True}
     
+    # Change impulse
+    if user_input.key == 'PAGEUP':                      return {'increase impulse': True}
+    elif user_input.key == 'PAGEDOWN':                  return {'decrease impulse': True}
+    elif user_input.key == 'HOME':                      return {'maintain impulse': True}
+
     # Movement keys
     if user_input.key == 'UP':                          return {'move': (0, -1)}
     elif user_input.key == 'DOWN':                      return {'move': (0, 1)}

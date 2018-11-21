@@ -41,7 +41,7 @@ def main():
         'highlight': (199, 234, 70)
     }
 
-    mech_component = Mech(hp=30, max_momentum=6)
+    mech_component = Mech(hp=30, peak_momentum=6)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255), "player", mech=mech_component)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', (255, 255, 0), "NPC")
     entities = [npc, player]
@@ -60,7 +60,7 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYER_TURN
-    turn_state = TurnStates.PRE_MOVEMENT_PHASE
+    turn_state = TurnStates.UPKEEP_PHASE
 
     fov_recompute = True
     
@@ -94,6 +94,9 @@ def main():
         action = handle_keys(user_input, game_state, turn_state)
 
         move = action.get('move')
+        increase_impulse = action.get('increase impulse')
+        decrease_impulse = action.get('decrease impulse')
+        maintain_impulse = action.get('maintain impulse')
         exit = action.get('exit')
         next_turn_phase = action.get('next_turn_phase')
         fullscreen = action.get('fullscreen')
@@ -107,12 +110,37 @@ def main():
         if game_state == GameStates.PLAYER_TURN:
             # See game_states.py for the turn structure.
 
-            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+            
+            if turn_state == TurnStates.UPKEEP_PHASE:    
                 message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
-                highlight_legal_moves(player, game_map)
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 fov_recompute = True
-
-                turn_state = TurnStates.MOVEMENT_PHASE
+                
+            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                # Prompt to change impulse
+                # TODO: A lot of repeat code here. Fix that.
+                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
+                if increase_impulse: 
+                    player.mech.impulse =  1
+                    player.mech.remaining_impulse = player.mech.impulse
+                    turn_state = TurnStates.MOVEMENT_PHASE
+                    message_log.add_message(Message('Impulse increased.', colors.get('orange')))
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
+                elif decrease_impulse: 
+                    player.mech.impulse = -1
+                    player.mech.remaining_impulse = player.mech.impulse
+                    turn_state = TurnStates.MOVEMENT_PHASE
+                    message_log.add_message(Message('Impulse decreased.', colors.get('orange')))
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
+                elif maintain_impulse: 
+                    player.mech.impulse =  0
+                    player.mech.remaining_impulse = player.mech.impulse
+                    turn_state = TurnStates.MOVEMENT_PHASE
+                    message_log.add_message(Message('Impulse maintained.', colors.get('orange')))
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
             
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if move:
@@ -128,6 +156,7 @@ def main():
 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 reset_highlight(game_map)
+                player.mech.reset() # Reset the mech for the next turn.
                 fov_recompute = True
 
                 turn_state = TurnStates.PRE_ATTACK_PHASE
@@ -145,7 +174,7 @@ def main():
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:
                 message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
 
-                turn_state = TurnStates.PRE_MOVEMENT_PHASE
+                turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
