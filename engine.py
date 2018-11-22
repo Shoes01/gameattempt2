@@ -94,9 +94,7 @@ def main():
         action = handle_keys(user_input, game_state, turn_state)
 
         move = action.get('move')
-        increase_impulse = action.get('increase impulse')
-        decrease_impulse = action.get('decrease impulse')
-        maintain_impulse = action.get('maintain impulse')
+        impulse = action.get('impulse')
         exit = action.get('exit')
         next_turn_phase = action.get('next_turn_phase')
         fullscreen = action.get('fullscreen')
@@ -113,32 +111,16 @@ def main():
             
             if turn_state == TurnStates.UPKEEP_PHASE:    
                 message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
+                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 fov_recompute = True
                 
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                # Prompt to change impulse
-                # TODO: A lot of repeat code here. Fix that.
-                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
-                if increase_impulse: 
+                if impulse: 
                     player.mech.impulse =  1
-                    player.mech.remaining_impulse = player.mech.impulse
+                    player.mech.remaining_impulse = impulse
                     turn_state = TurnStates.MOVEMENT_PHASE
-                    message_log.add_message(Message('Impulse increased.', colors.get('orange')))
-                    fov_recompute = True
-                    highlight_legal_moves(player, game_map)
-                elif decrease_impulse: 
-                    player.mech.impulse = -1
-                    player.mech.remaining_impulse = player.mech.impulse
-                    turn_state = TurnStates.MOVEMENT_PHASE
-                    message_log.add_message(Message('Impulse decreased.', colors.get('orange')))
-                    fov_recompute = True
-                    highlight_legal_moves(player, game_map)
-                elif maintain_impulse: 
-                    player.mech.impulse =  0
-                    player.mech.remaining_impulse = player.mech.impulse
-                    turn_state = TurnStates.MOVEMENT_PHASE
-                    message_log.add_message(Message('Impulse maintained.', colors.get('orange')))
+                    message_log.add_message(Message('Impulse set to {0}.'.format(impulse), colors.get('orange')))
                     fov_recompute = True
                     highlight_legal_moves(player, game_map)
             
@@ -149,9 +131,11 @@ def main():
                         player.move(dx, dy)
 
                         fov_recompute = True
-                    
-                if next_turn_phase:
+                
+                if next_turn_phase and player.mech.has_spent_minimum_momentum():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
+                elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
+                    message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
 
 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        

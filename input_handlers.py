@@ -17,9 +17,9 @@ def handle_player_turn_keys(user_input):
     if user_input.key == 'ENTER':                       return {'next_turn_phase': True}
     
     # Change impulse
-    if user_input.key == 'PAGEUP':                      return {'increase impulse': True}
-    elif user_input.key == 'PAGEDOWN':                  return {'decrease impulse': True}
-    elif user_input.key == 'HOME':                      return {'maintain impulse': True}
+    if user_input.key == 'PAGEUP':                      return {'impulse':  1}
+    elif user_input.key == 'PAGEDOWN':                  return {'impulse': -1}
+    elif user_input.key == 'HOME':                      return {'impulse':  0}
 
     # Movement keys
     if user_input.key == 'UP':                          return {'move': (0, -1)}

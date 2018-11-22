@@ -29,8 +29,13 @@ Things currently missing from the Turn Structure comment in game_states.py
 Once enemies are a thing, split GameStates into GameStates (PLAYER/ENEMY TURN) and TurnStates
 
 # BUG
-Moving up twice causes highlightning issues
-Generally, movement doesn't follow rules properly after more than one turn
+BUG: Mech has to attempt to move once before moving to the next phase.
+  REASON: There is a bool in the move() function that checks to see that the mech has moved a minimal amount.
+  FIX: Has been fixed?
+BUG: Sometimes, the mech is unable to move (or the tile is not highlighted?) in a relative coordinate (x, 0) or (0, y).
+  REASON: Needs to be investigated. Likely an error with signs.
+  FIX: None yet.
+
 
 # DEVELOPMENT MILESTONE - MOMENTUM BASED MOVEMENT
   In progress.

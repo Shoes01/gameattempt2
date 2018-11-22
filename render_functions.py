@@ -84,6 +84,7 @@ def clear_entity(con, entity):
     con.draw_char(entity.x, entity.y, ' ', entity.color, bg=None)
 
 def highlight_legal_moves(player, game_map):
+    # TODO: Consider flipping the logic. Don't look for tiles that work, look for tiles that _don't_ work.
     h_mom = player.mech.maximum_horizontal_momentum
     v_mom = player.mech.maximum_vertical_momentum
     mech_momentum = player.mech.calculate_maximum_momentum()
@@ -104,14 +105,14 @@ def highlight_legal_moves(player, game_map):
                 if mech_momentum == 1:
                     game_map.highlight[player.x + x][player.y + y] = True
                 
-                # If there is momentum in two directions
-                if math.copysign(1, h_mom) == math.copysign(1, x) and math.copysign(1, v_mom) == math.copysign(1, y):
-                    game_map.highlight[player.x + x][player.y + y] = True
-
                 # If there is momentum only in the v direction
-                if h_mom == 0 and (math.copysign(1, v_mom) == math.copysign(1, y) or y == 0):
+                elif h_mom == 0 and (math.copysign(1, v_mom) == math.copysign(1, y) or y == 0):
                     game_map.highlight[player.x + x][player.y + y] = True
                 
                 # If there is momentum only in the h direction
-                if v_mom == 0 and (math.copysign(1, h_mom) == math.copysign(1, x) or x == 0):
+                elif v_mom == 0 and (math.copysign(1, h_mom) == math.copysign(1, x) or x == 0):
+                    game_map.highlight[player.x + x][player.y + y] = True
+                
+                # If there is momentum in two directions
+                elif math.copysign(1, h_mom) == math.copysign(1, x) and math.copysign(1, v_mom) == math.copysign(1, y):
                     game_map.highlight[player.x + x][player.y + y] = True
