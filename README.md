@@ -28,11 +28,17 @@ Things currently missing from the Turn Structure comment in game_states.py
   * How damage will work.
 Once enemies are a thing, split GameStates into GameStates (PLAYER/ENEMY TURN) and TurnStates
 
+# BUG
+Moving up twice causes highlightning issues
+Generally, movement doesn't follow rules properly after more than one turn
+
 # DEVELOPMENT MILESTONE - MOMENTUM BASED MOVEMENT
   In progress.
-# DEVELOPMENT MILESTONE - TARGETING
+# DEVELOPMENT MILESTONE - SINGLE TILE TARGETING
+# DEVELOPMENT MILESTONE - MULTI TILE TARGETING
 # DEVELOPMENT MILESTONE - FIRST WEAPON SYSTEM: LASER
 # DEVELOPMENT MILESTONE - ANIMATION
+# DEVELOPMENT MILESTONE - EVENT QUEUE
 # DEVELOPMENT MILESTONE - SECOND WEAPON SYSTEM: BALLISTICS
 # DEVELOPMENT MILESTONE - TERRAIN
 # DEVELOPMENT MILESTONE - ENEMY NPC CAPAPBLE OF FIRING

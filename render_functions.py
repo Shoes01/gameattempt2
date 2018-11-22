@@ -96,8 +96,22 @@ def highlight_legal_moves(player, game_map):
             if (abs(x) + abs(y) >= mech_momentum - 2 and    # Ensure the tile exceeds the minimum.
                 abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
                 abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
-                abs(x) + abs(y) <= mech_momentum and        # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
-                (mech_momentum == 1 or                                                          # Allow omnidirectional movement if the mech_momentum is 1, the lowest.
-                (math.copysign(1, h_mom) == math.copysign(1, x) and math.copysign(1, v_mom) == math.copysign(1, y)))):  # Ensure the direction is correct.
+                abs(x) + abs(y) <= mech_momentum):          # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
                 
-                game_map.highlight[player.x + x][player.y + y] = True
+                # TODO: Clean up this portion of the code.
+
+                # If there is no momentum
+                if mech_momentum == 1:
+                    game_map.highlight[player.x + x][player.y + y] = True
+                
+                # If there is momentum in two directions
+                if math.copysign(1, h_mom) == math.copysign(1, x) and math.copysign(1, v_mom) == math.copysign(1, y):
+                    game_map.highlight[player.x + x][player.y + y] = True
+
+                # If there is momentum only in the v direction
+                if h_mom == 0 and (math.copysign(1, v_mom) == math.copysign(1, y) or y == 0):
+                    game_map.highlight[player.x + x][player.y + y] = True
+                
+                # If there is momentum only in the h direction
+                if v_mom == 0 and (math.copysign(1, h_mom) == math.copysign(1, x) or x == 0):
+                    game_map.highlight[player.x + x][player.y + y] = True
