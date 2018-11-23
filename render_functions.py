@@ -87,16 +87,17 @@ def highlight_legal_moves(player, game_map):
     h_mom = player.mech.maximum_horizontal_momentum
     v_mom = player.mech.maximum_vertical_momentum
     mech_momentum = player.mech.calculate_maximum_momentum()
+    mech_impulse = player.mech.impulse
 
     minimum = 0 - abs(mech_momentum)
     maximum = 0 + abs(mech_momentum) + 1
 
     for x in range(minimum, maximum):
         for y in range(minimum, maximum):
-            if (abs(x) + abs(y) >= mech_momentum - 2 and    # Ensure the tile exceeds the minimum.
-                abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
-                abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
-                abs(x) + abs(y) <= mech_momentum):          # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
+            if (abs(x) + abs(y) >= mech_momentum - 2 and         # Ensure the tile exceeds the minimum.
+                abs(x) <= abs(h_mom) + abs(mech_impulse) and     # Ensure the x value is below the horizontal momentum.
+                abs(y) <= abs(v_mom) + abs(mech_impulse) and     # Ensure the y value is below the vertical momentum.
+                abs(x) + abs(y) <= mech_momentum):               # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
                 # Now check to see that the direction matches the momentum.
                 if h_mom == 0:                                                                      # x can be anything.
                     if v_mom == 0:                                                                      # y can be anything (this is the trivial case).

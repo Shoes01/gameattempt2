@@ -92,6 +92,7 @@ def main():
         fov_recompute = False
 
         action = handle_keys(user_input, game_state, turn_state)
+        impulse = None # This is to avoid logic problems in the PRE_MOVEMENT_PHASE block.
 
         move = action.get('move')
         impulse = action.get('impulse')
@@ -116,9 +117,8 @@ def main():
                 fov_recompute = True
                 
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                if impulse: 
-                    player.mech.impulse =  1
-                    player.mech.remaining_impulse = impulse
+                if impulse is not None: 
+                    player.mech.impulse = impulse
                     turn_state = TurnStates.MOVEMENT_PHASE
                     message_log.add_message(Message('Impulse set to {0}.'.format(impulse), colors.get('orange')))
                     fov_recompute = True

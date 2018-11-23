@@ -7,13 +7,19 @@ class Mech:
         self.maximum_horizontal_momentum = 0    # Positive: right
         self.maximum_vertical_momentum = 0      # Positive: down
         self.impulse = 0                        # Three options, -1 (deccelaration), 0 (no change), +1 (acceleration)
-        self.remaining_impulse = 0              # Used to track the "bonus" momentum
+        self.has_spent_impulse = False          # When impulse is used to propel the mech further and gain momentum, this is set to True.
         self.accumulated_horizontal_momentum = 0# When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
         self.accumulated_vertical_momentum = 0  # When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
+        # TODO: When impulse is spent, it changes the maximum, thus changes the minimum tiles required to move...
         
     def calculate_maximum_momentum(self):
         # Calculate the maximum momentum the mech can use this turn.
-        return self.impulse + abs(self.maximum_horizontal_momentum) + abs(self.maximum_vertical_momentum)
+        mech_momentum = self.impulse + abs(self.maximum_horizontal_momentum) + abs(self.maximum_vertical_momentum)
+
+        if self.peak_momentum <= mech_momentum:
+            return self.peak_momentum
+        return mech_momentum
+        
     
     def calculate_accumulated_momentum(self):
         # Calculate the momentum the mech has accumulated this turn.
@@ -42,3 +48,4 @@ class Mech:
         # Reset values.
         self.accumulated_horizontal_momentum = 0
         self.accumulated_vertical_momentum = 0
+        self.has_spent_impulse = False

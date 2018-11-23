@@ -20,13 +20,13 @@ class Entity:
             # Allow the player to move.
 
             # The trivial case: the mech is at rest.
-            if self.mech.maximum_horizontal_momentum == 0 and self.mech.maximum_vertical_momentum == 0 and self.mech.remaining_impulse == 1:
+            if self.mech.maximum_horizontal_momentum == 0 and self.mech.maximum_vertical_momentum == 0 and self.mech.impulse == 1:
                 # Allow the player to move in any direction.
                 self.x += dx
                 self.y += dy
                 self.mech.accumulated_horizontal_momentum += dx
                 self.mech.accumulated_vertical_momentum += dy
-                self.mech.remaining_impulse = 0
+                self.mech.has_spent_impulse = True
             
             # The non-trivial case: the mech is moving, so there are some directions that are not allowed.
             # Moving along the x-axis
@@ -44,15 +44,15 @@ class Entity:
                     self.y += dy
                     self.mech.accumulated_vertical_momentum += dy
             # Moving after all momentum has been spent
-            elif self.mech.remaining_impulse == 1:
-                # Gain momentum in a direction. Note: the if statement may succeed if dx = 0 or dy = 0, and that would have no effect.
+            elif self.mech.impulse == 1 and not self.mech.has_spent_impulse:
+                # Gain momentum in a direction.
                 # Check the x-axis.
-                if self.mech.maximum_horizontal_momentum == 0 or math.copysign(1, dx) == math.copysign(1, self.mech.maximum_horizontal_momentum):
+                if dx != 0 and self.mech.maximum_horizontal_momentum == 0 or math.copysign(1, dx) == math.copysign(1, self.mech.maximum_horizontal_momentum):
                     self.x += dx
                     self.mech.accumulated_horizontal_momentum += dx
-                    self.mech.remaining_impulse -= abs(dx)
+                    self.mech.has_spent_impulse = True
                 # Check the y-axis.
-                if self.mech.maximum_vertical_momentum == 0 or math.copysign(1, dy) == math.copysign(1, self.mech.maximum_vertical_momentum):
+                if dy != 0 and self.mech.maximum_vertical_momentum == 0 or math.copysign(1, dy) == math.copysign(1, self.mech.maximum_vertical_momentum):
                     self.y += dy
                     self.mech.accumulated_vertical_momentum += dy
-                    self.mech.remaining_impulse -= abs(dy)
+                    self.mech.has_spent_impulse = True
