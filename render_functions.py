@@ -84,7 +84,6 @@ def clear_entity(con, entity):
     con.draw_char(entity.x, entity.y, ' ', entity.color, bg=None)
 
 def highlight_legal_moves(player, game_map):
-    # TODO: Consider flipping the logic. Don't look for tiles that work, look for tiles that _don't_ work.
     h_mom = player.mech.maximum_horizontal_momentum
     v_mom = player.mech.maximum_vertical_momentum
     mech_momentum = player.mech.calculate_maximum_momentum()
@@ -98,21 +97,14 @@ def highlight_legal_moves(player, game_map):
                 abs(x) <= abs(h_mom) + 1 and                # Ensure the x value is below the horizontal momentum.
                 abs(y) <= abs(v_mom) + 1 and                # Ensure the y value is below the vertical momentum.
                 abs(x) + abs(y) <= mech_momentum):          # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
-                
-                # TODO: Clean up this portion of the code.
-
-                # If there is no momentum
-                if mech_momentum == 1:
-                    game_map.highlight[player.x + x][player.y + y] = True
-                
-                # If there is momentum only in the v direction
-                elif h_mom == 0 and (math.copysign(1, v_mom) == math.copysign(1, y) or y == 0):
-                    game_map.highlight[player.x + x][player.y + y] = True
-                
-                # If there is momentum only in the h direction
-                elif v_mom == 0 and (math.copysign(1, h_mom) == math.copysign(1, x) or x == 0):
-                    game_map.highlight[player.x + x][player.y + y] = True
-                
-                # If there is momentum in two directions
-                elif math.copysign(1, h_mom) == math.copysign(1, x) and math.copysign(1, v_mom) == math.copysign(1, y):
-                    game_map.highlight[player.x + x][player.y + y] = True
+                # Now check to see that the direction matches the momentum.
+                if h_mom == 0:                                                                      # x can be anything.
+                    if v_mom == 0:                                                                      # y can be anything (this is the trivial case).
+                        game_map.highlight[player.x + x][player.y + y] = True
+                    elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
+                        game_map.highlight[player.x + x][player.y + y] = True
+                elif h_mom != 0 and ( x == 0 or math.copysign(1, x) == math.copysign(1, h_mom) ):   # x must be 0 or have the same sign as h_mom.
+                    if v_mom == 0:                                                                      # y can be anything.
+                        game_map.highlight[player.x + x][player.y + y] = True
+                    elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
+                        game_map.highlight[player.x + x][player.y + y] = True
