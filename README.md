@@ -13,7 +13,8 @@ Run engine.py.
 ## TODO
 * Inform the player of their h_mom and v_mom, and how much of each is remaining.
 
-   The "+1" in the mech_momentum code represents acceleration, decceleration, or maintenance
+   The "+1" in the mech_momentum code represents acceleration, decceleration, or maintenance  
+   Allow the player to set what they want their maximum momentum to be, and automagically manage the impulse for them? And highlight differently the legal tiles too?
 
 * Decide on what happens when a player is hit by projectiles.
 
@@ -39,7 +40,7 @@ None reported
 
 ## DEVELOPEMENT MILESTONES
 - [x] Momentum Based Momement
-- [ ] Basic obstacles
+- [x] Basic obstacles
 - [ ] Single Tile Targeting
 - [ ] Multi Tile Targeting
 - [ ] First Weapon System: Laser

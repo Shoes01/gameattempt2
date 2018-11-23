@@ -6,7 +6,13 @@ class GameMap(Map):
         self.explored = [[False for y in range(height)] for x in range(width)]
         self.highlight = [[False for y in range(height)] for x in range(width)]
 
+def set_highlight(game_map, x, y):
+    if (game_map.walkable[x, y] == True):
+        game_map.highlight[x][y] = True
+
+
 def reset_highlight(game_map):
+    # TODO: This will cause problems when the map is really big. It can be optimized to only reset tiles around the player.
     for x, y in game_map:
         game_map.highlight[x][y] = False
 

@@ -1,5 +1,7 @@
 import math
 
+from map_utils import set_highlight
+
 def get_names_under_mouse(mouse_coordinates, entities, game_map):
     x, y = mouse_coordinates
 
@@ -101,11 +103,11 @@ def highlight_legal_moves(player, game_map):
                 # Now check to see that the direction matches the momentum.
                 if h_mom == 0:                                                                      # x can be anything.
                     if v_mom == 0:                                                                      # y can be anything (this is the trivial case).
-                        game_map.highlight[player.x + x][player.y + y] = True
+                        set_highlight(game_map, player.x + x, player.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.highlight[player.x + x][player.y + y] = True
+                        set_highlight(game_map, player.x + x, player.y + y)
                 elif h_mom != 0 and ( x == 0 or math.copysign(1, x) == math.copysign(1, h_mom) ):   # x must be 0 or have the same sign as h_mom.
                     if v_mom == 0:                                                                      # y can be anything.
-                        game_map.highlight[player.x + x][player.y + y] = True
+                        set_highlight(game_map, player.x + x, player.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.highlight[player.x + x][player.y + y] = True
+                        set_highlight(game_map, player.x + x, player.y + y)
