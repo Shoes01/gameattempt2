@@ -38,7 +38,7 @@ None reported.
 - [x] Momentum Based Momement
 - [x] Basic obstacles
 - [x] Single Tile Targeting
-- [ ] First Weapon System: Laser
+- [x] First Weapon System: Laser
 - [ ] Multi Tile Targeting
   - [ ] Enforce a range limit on the multi-tiles
 - [ ] Basic UI
