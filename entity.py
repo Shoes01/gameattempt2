@@ -77,3 +77,9 @@ class Entity:
         """
         self.mech.reset()
         self.weapon.reset()
+    
+    def distance(self, x, y):
+        """
+        Calculate the Manhanttan distance from self to coordinate (x, y)
+        """
+        return abs(self.x - x) + abs(self.y - y)

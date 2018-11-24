@@ -36,6 +36,7 @@ def main():
         'light_ground': (200, 180, 50),
         'white': (255, 255, 255),
         'black': (0, 0, 0),
+        'light red': (255, 100, 100),
         'red': (255, 0, 0),
         'yellow': (255, 255, 0),
         'orange': (255, 127, 0),
@@ -46,7 +47,7 @@ def main():
     }
 
     mech_component = Mech(hp=30, peak_momentum=6)
-    weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'))
+    weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component, weapon=weapon_component)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC")
     cursor_component = Cursor()
@@ -111,8 +112,6 @@ def main():
                 cursor.char = ' '
                 cursor.x = -1
                 cursor.y = -1
-                # Reset map flags
-                reset_flags(game_map)
 
                 fov_recompute = True
                 game_state = previous_game_state
@@ -127,6 +126,8 @@ def main():
             # See game_states.py for the turn structure.
             # Turns order is reversed so ensure that the loop runs once for each
             if turn_state == TurnStates.POST_ATTACK_PHASE:
+                # Reset map flags and remove targets.
+                reset_flags(game_map)
                 for x, y in player.weapon.targets:
                     erase_cell(con, x, y)
                 turn_state = TurnStates.UPKEEP_PHASE
@@ -136,8 +137,12 @@ def main():
                 if change_game_state == GameStates.TARGETING:
                     # Turn on cursor.
                     cursor.char = 'X'
-                    cursor.x = player.x
-                    cursor.y = player.y
+                    # If there were no previous targets, start on the player.
+                    if len(player.weapon.targets) == 0:                        
+                        cursor.x = player.x
+                        cursor.y = player.y
+                    else:
+                        cursor.x, cursor.y = player.weapon.targets[-1]
 
                     fov_recompute = True
                     previous_game_state = game_state
@@ -197,8 +202,21 @@ def main():
         if game_state == GameStates.TARGETING:
             if move:
                 dx, dy = move
-                cursor.fly(dx, dy)
-                fov_recompute = True
+                # Ensure the first target is in firing range.
+                if len(player.weapon.targets) == 0:
+                    if player.distance(cursor.x + dx, cursor.y + dy) <= player.weapon.range:
+                        cursor.fly(dx, dy)
+                        fov_recompute = True
+                    else:
+                        message_log.add_message(Message('Out of range.', colors.get('red')))
+                # Ensure that the next targets are adjacent to the previous target
+                elif len(player.weapon.targets) > 0:
+                    tar_x, tar_y = player.weapon.targets[-1] # Get the most recent target added.
+                    if abs(tar_x - (cursor.x + dx)) + abs(tar_y - (cursor.y + dy)) <= 1:
+                        cursor.fly(dx, dy)
+                        fov_recompute = True
+                    else:
+                        message_log.add_message(Message('Invalid target.', colors.get('red')))
 
             if select:
                 if len(player.weapon.targets) < player.weapon.max_targets:

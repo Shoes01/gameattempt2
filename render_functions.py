@@ -51,7 +51,7 @@ def render_all(con, panel, entities, game_map, fov_recompute, root_console, mess
                 con.draw_char(x, y, None, fg=None, bg=colors.get('highlight'))
 
             if game_map.targeted[x][y]:
-                con.draw_char(x, y, 'X', fg=colors.get('red'), bg=None)
+                con.draw_char(x, y, None, fg=None, bg=colors.get('light red'))
 
     # Draw all entities in the list
     for entity in entities:

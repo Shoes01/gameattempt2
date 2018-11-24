@@ -39,20 +39,20 @@ None reported.
 - [x] Basic obstacles
 - [x] Single Tile Targeting
 - [x] First Weapon System: Laser
-- [ ] Multi Tile Targeting
-  - [ ] Enforce a range limit on the multi-tiles
+- [x] Multi Tile Targeting
 - [ ] Basic UI
   - [ ] Display momentum and impulse levels
   - [ ] Display weapon information (number of current targets, max targets, total damage output)
   - [ ] Display remaining HP
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
-  - [ ] Allow the player to cancel targeting entirely, or confirm targeting. Highlight the tiles red instead of marking them with an X?
+  - [ ] Allow the player to cancel targeting entirely and restart.
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement weapon damage
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics
+  - [ ] Code logic to handle an entity with multiple weapons
 - [ ] Terrain
 - [ ] Enemy NPC: Firing logic
 - [ ] Radar Based Detection
