@@ -2,6 +2,7 @@ import tdl
 
 from components.cursor import Cursor
 from components.mech import Mech
+from components.weapon import Weapon
 from entity import Entity
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
@@ -38,13 +39,15 @@ def main():
         'red': (255, 0, 0),
         'yellow': (255, 255, 0),
         'orange': (255, 127, 0),
+        'green': (0, 255, 0,),
         'light_red': (255, 114, 114),
         'darker_red': (127, 0, 0),
         'highlight': (199, 234, 70)
     }
 
     mech_component = Mech(hp=30, peak_momentum=6)
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component)
+    weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'))
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component, weapon=weapon_component)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC")
     cursor_component = Cursor()
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
@@ -110,8 +113,6 @@ def main():
                 cursor.y = -1
                 # Reset map flags
                 reset_flags(game_map)
-                for x, y in cursor.cursor.target_list:
-                    erase_cell(con, x, y)
 
                 fov_recompute = True
                 game_state = previous_game_state
@@ -126,6 +127,8 @@ def main():
             # See game_states.py for the turn structure.
             # Turns order is reversed so ensure that the loop runs once for each
             if turn_state == TurnStates.POST_ATTACK_PHASE:
+                for x, y in player.weapon.targets:
+                    erase_cell(con, x, y)
                 turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
                 
@@ -135,10 +138,6 @@ def main():
                     cursor.char = 'X'
                     cursor.x = player.x
                     cursor.y = player.y
-                    # TODO: Eventually, a weapon will determine this.
-                    cursor.cursor.minimum = 0
-                    cursor.cursor.maximum = 5
-                    cursor.cursor.so_far = 0
 
                     fov_recompute = True
                     previous_game_state = game_state
@@ -156,7 +155,7 @@ def main():
                 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 reset_flags(game_map)
-                player.mech.reset() # Reset the mech for the next turn.
+                player.reset() # Reset the mech for the next turn. ### Move this to the post-attack phase
                 fov_recompute = True
 
                 turn_state = TurnStates.PRE_ATTACK_PHASE
@@ -202,11 +201,10 @@ def main():
                 fov_recompute = True
 
             if select:
-                if cursor.cursor.so_far < cursor.cursor.maximum:
+                if len(player.weapon.targets) < player.weapon.max_targets:
                     if set_targeted(game_map, cursor.x, cursor.y):  # At the moment, this always returns True. In the future, this may change.
-                        cursor.cursor.so_far += 1
                         fov_recompute = True
-                        cursor.cursor.target_list.append((cursor.x, cursor.y))
+                        player.weapon.targets.append((cursor.x, cursor.y))
                 else:
                     message_log.add_message(Message('Targeting failed.', colors.get('red')))
 

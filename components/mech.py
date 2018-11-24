@@ -10,7 +10,6 @@ class Mech:
         self.has_spent_impulse = False          # When impulse is used to propel the mech further and gain momentum, this is set to True.
         self.accumulated_horizontal_momentum = 0# When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
         self.accumulated_vertical_momentum = 0  # When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
-        # TODO: When impulse is spent, it changes the maximum, thus changes the minimum tiles required to move...
         
     def calculate_maximum_momentum(self):
         # Calculate the maximum momentum the mech can use this turn.

@@ -34,19 +34,22 @@ Run engine.py.
 __General__
 None reported.
 
-__Targeting__
-The "targets so far" is not remembered. This can be fixed by having the weapon of the mech remembering all the stats.
-
 ## DEVELOPEMENT MILESTONES
 - [x] Momentum Based Momement
 - [x] Basic obstacles
 - [x] Single Tile Targeting
 - [ ] First Weapon System: Laser
 - [ ] Multi Tile Targeting
+  - [ ] Enforce a range limit on the multi-tiles
+- [ ] Basic UI
+  - [ ] Display momentum and impulse levels
+  - [ ] Display weapon information (number of current targets, max targets, total damage output)
+  - [ ] Display remaining HP
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
-  - [ ] Track momentum levels and other relevant numbers on the UI
+  - [ ] Allow the player to cancel targeting entirely, or confirm targeting. Highlight the tiles red instead of marking them with an X?
 - [ ] Enemy NPC: Destroyable
+  - [ ] Implement weapon damage
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics

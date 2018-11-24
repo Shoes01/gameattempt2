@@ -116,4 +116,8 @@ def highlight_legal_moves(player, game_map):
                         set_highlight(game_map, player.x + x, player.y + y)
 
 def erase_cell(con, x, y):
-    con.draw_char(x, y, ' ', None, None)
+    """
+    Some temporary cell fg and bg should stick around until the end of a phase.
+    Those need to be manually erased.
+    """
+    con.draw_char(x, y, ' ', bg=(0, 0, 0), fg=(0, 0, 0))
