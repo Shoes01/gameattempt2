@@ -40,9 +40,9 @@ The "targets so far" is not remembered. This can be fixed by having the weapon o
 ## DEVELOPEMENT MILESTONES
 - [x] Momentum Based Momement
 - [x] Basic obstacles
-- [ ] Single Tile Targeting
-- [ ] Multi Tile Targeting
+- [x] Single Tile Targeting
 - [ ] First Weapon System: Laser
+- [ ] Multi Tile Targeting
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
   - [ ] Track momentum levels and other relevant numbers on the UI
