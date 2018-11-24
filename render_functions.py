@@ -50,6 +50,9 @@ def render_all(con, panel, entities, game_map, fov_recompute, root_console, mess
             if game_map.highlight[x][y]:
                 con.draw_char(x, y, None, fg=None, bg=colors.get('highlight'))
 
+            if game_map.targeted[x][y]:
+                con.draw_char(x, y, 'X', fg=colors.get('red'), bg=None)
+
     # Draw all entities in the list
     for entity in entities:
         draw_entity(con, entity, game_map.fov)
@@ -111,3 +114,6 @@ def highlight_legal_moves(player, game_map):
                         set_highlight(game_map, player.x + x, player.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
                         set_highlight(game_map, player.x + x, player.y + y)
+
+def erase_cell(con, x, y):
+    con.draw_char(x, y, ' ', None, None)

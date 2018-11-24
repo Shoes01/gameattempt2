@@ -5,11 +5,6 @@ A simple mech arena shooter centered around managing momentum.
 Requires python 3 and tdl. 
 Run engine.py.
 
-## ISSUES
-* Things only refresh after there is user_input.
-
-   Have a pre-phase where messages are displayed
-
 ## TODO
 * Inform the player of their h_mom and v_mom, and how much of each is remaining.
 
@@ -36,7 +31,11 @@ Run engine.py.
    How damage will work.  
 
 ## BUGS
-None reported
+__General__
+None reported.
+
+__Targeting__
+The "targets so far" is not remembered. This can be fixed by having the weapon of the mech remembering all the stats.
 
 ## DEVELOPEMENT MILESTONES
 - [x] Momentum Based Momement
@@ -44,6 +43,9 @@ None reported
 - [ ] Single Tile Targeting
 - [ ] Multi Tile Targeting
 - [ ] First Weapon System: Laser
+- [ ] QoL Maintenance
+  - [ ] Allow the player to "set and forget" momentum level
+  - [ ] Track momentum levels and other relevant numbers on the UI
 - [ ] Enemy NPC: Destroyable
 - [ ] Animation
 - [ ] Event Queue

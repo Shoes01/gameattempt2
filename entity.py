@@ -4,18 +4,23 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, mech=None):
+    def __init__(self, x, y, char, color, name, mech=None, cursor=None):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
         self.name = name
         self.mech = mech
+        self.cursor = cursor
 
-        if self.mech:
-            self.mech.owner = self
+        if self.mech:   self.mech.owner = self        
+        if self.cursor: self.cursor.owner = self
 
     def move(self, dx, dy):
+        """
+        Move the entity according to the rules of momentum.
+        Cares about obstacles.
+        """
         if self.mech.calculate_accumulated_momentum() < self.mech.calculate_maximum_momentum():
             # Allow the player to move.
 
@@ -56,3 +61,10 @@ class Entity:
                     self.y += dy
                     self.mech.accumulated_vertical_momentum += dy
                     self.mech.has_spent_impulse = True
+
+    def fly(self, dx, dy):
+        """
+        Move the entity regardless of everything.
+        """
+        self.x += dx
+        self.y += dy

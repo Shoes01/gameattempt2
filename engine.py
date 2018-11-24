@@ -1,12 +1,13 @@
 import tdl
 
+from components.cursor import Cursor
 from components.mech import Mech
 from entity import Entity
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
-from map_utils import GameMap, make_map, reset_highlight
-from render_functions import clear_all, highlight_legal_moves, render_all
+from map_utils import GameMap, make_map, reset_flags, set_targeted
+from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all
 
 def main():
     screen_width = 80
@@ -35,6 +36,7 @@ def main():
         'white': (255, 255, 255),
         'black': (0, 0, 0),
         'red': (255, 0, 0),
+        'yellow': (255, 255, 0),
         'orange': (255, 127, 0),
         'light_red': (255, 114, 114),
         'darker_red': (127, 0, 0),
@@ -42,9 +44,11 @@ def main():
     }
 
     mech_component = Mech(hp=30, peak_momentum=6)
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255), "player", mech=mech_component)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', (255, 255, 0), "NPC")
-    entities = [npc, player]
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component)
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC")
+    cursor_component = Cursor()
+    cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
+    entities = [npc, player, cursor]
 
     tdl.set_font('arial10x10.png', greyscale=True, altLayout=True)
 
@@ -60,6 +64,7 @@ def main():
     mouse_coordinates = (0, 0)
 
     game_state = GameStates.PLAYER_TURN
+    previous_game_state = game_state
     turn_state = TurnStates.UPKEEP_PHASE
 
     fov_recompute = True
@@ -83,47 +88,79 @@ def main():
         else:
             user_input = None
 
-        # FIX: user_input double dips, key is CHAR once and then TEXT, with the same input.
-        # The event type KEYDOWN is triggered twice when clicking a key once. The key is CHAR first, and then TEXT. 
-
-        if not user_input and not fov_recompute:
-            continue
-
         fov_recompute = False
 
-        action = handle_keys(user_input, game_state, turn_state)
-        impulse = None # This is to avoid logic problems in the PRE_MOVEMENT_PHASE block.
+        action = handle_keys(user_input, game_state)
+        impulse = None           # This is to avoid logic problems.
+        change_game_state = None # This is to avoid logic problems.
 
-        move = action.get('move')
-        impulse = action.get('impulse')
-        exit = action.get('exit')
-        next_turn_phase = action.get('next_turn_phase')
-        fullscreen = action.get('fullscreen')
+        move = action.get('move')                           # Attempt to move.
+        impulse = action.get('impulse')                     # Adjust mech impulse.
+        next_turn_phase = action.get('next turn phase')     # Move to the next phase.
+        change_game_state = action.get('change game state') # Go to different game_state
+        select = action.get('select')                       # A target has been selected via keyboard.
+        exit = action.get('exit')                           # Exit whatever screen is open.
+        fullscreen = action.get('fullscreen')               # Set game to full screen.
         
         if exit:
-            return True
+            if game_state == GameStates.TARGETING:
+                # Turn off cursor
+                cursor.char = ' '
+                cursor.x = -1
+                cursor.y = -1
+                # Reset map flags
+                reset_flags(game_map)
+                for x, y in cursor.cursor.target_list:
+                    erase_cell(con, x, y)
+
+                fov_recompute = True
+                game_state = previous_game_state
+            
+            else:
+                return True
 
         if fullscreen:
             tdl.set_fullscreen(not tdl.get_fullscreen())
 
         if game_state == GameStates.PLAYER_TURN:
             # See game_states.py for the turn structure.
-
-            
-            if turn_state == TurnStates.UPKEEP_PHASE:    
-                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
-                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
-                turn_state = TurnStates.PRE_MOVEMENT_PHASE
-                fov_recompute = True
+            # Turns order is reversed so ensure that the loop runs once for each
+            if turn_state == TurnStates.POST_ATTACK_PHASE:
+                turn_state = TurnStates.UPKEEP_PHASE
+                game_state = GameStates.ENEMY_TURN
                 
-            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                if impulse is not None: 
-                    player.mech.impulse = impulse
-                    turn_state = TurnStates.MOVEMENT_PHASE
-                    message_log.add_message(Message('Impulse set to {0}.'.format(impulse), colors.get('orange')))
+            if turn_state == TurnStates.ATTACK_PHASE:
+                if change_game_state == GameStates.TARGETING:
+                    # Turn on cursor.
+                    cursor.char = 'X'
+                    cursor.x = player.x
+                    cursor.y = player.y
+                    # TODO: Eventually, a weapon will determine this.
+                    cursor.cursor.minimum = 0
+                    cursor.cursor.maximum = 5
+                    cursor.cursor.so_far = 0
+
                     fov_recompute = True
-                    highlight_legal_moves(player, game_map)
-            
+                    previous_game_state = game_state
+                    game_state = GameStates.TARGETING
+
+                if next_turn_phase:
+                    turn_state = TurnStates.POST_ATTACK_PHASE
+                    
+            if turn_state == TurnStates.PRE_ATTACK_PHASE:
+                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
+                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', colors.get('orange')))
+                fov_recompute = True
+
+                turn_state = TurnStates.ATTACK_PHASE
+                
+            if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
+                reset_flags(game_map)
+                player.mech.reset() # Reset the mech for the next turn.
+                fov_recompute = True
+
+                turn_state = TurnStates.PRE_ATTACK_PHASE
+
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if move:
                     dx, dy = move
@@ -137,35 +174,41 @@ def main():
                 elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
                     message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
 
+            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                if impulse is not None: 
+                    player.mech.impulse = impulse
+                    turn_state = TurnStates.MOVEMENT_PHASE
+                    message_log.add_message(Message('Impulse set to {0}.'.format(impulse), colors.get('orange')))
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
 
-            if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
-                reset_highlight(game_map)
-                player.mech.reset() # Reset the mech for the next turn.
+            if turn_state == TurnStates.UPKEEP_PHASE and game_state == GameStates.PLAYER_TURN: # This is added to avoid starting the Upkeep Phase when the turn just ended.
+                message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
+                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
+                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 fov_recompute = True
 
-                turn_state = TurnStates.PRE_ATTACK_PHASE
-            
-            if turn_state == TurnStates.PRE_ATTACK_PHASE:
-                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
-
-                turn_state = TurnStates.ATTACK_PHASE
-            
-            if turn_state == TurnStates.ATTACK_PHASE:
-                # Do nothing
-
-                turn_state = TurnStates.POST_MOVEMENT_PHASE
-            
-            if turn_state == TurnStates.POST_MOVEMENT_PHASE:
-                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
-
-                turn_state = TurnStates.UPKEEP_PHASE
-                game_state = GameStates.ENEMY_TURN
-
         if game_state == GameStates.ENEMY_TURN:
-            message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
+            message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
             fov_recompute = True
 
             game_state = GameStates.PLAYER_TURN
+        
+        if game_state == GameStates.TARGETING:
+            if move:
+                dx, dy = move
+                cursor.fly(dx, dy)
+                fov_recompute = True
+
+            if select:
+                if cursor.cursor.so_far < cursor.cursor.maximum:
+                    if set_targeted(game_map, cursor.x, cursor.y):  # At the moment, this always returns True. In the future, this may change.
+                        cursor.cursor.so_far += 1
+                        fov_recompute = True
+                        cursor.cursor.target_list.append((cursor.x, cursor.y))
+                else:
+                    message_log.add_message(Message('Targeting failed.', colors.get('red')))
 
 if __name__ == '__main__':
     main()
