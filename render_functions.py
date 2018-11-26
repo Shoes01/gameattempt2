@@ -37,7 +37,12 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
     panel.draw_str(x_centered, y, text, fg=string_color, bg=None)
 
-def render_all(con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors):
+def render_all(
+    con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
+    status, status_height, status_width, status_x, game_state, turn_state):
+    """
+    Print con elements.
+    """
     if fov_recompute:
         # Draw all the tiles in the game map
         for x, y in game_map:
@@ -66,8 +71,11 @@ def render_all(con, panel, entities, game_map, fov_recompute, root_console, mess
     for entity in entities:
         draw_entity(con, entity, game_map.fov)
 
-    root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0)
+    root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0) # Show the tiles and the entities
 
+    """
+    Print panel elements.
+    """
     panel.clear(fg=colors.get('white'), bg=colors.get('black'))
 
     # Print the game messages, one line at a time
@@ -82,6 +90,16 @@ def render_all(con, panel, entities, game_map, fov_recompute, root_console, mess
                colors.get('light_red'), colors.get('darker_red'), colors.get('white'))
 
     root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
+
+    """
+    Print status elements.
+    """
+    status.clear(fg=colors.get('white'), bg=colors.get('black'))
+
+    status.draw_str(0, 0, '{0}'.format(game_state.name), fg=colors.get('white'), bg=colors.get('red'))
+    status.draw_str(0, 1, '{0}'.format(turn_state.name), fg=colors.get('white'), bg=colors.get('orange'))
+
+    root_console.blit(status, status_x, 0, status_width, status_height, 0, 0)
 
 
 def clear_all(con, entities):

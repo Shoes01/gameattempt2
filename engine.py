@@ -22,8 +22,12 @@ def main():
     message_width = screen_width - bar_width - 2
     message_height = panel_height - 1
 
+    status_width = 15
+    status_height = screen_height - panel_height
+    status_x = screen_width - status_width
+
     map_width = 80
-    map_height = 43
+    map_height = screen_height - panel_height
 
     fov_algorithm = 'BASIC'
     fov_light_walls = True
@@ -59,6 +63,7 @@ def main():
     root_console = tdl.init(screen_width, screen_height, title='MVP v0.0')
     con = tdl.Console(screen_width, screen_height)
     panel = tdl.Console(screen_width, panel_height)
+    status = tdl.Console(status_width, status_height)
 
     game_map = GameMap(map_width, map_height)
     make_map(game_map)
@@ -77,7 +82,9 @@ def main():
         if fov_recompute:
             game_map.compute_fov(player.x, player.y, fov=fov_algorithm, radius=fov_radius, light_walls=fov_light_walls)
 
-        render_all(con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors)
+        render_all(
+            con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
+            status, status_height, status_width, status_x, game_state, turn_state)
 
         tdl.flush()
 
