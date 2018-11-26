@@ -47,8 +47,10 @@ None reported.
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
   - [ ] Allow the player to cancel targeting entirely and restart.
+  - [ ] Implement a RenderOrder (found in part 6)
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement weapon damage
+  - [ ] Implement a turn summary variable (found in part 6)
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics

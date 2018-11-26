@@ -11,6 +11,15 @@ def get_names_under_mouse(mouse_coordinates, entities, game_map):
 
     return names.capitalize()
 
+def get_names_under_mouse(mouse_coordinates, entities, game_map):
+    x, y = mouse_coordinates
+
+    names = [entity.name for entity in entities
+             if entity.x == x and entity.y == y and game_map.fov[entity.x, entity.y]]
+    names = ', '.join(names)
+
+    return names.capitalize()
+
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color, string_color):
     # Render a bar (HP, experience, etc). first calculate the width of the bar
     bar_width = int(float(value) / maximum * total_width)
@@ -67,10 +76,10 @@ def render_all(con, panel, entities, game_map, fov_recompute, root_console, mess
         panel.draw_str(message_log.x, y, message.text, bg=None, fg=message.color)
         y += 1
 
+    panel.draw_str(1, 0, get_names_under_mouse(mouse_coordinates, entities, game_map))
+
     render_bar(panel, 1, 1, bar_width, 'TEST', 20, 30,
                colors.get('light_red'), colors.get('darker_red'), colors.get('white'))
-
-    panel.draw_str(1, 0, get_names_under_mouse(mouse_coordinates, entities, game_map))
 
     root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
 

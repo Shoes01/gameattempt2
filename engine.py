@@ -41,7 +41,7 @@ def main():
         'yellow': (255, 255, 0),
         'orange': (255, 127, 0),
         'green': (0, 255, 0,),
-        'light_red': (255, 114, 114),
+        'light_red': (255, 114, 114),   
         'darker_red': (127, 0, 0),
         'highlight': (199, 234, 70)
     }
@@ -54,7 +54,7 @@ def main():
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
 
-    tdl.set_font('arial10x10.png', greyscale=True, altLayout=True)
+    tdl.set_font('rexpaint_cp437_10x10.png')
 
     root_console = tdl.init(screen_width, screen_height, title='MVP v0.0')
     con = tdl.Console(screen_width, screen_height)
