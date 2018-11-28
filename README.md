@@ -5,36 +5,12 @@ A simple mech arena shooter centered around managing momentum.
 Requires python 3 and tdl. 
 Run engine.py.
 
-## TODO
-* Inform the player of their h_mom and v_mom, and how much of each is remaining.
-
-   The "+1" in the mech_momentum code represents acceleration, decceleration, or maintenance  
-   Allow the player to set what they want their maximum momentum to be, and automagically manage the impulse for them? And highlight differently the legal tiles too?
-
-* Decide on what happens when a player is hit by projectiles.
-
-   If momentum is reduced by 1: stagger, may not accelerate  
-   If momentum is reduced by 2: stagger badly, must slow down  
-   If momentum is reduced by 3: fall down  
-   There should be a bonus resistance to stagger/falling based on??  
-
-* Decide on what kind of targeting patterns the player can use.
-
-   Draw the line manually?  
-   Rotate the line / spread the line out?  
-   Only have | / - patterns? Plus a spread?  
-
-* Things currently missing from the Turn Structure comment in game_states.py
-
-   How radar detection will work.  
-   How stagger / falling will work.  
-   How damage will work.  
-
 ## BUGS
 __General__
+
 None reported.
 
-## DEVELOPEMENT MILESTONES
+## ROAD MAP
 - [x] Momentum Based Momement
 - [x] Basic obstacles
 - [x] Single Tile Targeting
@@ -57,8 +33,17 @@ None reported.
   - [ ] Code logic to handle an entity with multiple weapons
   - [ ] Allow the player to target a tile multiple times
 - [ ] Terrain
-- [ ] Revisit momentum logic. Make harder to slow down? Give fewer choices?
+- [ ] Revisit turn structure
+  - [ ] Decide where radar detection should happen
+  - [ ] Decide where staggering should happen
+  - [ ] Decide where damage should happen
+- [ ] Revisit momentum logic
+  - [ ] Should the player have fewer choices?
+  - [ ] Should the player have a harder time slowing time?
+  - [ ] Define how staggering, staggering badly and falling down will work
 - [ ] Enemy NPC: Firing logic
+- [ ] Momentum based weapons
+  - [ ] Weapons impart momentum on user and target
 - [ ] Radar Based Detection
 - [ ] Third Weapon System: Missiles
 - [ ] Fourth Weapon System: Artillery
