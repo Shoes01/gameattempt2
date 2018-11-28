@@ -1,6 +1,7 @@
 import math
 
 from map_utils import set_highlight
+from ui_functions import draw_card
 
 def get_names_under_mouse(mouse_coordinates, entities, game_map):
     x, y = mouse_coordinates
@@ -39,9 +40,10 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
 def render_all(
     con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
-    status, status_height, status_width, status_x, game_state, turn_state):
+    status, status_height, status_width, status_x, game_state, turn_state, player):
     """
-    Print con elements.
+    Print con console.
+    Displays the tiles and entities.
     """
     if fov_recompute:
         # Draw all the tiles in the game map
@@ -74,7 +76,8 @@ def render_all(
     root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0) # Show the tiles and the entities
 
     """
-    Print panel elements.
+    Print panel console.
+    Displays HP bar and message log.
     """
     panel.clear(fg=colors.get('white'), bg=colors.get('black'))
 
@@ -92,12 +95,16 @@ def render_all(
     root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
 
     """
-    Print status elements.
+    Print status card.
+    Displays game state and turn state.
     """
     status.clear(fg=colors.get('white'), bg=colors.get('black'))
 
-    status.draw_str(0, 0, '{0}'.format(game_state.name), fg=colors.get('white'), bg=colors.get('red'))
-    status.draw_str(0, 1, '{0}'.format(turn_state.name), fg=colors.get('white'), bg=colors.get('orange'))
+    draw_card(status, 0, 0, status_width, status_height, colors, 'white', turn=game_state.name, phase=turn_state.name, 
+        momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
+
+    #    status.draw_str(0, 0, '{0}'.format(game_state.name), fg=colors.get('white'), bg=colors.get('red'))
+    #    status.draw_str(0, 1, '{0}'.format(turn_state.name), fg=colors.get('white'), bg=colors.get('orange'))
 
     root_console.blit(status, status_x, 0, status_width, status_height, 0, 0)
 

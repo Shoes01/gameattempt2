@@ -84,7 +84,7 @@ def main():
 
         render_all(
             con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
-            status, status_height, status_width, status_x, game_state, turn_state)
+            status, status_height, status_width, status_x, game_state, turn_state, player)
 
         tdl.flush()
 

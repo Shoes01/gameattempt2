@@ -55,7 +55,9 @@ None reported.
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics
   - [ ] Code logic to handle an entity with multiple weapons
+  - [ ] Allow the player to target a tile multiple times
 - [ ] Terrain
+- [ ] Revisit momentum logic. Make harder to slow down? Give fewer choices?
 - [ ] Enemy NPC: Firing logic
 - [ ] Radar Based Detection
 - [ ] Third Weapon System: Missiles
