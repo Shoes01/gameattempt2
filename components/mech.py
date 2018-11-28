@@ -1,8 +1,9 @@
 import math
 
 class Mech:
-    def __init__(self, hp, peak_momentum):
-        self.hp = hp
+    def __init__(self, max_hp, peak_momentum):
+        self.max_hp = max_hp                    # The max HP of the mech.
+        self.hp = max_hp                        # The current HP of the mech.
         self.peak_momentum = peak_momentum      # The absolute highest momentum the mech can have
         self.maximum_horizontal_momentum = 0    # Positive: right
         self.maximum_vertical_momentum = 0      # Positive: down

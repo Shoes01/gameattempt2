@@ -89,22 +89,24 @@ def render_all(
 
     panel.draw_str(1, 0, get_names_under_mouse(mouse_coordinates, entities, game_map))
 
-    render_bar(panel, 1, 1, bar_width, 'TEST', 20, 30,
+    render_bar(panel, 1, 1, bar_width, 'HP', player.mech.hp, player.mech.max_hp,
                colors.get('light_red'), colors.get('darker_red'), colors.get('white'))
 
     root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
 
     """
     Print status card.
-    Displays game state and turn state.
+    Displays game state and turn state, momentum state and more.
+    Displays weapons stats.
     """
     status.clear(fg=colors.get('white'), bg=colors.get('black'))
 
-    draw_card(status, 0, 0, status_width, status_height, colors, 'white', turn=game_state.name, phase=turn_state.name, 
+    draw_card(status, 0, 0, status_width, status_height, colors, 'white', 
+        turn=game_state.name, phase=turn_state.name, 
         momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
 
-    #    status.draw_str(0, 0, '{0}'.format(game_state.name), fg=colors.get('white'), bg=colors.get('red'))
-    #    status.draw_str(0, 1, '{0}'.format(turn_state.name), fg=colors.get('white'), bg=colors.get('orange'))
+    draw_card(status, 0, 10, status_width, status_height, colors, 'green', 
+        weapon=player.weapon.name, dmg=player.weapon.damage, range=player.weapon.range, cur_targets=len(player.weapon.targets), max_targets=player.weapon.max_targets)
 
     root_console.blit(status, status_x, 0, status_width, status_height, 0, 0)
 

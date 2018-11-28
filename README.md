@@ -40,10 +40,10 @@ None reported.
 - [x] Single Tile Targeting
 - [x] First Weapon System: Laser
 - [x] Multi Tile Targeting
-- [ ] Basic UI
-  - [ ] Display momentum and impulse levels
-  - [ ] Display weapon information (number of current targets, max targets, total damage output)
-  - [ ] Display remaining HP
+- [x] Basic UI
+  - [x] Display momentum and impulse levels
+  - [x] Display weapon information (number of current targets, max targets, total damage output)
+  - [x] Display remaining HP
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
   - [ ] Allow the player to cancel targeting entirely and restart.

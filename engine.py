@@ -50,7 +50,7 @@ def main():
         'highlight': (199, 234, 70)
     }
 
-    mech_component = Mech(hp=30, peak_momentum=6)
+    mech_component = Mech(max_hp=30, peak_momentum=6)
     weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component, weapon=weapon_component)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC")
