@@ -6,12 +6,13 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, render_order=RenderOrder.CORPSE, mech=None, cursor=None, weapon=None):
+    def __init__(self, x, y, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, mech=None, cursor=None, weapon=None):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
         self.name = name
+        self.has_moved = False
         self.render_order = render_order
         self.mech = mech
         self.cursor = cursor
@@ -32,8 +33,7 @@ class Entity:
             # The trivial case: the mech is at rest.
             if self.mech.maximum_horizontal_momentum == 0 and self.mech.maximum_vertical_momentum == 0 and self.mech.impulse == 1:
                 # Allow the player to move in any direction.
-                self.x += dx
-                self.y += dy
+                self.fly(dx, dy)
                 self.mech.accumulated_horizontal_momentum += dx
                 self.mech.accumulated_vertical_momentum += dy
                 self.mech.has_spent_impulse = True
@@ -44,26 +44,26 @@ class Entity:
                 # The mech has momentum left. Check that it wants to move in the right direction.
                 if math.copysign(1, dx) == math.copysign(1, self.mech.maximum_horizontal_momentum):
                     # Allow the player to move in the x axis
-                    self.x += dx
+                    self.fly(dx, 0)
                     self.mech.accumulated_horizontal_momentum += dx
             # Moving along the y-axis
             elif abs(self.mech.accumulated_vertical_momentum) < abs(self.mech.maximum_vertical_momentum) and dy != 0:
                 # The mech has momentum left. Check that it wants to move in the right direction.
                 if math.copysign(1, dy) == math.copysign(1, self.mech.maximum_vertical_momentum):
                     # Allow the player to move in the y axis
-                    self.y += dy
+                    self.fly(0, dy)
                     self.mech.accumulated_vertical_momentum += dy
             # Moving after all momentum has been spent
-            elif self.mech.impulse == 1 and not self.mech.has_spent_impulse:
+            elif abs(self.mech.impulse) == 1 and not self.mech.has_spent_impulse:
                 # Gain momentum in a direction.
                 # Check the x-axis.
                 if dx != 0 and self.mech.maximum_horizontal_momentum == 0 or math.copysign(1, dx) == math.copysign(1, self.mech.maximum_horizontal_momentum):
-                    self.x += dx
+                    self.fly(dx, 0)
                     self.mech.accumulated_horizontal_momentum += dx
                     self.mech.has_spent_impulse = True
                 # Check the y-axis.
                 if dy != 0 and self.mech.maximum_vertical_momentum == 0 or math.copysign(1, dy) == math.copysign(1, self.mech.maximum_vertical_momentum):
-                    self.y += dy
+                    self.fly(0, dy)
                     self.mech.accumulated_vertical_momentum += dy
                     self.mech.has_spent_impulse = True
 
@@ -73,6 +73,7 @@ class Entity:
         """
         self.x += dx
         self.y += dy
+        self.has_moved = True
 
     def reset(self):
         """
@@ -80,6 +81,7 @@ class Entity:
         """
         self.mech.reset()
         self.weapon.reset()
+        self.has_moved = False
     
     def distance(self, x, y):
         """

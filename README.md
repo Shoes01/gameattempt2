@@ -2,7 +2,7 @@
 A simple mech arena shooter centered around managing momentum.
 
 ## DEPENDENCIES
-Requires python 3 and tdl. 
+Requires python 3 and python-tcod. 
 Run engine.py.
 
 ## BUGS
@@ -21,8 +21,8 @@ None reported.
   - [x] Display weapon information (number of current targets, max targets, total damage output)
   - [x] Display remaining HP
 - [ ] QoL Maintenance
-  - [ ] Allow the player to "set and forget" momentum level
-  - [ ] Allow the player to cancel targeting entirely and restart.
+  - [x] Allow the player to "set and forget" momentum level
+  - [ ] Allow the player to cancel targeting entirely and restart
   - [X] Implement a RenderOrder
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement weapon damage
@@ -32,6 +32,7 @@ None reported.
 - [ ] Second Weapon System: Ballistics
   - [ ] Code logic to handle an entity with multiple weapons
   - [ ] Allow the player to target a tile multiple times
+- [ ] Provide adequate documentation
 - [ ] Terrain
 - [ ] Revisit turn structure
   - [ ] Decide where radar detection should happen
@@ -41,6 +42,7 @@ None reported.
   - [ ] Should the player have fewer choices?
   - [ ] Should the player have a harder time slowing time?
   - [ ] Define how staggering, staggering badly and falling down will work
+  - [ ] Generalize the logic to allow for impulses greater than 1
 - [ ] Revisit UI
   - [ ] Consider changing fonts
   - [ ] Implement a more cohesive UI

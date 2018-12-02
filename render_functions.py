@@ -134,6 +134,8 @@ def clear_entity(con, entity):
     libtcod.console_put_char(con, entity.x, entity.y, ' ', libtcod.BKGND_NONE)
 
 def highlight_legal_moves(player, game_map):
+    game_map.reset_flags()
+    
     h_mom = player.mech.maximum_horizontal_momentum
     v_mom = player.mech.maximum_vertical_momentum
     mech_momentum = player.mech.calculate_maximum_momentum()

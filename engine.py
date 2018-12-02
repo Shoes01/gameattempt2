@@ -130,10 +130,14 @@ def main():
             # See game_states.py for the turn structure.
             # Turns order is reversed so ensure that the loop runs once for each
             if turn_state == TurnStates.POST_ATTACK_PHASE:
+                # Reset the mech for the next turn.
+                player.reset()
+                
                 # Reset map flags and remove targets.
                 game_map.reset_flags()
                 for x, y in player.weapon.targets:
                     erase_cell(con, x, y)
+                
                 turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
                 
@@ -163,13 +167,22 @@ def main():
                 turn_state = TurnStates.ATTACK_PHASE
                 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
-                game_map.reset_flags()
-                player.reset() # Reset the mech for the next turn. ### Move this to the post-attack phase
+                game_map.reset_flags()                
                 fov_recompute = True
 
                 turn_state = TurnStates.PRE_ATTACK_PHASE
 
             if turn_state == TurnStates.MOVEMENT_PHASE:
+                """
+                Move impulse logic here. Add a check to see if the player has begun moving, and not allow changes to impulse.
+                Move higihlight code here.
+                """
+                if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
+                    player.mech.change_impulse(impulse)
+                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), colors.get('orange')))                    
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
+
                 if move:
                     dx, dy = move
                     if not game_map.tiles[player.x + dx][player.y + dy].blocked:
@@ -183,12 +196,9 @@ def main():
                     message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
 
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                if impulse is not None: 
-                    player.mech.impulse = impulse
-                    turn_state = TurnStates.MOVEMENT_PHASE
-                    message_log.add_message(Message('Impulse set to {0}.'.format(impulse), colors.get('orange')))
-                    fov_recompute = True
-                    highlight_legal_moves(player, game_map)
+                highlight_legal_moves(player, game_map)
+                turn_state = TurnStates.MOVEMENT_PHASE
+                fov_recompute = True
 
             if turn_state == TurnStates.UPKEEP_PHASE and game_state == GameStates.PLAYER_TURN: # This is added to avoid starting the Upkeep Phase when the turn just ended.
                 message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
