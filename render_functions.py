@@ -1,22 +1,14 @@
+import tcod as libtcod
 import math
 
-from map_utils import set_highlight
+from map_objects.game_map import GameMap
 from ui_functions import draw_card
 
-def get_names_under_mouse(mouse_coordinates, entities, game_map):
-    x, y = mouse_coordinates
+def get_names_under_mouse(mouse, entities, fov_map):
+    (x, y) = (mouse.cx, mouse.cy)
 
     names = [entity.name for entity in entities
-             if entity.x == x and entity.y == y and game_map.fov[entity.x, entity.y]]
-    names = ', '.join(names)
-
-    return names.capitalize()
-
-def get_names_under_mouse(mouse_coordinates, entities, game_map):
-    x, y = mouse_coordinates
-
-    names = [entity.name for entity in entities
-             if entity.x == x and entity.y == y and game_map.fov[entity.x, entity.y]]
+             if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
     names = ', '.join(names)
 
     return names.capitalize()
@@ -26,20 +18,21 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     bar_width = int(float(value) / maximum * total_width)
 
     # Render the background first
-    panel.draw_rect(x, y, total_width, 1, None, bg=back_color)
+    libtcod.console_set_default_background(panel, back_color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
+    libtcod.console_set_default_background(panel, back_color)
     # Now render the bar on top
     if bar_width > 0:
-        panel.draw_rect(x, y, bar_width, 1, None, bg=bar_color)
+        libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
     # Finally, some centered text with the values
-    text = name + ': ' + str(value) + '/' + str(maximum)
-    x_centered = x + int((total_width-len(text)) / 2)
-
-    panel.draw_str(x_centered, y, text, fg=string_color, bg=None)
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE, libtcod.CENTER,
+                             '{0}: {1}/{2}'.format(name, value, maximum))
 
 def render_all(
-    con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
+    con, panel, entities, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, 
     status, status_height, status_width, status_x, game_state, turn_state, player):
     """
     Print con console.
@@ -47,59 +40,71 @@ def render_all(
     """
     if fov_recompute:
         # Draw all the tiles in the game map
-        for x, y in game_map:
-            wall = not game_map.transparent[x, y]
+        for y in range(game_map.height):
+            for x in range(game_map.width):
+                visible = libtcod.map_is_in_fov(fov_map, x, y)
+                wall = game_map.tiles[x][y].block_sight
+                explored = game_map.tiles[x][y].explored
+                highlighted = game_map.tiles[x][y].highlighted
+                targeted = game_map.tiles[x][y].targeted
 
-            if game_map.fov[x, y]:
-                if wall:
-                    con.draw_char(x, y, None, fg=None, bg=colors.get('light_wall'))
-                else:
-                    con.draw_char(x, y, None, fg=None, bg=colors.get('light_ground'))
+                if visible:
+                    if wall:
+                        libtcod.console_set_char_background(con, x, y, colors.get('light_wall'), libtcod.BKGND_SET)
+                    else:                        
+                        libtcod.console_set_char_background(con, x, y, colors.get('light_ground'), libtcod.BKGND_SET)
 
-                    game_map.explored[x][y] = True
-            elif game_map.explored[x][y]:
-                if wall:
-                    con.draw_char(x, y, None, fg=None, bg=colors.get('dark_wall'))
-                else:
-                    con.draw_char(x, y, None, fg=None, bg=colors.get('dark_ground'))
-            
-            if game_map.highlight[x][y]:
-                con.draw_char(x, y, None, fg=None, bg=colors.get('highlight'))
+                    game_map.tiles[x][y].explored = True
+                elif explored:
+                    if wall:
+                        libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
+                    else:
+                        libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
+                
+                if highlighted:
+                    libtcod.console_set_char_background(con, x, y, colors.get('highlight'), libtcod.BKGND_SET)
 
-            if game_map.targeted[x][y]:
-                con.draw_char(x, y, None, fg=None, bg=colors.get('light red'))
+                if targeted:
+                    libtcod.console_set_char_background(con, x, y, colors.get('light red'), libtcod.BKGND_SET)
 
     # Draw all entities in the list
     for entity in entities:
-        draw_entity(con, entity, game_map.fov)
+        draw_entity(con, entity, fov_map, game_map)
 
-    root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0) # Show the tiles and the entities
+    libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
     """
     Print panel console.
     Displays HP bar and message log.
     """
-    panel.clear(fg=colors.get('white'), bg=colors.get('black'))
+    libtcod.console_set_default_background(panel, libtcod.black)
+    libtcod.console_clear(panel)
 
     # Print the game messages, one line at a time
     y = 1
     for message in message_log.messages:
-        panel.draw_str(message_log.x, y, message.text, bg=None, fg=message.color)
+        libtcod.console_set_default_foreground(panel, message.color)
+        libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
         y += 1
 
-    panel.draw_str(1, 0, get_names_under_mouse(mouse_coordinates, entities, game_map))
+    # Print what is under the mouse.
+    libtcod.console_set_default_foreground(panel, libtcod.light_gray)
+    libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
+                             get_names_under_mouse(mouse, entities, fov_map))
 
+    # Print the HP bar.
     render_bar(panel, 1, 1, bar_width, 'HP', player.mech.hp, player.mech.max_hp,
-               colors.get('light_red'), colors.get('darker_red'), colors.get('white'))
+               libtcod.light_red, libtcod.darker_red, libtcod.white)
 
-    root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
+    libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
     """
     Print status card.
     Displays game state and turn state, momentum state and more.
     Displays weapons stats.
     """
-    status.clear(fg=colors.get('white'), bg=colors.get('black'))
+    libtcod.console_set_default_background(status, libtcod.black)
+    libtcod.console_clear(status)
 
     draw_card(status, 0, 0, status_width, status_height, colors, 'white', 
         turn=game_state.name, phase=turn_state.name, 
@@ -108,21 +113,20 @@ def render_all(
     draw_card(status, 0, 10, status_width, status_height, colors, 'green', 
         weapon=player.weapon.name, dmg=player.weapon.damage, range=player.weapon.range, cur_targets=len(player.weapon.targets), max_targets=player.weapon.max_targets)
 
-    root_console.blit(status, status_x, 0, status_width, status_height, 0, 0)
-
+    libtcod.console_blit(status, status_x, 0, screen_width, status_height, 0, 0, 0)
 
 def clear_all(con, entities):
     for entity in entities:
         clear_entity(con, entity)
 
-
-def draw_entity(con, entity, fov):
-    if fov[entity.x, entity.y]:
-        con.draw_char(entity.x, entity.y, entity.char, entity.color, bg=None)
+def draw_entity(con, entity, fov_map, game_map):
+    if libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
+        libtcod.console_set_default_foreground(con, entity.color)
+        libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)
 
 def clear_entity(con, entity):
     # erase the character that represents this object
-    con.draw_char(entity.x, entity.y, ' ', entity.color, bg=None)
+    libtcod.console_put_char(con, entity.x, entity.y, ' ', libtcod.BKGND_NONE)
 
 def highlight_legal_moves(player, game_map):
     h_mom = player.mech.maximum_horizontal_momentum
@@ -142,18 +146,18 @@ def highlight_legal_moves(player, game_map):
                 # Now check to see that the direction matches the momentum.
                 if h_mom == 0:                                                                      # x can be anything.
                     if v_mom == 0:                                                                      # y can be anything (this is the trivial case).
-                        set_highlight(game_map, player.x + x, player.y + y)
+                        game_map.set_highlighted(player.x + x, player.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        set_highlight(game_map, player.x + x, player.y + y)
+                        game_map.set_highlighted(player.x + x, player.y + y)
                 elif h_mom != 0 and ( x == 0 or math.copysign(1, x) == math.copysign(1, h_mom) ):   # x must be 0 or have the same sign as h_mom.
                     if v_mom == 0:                                                                      # y can be anything.
-                        set_highlight(game_map, player.x + x, player.y + y)
+                        game_map.set_highlighted(player.x + x, player.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        set_highlight(game_map, player.x + x, player.y + y)
+                        game_map.set_highlighted(player.x + x, player.y + y)
 
 def erase_cell(con, x, y):
     """
     Some temporary cell fg and bg should stick around until the end of a phase.
     Those need to be manually erased.
     """
-    con.draw_char(x, y, ' ', bg=(0, 0, 0), fg=(0, 0, 0))
+    libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)

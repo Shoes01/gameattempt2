@@ -1,13 +1,14 @@
-import tdl
+import tcod as libtcod
 
 from components.cursor import Cursor
 from components.mech import Mech
 from components.weapon import Weapon
 from entity import Entity
+from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
-from map_utils import GameMap, make_map, reset_flags, set_targeted
+from map_objects.game_map import GameMap
 from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all
 
 def main():
@@ -29,7 +30,7 @@ def main():
     map_width = 80
     map_height = screen_height - panel_height
 
-    fov_algorithm = 'BASIC'
+    fov_algorithm = 0
     fov_light_walls = True
     fov_radius = 10
 
@@ -58,50 +59,46 @@ def main():
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
 
-    tdl.set_font('rexpaint_cp437_10x10.png')
+    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    root_console = tdl.init(screen_width, screen_height, title='MVP v0.0')
-    con = tdl.Console(screen_width, screen_height)
-    panel = tdl.Console(screen_width, panel_height)
-    status = tdl.Console(status_width, status_height)
+    libtcod.console_init_root(screen_width, screen_height, title='MVP v0.0')
+
+    con = libtcod.console_new(screen_width, screen_height)
+    panel = libtcod.console_new(screen_width, panel_height)
+    status = libtcod.console_new(status_width, status_height)
 
     game_map = GameMap(map_width, map_height)
-    make_map(game_map)
 
     message_log = MessageLog(message_x, message_width, message_height)
 
-    mouse_coordinates = (0, 0)
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
 
     game_state = GameStates.PLAYER_TURN
     previous_game_state = game_state
     turn_state = TurnStates.UPKEEP_PHASE
 
     fov_recompute = True
+
+    fov_map = initialize_fov(game_map)
     
-    while not tdl.event.is_window_closed():
+    while not libtcod.console_is_window_closed():
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+
         if fov_recompute:
-            game_map.compute_fov(player.x, player.y, fov=fov_algorithm, radius=fov_radius, light_walls=fov_light_walls)
+            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
         render_all(
-            con, panel, entities, game_map, fov_recompute, root_console, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, 
+            con, panel, entities, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, 
             status, status_height, status_width, status_x, game_state, turn_state, player)
 
-        tdl.flush()
+        libtcod.console_flush()
 
         clear_all(con, entities)
 
-        for event in tdl.event.get():
-            if event.type == 'KEYDOWN':
-                user_input = event
-                break
-            elif event.type == 'MOUSEMOTION':
-                mouse_coordinates = event.cell
-        else:
-            user_input = None
-
         fov_recompute = False
 
-        action = handle_keys(user_input, game_state)
+        action = handle_keys(key, game_state)
         impulse = None           # This is to avoid logic problems.
         change_game_state = None # This is to avoid logic problems.
 
@@ -127,14 +124,14 @@ def main():
                 return True
 
         if fullscreen:
-            tdl.set_fullscreen(not tdl.get_fullscreen())
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
         if game_state == GameStates.PLAYER_TURN:
             # See game_states.py for the turn structure.
             # Turns order is reversed so ensure that the loop runs once for each
             if turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Reset map flags and remove targets.
-                reset_flags(game_map)
+                game_map.reset_flags()
                 for x, y in player.weapon.targets:
                     erase_cell(con, x, y)
                 turn_state = TurnStates.UPKEEP_PHASE
@@ -166,7 +163,7 @@ def main():
                 turn_state = TurnStates.ATTACK_PHASE
                 
             if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
-                reset_flags(game_map)
+                game_map.reset_flags()
                 player.reset() # Reset the mech for the next turn. ### Move this to the post-attack phase
                 fov_recompute = True
 
@@ -175,7 +172,7 @@ def main():
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if move:
                     dx, dy = move
-                    if game_map.walkable[player.x + dx, player.y + dy]:
+                    if not game_map.tiles[player.x + dx][player.y + dy].blocked:
                         player.move(dx, dy)
 
                         fov_recompute = True
@@ -227,7 +224,7 @@ def main():
 
             if select:
                 if len(player.weapon.targets) < player.weapon.max_targets:
-                    if set_targeted(game_map, cursor.x, cursor.y):  # At the moment, this always returns True. In the future, this may change.
+                    if game_map.set_targeted(cursor.x, cursor.y):  # At the moment, this always returns True. In the future, this may change.
                         fov_recompute = True
                         player.weapon.targets.append((cursor.x, cursor.y))
                 else:

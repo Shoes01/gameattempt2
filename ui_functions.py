@@ -1,3 +1,5 @@
+import tcod as libtcod
+
 def draw_card(console, x, y, w, h, colors, color, **kwargs):
     """
     A card is a UI element that displays information to the player.
@@ -14,7 +16,9 @@ def draw_card(console, x, y, w, h, colors, color, **kwargs):
     offset = 0
 
     for key, value in kwargs.items():
-        console.draw_str(x, y + offset, '{0}: {1}'.format(key, value), fg=colors.get(color), bg=None)
+        libtcod.console_set_default_background(console, libtcod.black)
+        libtcod.console_set_default_foreground(console, colors.get(color))
+        libtcod.console_print_ex(console, x, y, libtcod.BKGND_NONE, libtcod.LEFT, '{0}: {1}'.format(key, value))
         offset += 1
         if offset == h:
             break
