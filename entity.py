@@ -1,15 +1,18 @@
 import math
 
+from render_functions import RenderOrder
+
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, mech=None, cursor=None, weapon=None):
+    def __init__(self, x, y, char, color, name, render_order=RenderOrder.CORPSE, mech=None, cursor=None, weapon=None):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
         self.name = name
+        self.render_order = render_order
         self.mech = mech
         self.cursor = cursor
         self.weapon = weapon

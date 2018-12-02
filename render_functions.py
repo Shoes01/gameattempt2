@@ -1,8 +1,13 @@
-import tcod as libtcod
 import math
+import tcod as libtcod
 
+from enum import auto, Enum
 from map_objects.game_map import GameMap
 from ui_functions import draw_card
+
+class RenderOrder(Enum):
+    CORPSE = auto()
+    ACTOR = auto()
 
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)

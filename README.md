@@ -23,7 +23,7 @@ None reported.
 - [ ] QoL Maintenance
   - [ ] Allow the player to "set and forget" momentum level
   - [ ] Allow the player to cancel targeting entirely and restart.
-  - [ ] Implement a RenderOrder (found in part 6)
+  - [X] Implement a RenderOrder
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement weapon damage
   - [ ] Implement a turn summary variable (found in part 6)
@@ -41,6 +41,10 @@ None reported.
   - [ ] Should the player have fewer choices?
   - [ ] Should the player have a harder time slowing time?
   - [ ] Define how staggering, staggering badly and falling down will work
+- [ ] Revisit UI
+  - [ ] Consider changing fonts
+  - [ ] Implement a more cohesive UI
+- [ ] QoL Maintenance II
 - [ ] Enemy NPC: Firing logic
 - [ ] Momentum based weapons
   - [ ] Weapons impart momentum on user and target

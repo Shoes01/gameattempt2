@@ -9,7 +9,7 @@ from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
 from map_objects.game_map import GameMap
-from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all
+from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all, RenderOrder
 
 def main():
     screen_width = 80
@@ -53,8 +53,8 @@ def main():
 
     mech_component = Mech(max_hp=30, peak_momentum=6)
     weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", mech=mech_component, weapon=weapon_component)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC")
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR)
     cursor_component = Cursor()
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
