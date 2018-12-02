@@ -105,7 +105,8 @@ def main():
         move = action.get('move')                           # Attempt to move.
         impulse = action.get('impulse')                     # Adjust mech impulse.
         next_turn_phase = action.get('next turn phase')     # Move to the next phase.
-        change_game_state = action.get('change game state') # Go to different game_state
+        change_game_state = action.get('change game state') # Go to different game_state.
+        reset_targets = action.get('reset_targets')         # Reset targets.
         select = action.get('select')                       # A target has been selected via keyboard.
         exit = action.get('exit')                           # Exit whatever screen is open.
         fullscreen = action.get('fullscreen')               # Set game to full screen.
@@ -155,6 +156,12 @@ def main():
                     fov_recompute = True
                     previous_game_state = game_state
                     game_state = GameStates.TARGETING
+
+                if reset_targets:
+                    player.weapon.reset()
+                    message_log.add_message(Message('Targeting reset.', libtcod.light_blue))
+                    game_map.reset_flags()
+                    fov_recompute = True
 
                 if next_turn_phase:
                     turn_state = TurnStates.POST_ATTACK_PHASE

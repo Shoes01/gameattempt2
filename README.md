@@ -20,9 +20,9 @@ None reported.
   - [x] Display momentum and impulse levels
   - [x] Display weapon information (number of current targets, max targets, total damage output)
   - [x] Display remaining HP
-- [ ] QoL Maintenance
+- [x] QoL Maintenance
   - [x] Allow the player to "set and forget" momentum level
-  - [ ] Allow the player to cancel targeting entirely and restart
+  - [x] Allow the player to cancel targeting entirely and restart
   - [X] Implement a RenderOrder
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement weapon damage
