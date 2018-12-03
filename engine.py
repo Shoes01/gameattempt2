@@ -54,7 +54,7 @@ def main():
     mech_component = Mech(max_hp=30, peak_momentum=6)
     weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR)
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=mech_component)
     cursor_component = Cursor()
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
@@ -98,6 +98,7 @@ def main():
 
         fov_recompute = False
 
+        # Handle actions by the player.
         action = handle_keys(key, game_state)
         impulse = None           # This is to avoid logic problems.
         change_game_state = None # This is to avoid logic problems.
@@ -111,6 +112,9 @@ def main():
         exit = action.get('exit')                           # Exit whatever screen is open.
         fullscreen = action.get('fullscreen')               # Set game to full screen.
         
+        # Handle results from the player actions.
+        player_turn_results = []        
+
         if exit:
             if game_state == GameStates.TARGETING:
                 # Turn off cursor
@@ -127,22 +131,56 @@ def main():
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
+        """
+        Handle the Player Turn.
+        """
         if game_state == GameStates.PLAYER_TURN:
-            # See game_states.py for the turn structure.
-            # Turns order is reversed so ensure that the loop runs once for each
-            if turn_state == TurnStates.POST_ATTACK_PHASE:
-                # Reset the mech for the next turn.
-                player.reset()
+            # See game_states.py for the turn structure.                                                    
+            if turn_state == TurnStates.UPKEEP_PHASE:
+                message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
+                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
+                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
+                fov_recompute = True
+
+            elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                highlight_legal_moves(player, game_map)
+                turn_state = TurnStates.MOVEMENT_PHASE
+                fov_recompute = True
+
+            elif turn_state == TurnStates.MOVEMENT_PHASE:
+                if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
+                    player.mech.change_impulse(impulse)
+                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), colors.get('orange')))                    
+                    fov_recompute = True
+                    highlight_legal_moves(player, game_map)
+
+                if move:
+                    dx, dy = move
+                    if not game_map.tiles[player.x + dx][player.y + dy].blocked:
+                        player.move(dx, dy)
+
+                        fov_recompute = True
                 
-                # Reset map flags and remove targets.
-                game_map.reset_flags()
-                for x, y in player.weapon.targets:
-                    erase_cell(con, x, y)
-                
-                turn_state = TurnStates.UPKEEP_PHASE
-                game_state = GameStates.ENEMY_TURN
-                
-            if turn_state == TurnStates.ATTACK_PHASE:
+                if next_turn_phase and player.mech.has_spent_minimum_momentum():
+                    turn_state = TurnStates.POST_MOVEMENT_PHASE
+                elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
+                    message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
+
+            elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
+                game_map.reset_flags()                
+                fov_recompute = True
+
+                turn_state = TurnStates.PRE_ATTACK_PHASE
+
+            elif turn_state == TurnStates.PRE_ATTACK_PHASE:
+                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
+                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', colors.get('orange')))
+                fov_recompute = True
+
+                turn_state = TurnStates.ATTACK_PHASE
+
+            elif turn_state == TurnStates.ATTACK_PHASE:
                 if change_game_state == GameStates.TARGETING:
                     # Turn on cursor.
                     cursor.char = 'X'
@@ -165,61 +203,22 @@ def main():
 
                 if next_turn_phase:
                     turn_state = TurnStates.POST_ATTACK_PHASE
-                    
-            if turn_state == TurnStates.PRE_ATTACK_PHASE:
-                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
-                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', colors.get('orange')))
-                fov_recompute = True
 
-                turn_state = TurnStates.ATTACK_PHASE
+            elif turn_state == TurnStates.POST_ATTACK_PHASE:
+                # Reset the mech for the next turn.
+                player.reset()
                 
-            if turn_state == TurnStates.POST_MOVEMENT_PHASE:        
-                game_map.reset_flags()                
-                fov_recompute = True
-
-                turn_state = TurnStates.PRE_ATTACK_PHASE
-
-            if turn_state == TurnStates.MOVEMENT_PHASE:
-                """
-                Move impulse logic here. Add a check to see if the player has begun moving, and not allow changes to impulse.
-                Move higihlight code here.
-                """
-                if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
-                    player.mech.change_impulse(impulse)
-                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), colors.get('orange')))                    
-                    fov_recompute = True
-                    highlight_legal_moves(player, game_map)
-
-                if move:
-                    dx, dy = move
-                    if not game_map.tiles[player.x + dx][player.y + dy].blocked:
-                        player.move(dx, dy)
-
-                        fov_recompute = True
+                # Reset map flags and remove targets.
+                game_map.reset_flags()
+                for x, y in player.weapon.targets:
+                    erase_cell(con, x, y)
                 
-                if next_turn_phase and player.mech.has_spent_minimum_momentum():
-                    turn_state = TurnStates.POST_MOVEMENT_PHASE
-                elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
-                    message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
+                turn_state = TurnStates.UPKEEP_PHASE
+                game_state = GameStates.ENEMY_TURN
 
-            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                highlight_legal_moves(player, game_map)
-                turn_state = TurnStates.MOVEMENT_PHASE
-                fov_recompute = True
-
-            if turn_state == TurnStates.UPKEEP_PHASE and game_state == GameStates.PLAYER_TURN: # This is added to avoid starting the Upkeep Phase when the turn just ended.
-                message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
-                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
-                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
-                turn_state = TurnStates.PRE_MOVEMENT_PHASE
-                fov_recompute = True
-
-        if game_state == GameStates.ENEMY_TURN:
-            message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
-            fov_recompute = True
-
-            game_state = GameStates.PLAYER_TURN
-        
+        """
+        Handle targeting.
+        """
         if game_state == GameStates.TARGETING:
             if move:
                 dx, dy = move
@@ -246,6 +245,36 @@ def main():
                         player.weapon.targets.append((cursor.x, cursor.y))
                 else:
                     message_log.add_message(Message('Targeting failed.', colors.get('red')))
+
+        """
+        Handle the Enemy Turn.
+        """
+        if game_state == GameStates.ENEMY_TURN:            
+            if turn_state == TurnStates.UPKEEP_PHASE:
+                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
+                fov_recompute = True
+
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
+
+            elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                turn_state = TurnStates.MOVEMENT_PHASE
+
+            elif turn_state == TurnStates.MOVEMENT_PHASE:
+                turn_state = TurnStates.POST_MOVEMENT_PHASE
+
+            elif turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                turn_state = TurnStates.PRE_ATTACK_PHASE    
+            
+            elif turn_state == TurnStates.PRE_ATTACK_PHASE:
+                turn_state = TurnStates.ATTACK_PHASE    
+            
+            elif turn_state == TurnStates.ATTACK_PHASE:
+                turn_state = TurnStates.POST_ATTACK_PHASE
+
+            elif turn_state == TurnStates.POST_ATTACK_PHASE:
+                turn_state = TurnStates.UPKEEP_PHASE
+                game_state = GameStates.PLAYER_TURN
+
 
 if __name__ == '__main__':
     main()
