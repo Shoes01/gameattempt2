@@ -1,5 +1,6 @@
 import tcod as libtcod
 
+from components.ai import DoNothing
 from components.cursor import Cursor
 from components.mech import Mech
 from components.weapon import Weapon
@@ -54,7 +55,8 @@ def main():
     mech_component = Mech(max_hp=30, peak_momentum=6)
     weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=mech_component)
+    ai_component = DoNothing()
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=mech_component, ai=ai_component)
     cursor_component = Cursor()
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
@@ -213,6 +215,8 @@ def main():
                 for x, y in player.weapon.targets:
                     erase_cell(con, x, y)
                 
+                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
+                fov_recompute = True
                 turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
 
@@ -249,32 +253,39 @@ def main():
         """
         Handle the Enemy Turn.
         """
-        if game_state == GameStates.ENEMY_TURN:            
-            if turn_state == TurnStates.UPKEEP_PHASE:
-                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
-                fov_recompute = True
+        if game_state == GameStates.ENEMY_TURN:
+            for enemy in entities:
+                if enemy.ai:
+                    enemy_turn_results = []
 
-                turn_state = TurnStates.PRE_MOVEMENT_PHASE
+                    if turn_state == TurnStates.UPKEEP_PHASE:
+                        turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
-            elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                turn_state = TurnStates.MOVEMENT_PHASE
+                    elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                        turn_state = TurnStates.MOVEMENT_PHASE
 
-            elif turn_state == TurnStates.MOVEMENT_PHASE:
-                turn_state = TurnStates.POST_MOVEMENT_PHASE
+                    elif turn_state == TurnStates.MOVEMENT_PHASE:
+                        enemy.ai.take_turn()
+                        turn_state = TurnStates.POST_MOVEMENT_PHASE
 
-            elif turn_state == TurnStates.POST_MOVEMENT_PHASE:
-                turn_state = TurnStates.PRE_ATTACK_PHASE    
-            
-            elif turn_state == TurnStates.PRE_ATTACK_PHASE:
-                turn_state = TurnStates.ATTACK_PHASE    
-            
-            elif turn_state == TurnStates.ATTACK_PHASE:
-                turn_state = TurnStates.POST_ATTACK_PHASE
+                    elif turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                        turn_state = TurnStates.PRE_ATTACK_PHASE    
+                    
+                    elif turn_state == TurnStates.PRE_ATTACK_PHASE:
+                        turn_state = TurnStates.ATTACK_PHASE    
+                    
+                    elif turn_state == TurnStates.ATTACK_PHASE:
+                        turn_state = TurnStates.POST_ATTACK_PHASE
 
-            elif turn_state == TurnStates.POST_ATTACK_PHASE:
-                turn_state = TurnStates.UPKEEP_PHASE
-                game_state = GameStates.PLAYER_TURN
+                    elif turn_state == TurnStates.POST_ATTACK_PHASE:
+                        turn_state = TurnStates.UPKEEP_PHASE
+                        game_state = GameStates.PLAYER_TURN
+                    
+                    for result in enemy_turn_results:
+                        message = result.get('message')
 
+                        if message:
+                            message_log.add_message(message)
 
 if __name__ == '__main__':
     main()

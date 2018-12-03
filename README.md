@@ -8,7 +8,8 @@ Run engine.py.
 ## BUGS
 __General__
 
-None reported.
+Need to find a way to ensure the enemy turn will eventually become the player turn.
+    Move the enemy loop inside each turn state individually.
 
 ## ROAD MAP
 - [x] Momentum Based Momement

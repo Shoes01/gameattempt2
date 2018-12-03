@@ -6,7 +6,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, mech=None, cursor=None, weapon=None):
+    def __init__(self, x, y, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, mech=None, cursor=None, weapon=None, ai=None):
         self.x = x
         self.y = y
         self.char = char
@@ -17,10 +17,12 @@ class Entity:
         self.mech = mech
         self.cursor = cursor
         self.weapon = weapon
+        self.ai = ai
 
         if self.mech:   self.mech.owner = self        
         if self.cursor: self.cursor.owner = self
         if self.weapon: self.weapon.owner = self
+        if self.ai:     self.ai.owner = self
 
     def move(self, dx, dy):
         """

@@ -118,7 +118,7 @@ def render_all(
     draw_card(status, 0, 10, status_width, status_height, colors, 'green', 
         weapon=player.weapon.name, dmg=player.weapon.damage, range=player.weapon.range, cur_targets=len(player.weapon.targets), max_targets=player.weapon.max_targets)
 
-    libtcod.console_blit(status, status_x, 0, screen_width, status_height, 0, 0, 0)
+    libtcod.console_blit(status, 0, 0, status_width, status_height, 0, status_x, 0)
 
 def clear_all(con, entities):
     for entity in entities:
