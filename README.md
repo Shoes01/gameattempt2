@@ -35,6 +35,7 @@ Need to find a way to ensure the enemy turn will eventually become the player tu
   - [ ] Allow the player to target a tile multiple times
 - [ ] Provide adequate documentation
 - [ ] Terrain
+  - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
   - [ ] Decide where radar detection should happen
   - [ ] Decide where staggering should happen

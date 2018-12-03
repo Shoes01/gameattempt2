@@ -254,38 +254,40 @@ def main():
         Handle the Enemy Turn.
         """
         if game_state == GameStates.ENEMY_TURN:
-            for enemy in entities:
-                if enemy.ai:
-                    enemy_turn_results = []
+            enemy_turn_results = {}
 
-                    if turn_state == TurnStates.UPKEEP_PHASE:
-                        turn_state = TurnStates.PRE_MOVEMENT_PHASE
+            if turn_state == TurnStates.UPKEEP_PHASE:
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
-                    elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                        turn_state = TurnStates.MOVEMENT_PHASE
+            elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                turn_state = TurnStates.MOVEMENT_PHASE
 
-                    elif turn_state == TurnStates.MOVEMENT_PHASE:
-                        enemy.ai.take_turn()
-                        turn_state = TurnStates.POST_MOVEMENT_PHASE
+            elif turn_state == TurnStates.MOVEMENT_PHASE:
+                for enemy in entities:
+                    if enemy.ai:
+                        enemy_turn_results = enemy.ai.take_turn()
 
-                    elif turn_state == TurnStates.POST_MOVEMENT_PHASE:
-                        turn_state = TurnStates.PRE_ATTACK_PHASE    
-                    
-                    elif turn_state == TurnStates.PRE_ATTACK_PHASE:
-                        turn_state = TurnStates.ATTACK_PHASE    
-                    
-                    elif turn_state == TurnStates.ATTACK_PHASE:
-                        turn_state = TurnStates.POST_ATTACK_PHASE
+                turn_state = TurnStates.POST_MOVEMENT_PHASE
 
-                    elif turn_state == TurnStates.POST_ATTACK_PHASE:
-                        turn_state = TurnStates.UPKEEP_PHASE
-                        game_state = GameStates.PLAYER_TURN
-                    
-                    for result in enemy_turn_results:
-                        message = result.get('message')
+            elif turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                turn_state = TurnStates.PRE_ATTACK_PHASE    
+            
+            elif turn_state == TurnStates.PRE_ATTACK_PHASE:
+                turn_state = TurnStates.ATTACK_PHASE    
+            
+            elif turn_state == TurnStates.ATTACK_PHASE:
+                turn_state = TurnStates.POST_ATTACK_PHASE
 
-                        if message:
-                            message_log.add_message(message)
+            elif turn_state == TurnStates.POST_ATTACK_PHASE:
+                turn_state = TurnStates.UPKEEP_PHASE
+                game_state = GameStates.PLAYER_TURN
+            
+            for result in enemy_turn_results:
+                message = result.get('message')
+
+                if message:
+                    message_log.add_message(Message(message, libtcod.yellow))
+                    fov_recompute = True
 
 if __name__ == '__main__':
     main()
