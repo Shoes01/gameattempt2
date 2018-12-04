@@ -33,7 +33,10 @@ Need to find a way to ensure the enemy turn will eventually become the player tu
 - [ ] Second Weapon System: Ballistics
   - [ ] Code logic to handle an entity with multiple weapons
   - [ ] Allow the player to target a tile multiple times
-- [ ] Provide adequate documentation
+- [ ] Improve code
+  - [ ] Provide adequate documentation
+  - [ ] Decouple what can be decoupled
+  - [ ] Move things out of engine.py
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
