@@ -8,8 +8,7 @@ Run engine.py.
 ## BUGS
 __General__
 
-Need to find a way to ensure the enemy turn will eventually become the player turn.
-    Move the enemy loop inside each turn state individually.
+UI bug: When the NPC takes damage, the player HP bar goes down.
 
 ## ROAD MAP
 - [x] Momentum Based Momement
@@ -27,8 +26,8 @@ Need to find a way to ensure the enemy turn will eventually become the player tu
   - [X] Implement a RenderOrder
 - [ ] Enemy NPC: Destroyable
   - [ ] Implement death function
-  - [ ] Implement weapon damage
-  - [ ] Implement a turn summary variable (found in part 6)
+  - [x] Implement weapon damage
+  - [x] Implement a turn summary variable
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics

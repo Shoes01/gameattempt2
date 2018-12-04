@@ -115,7 +115,7 @@ def main():
         fullscreen = action.get('fullscreen')               # Set game to full screen.
         
         # Handle results from the player actions.
-        player_turn_results = []        
+        player_turn_results = []
 
         if exit:
             if game_state == GameStates.TARGETING:
@@ -139,8 +139,6 @@ def main():
         if game_state == GameStates.PLAYER_TURN:
             # See game_states.py for the turn structure.                                                    
             if turn_state == TurnStates.UPKEEP_PHASE:
-                message_log.add_message(Message('Begin PLAYER TURN.', colors.get('white')))
-                message_log.add_message(Message('Begin MOVEMENT PHASE.', colors.get('white')))
                 message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 fov_recompute = True
@@ -176,7 +174,6 @@ def main():
                 turn_state = TurnStates.PRE_ATTACK_PHASE
 
             elif turn_state == TurnStates.PRE_ATTACK_PHASE:
-                message_log.add_message(Message('Begin ATTACK PHASE.', colors.get('white')))
                 message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', colors.get('orange')))
                 fov_recompute = True
 
@@ -208,7 +205,7 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player.fire_weapon(game_map, entities)
+                player_turn_results.extend(player.fire_weapon(game_map, entities))
 
                 # Reset the mech for the next turn.
                 player.reset()
@@ -218,10 +215,16 @@ def main():
                 for x, y in player.weapon.targets:
                     erase_cell(con, x, y)
                 
-                message_log.add_message(Message('Begin ENEMY TURN.', colors.get('white')))
                 fov_recompute = True
                 turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
+            
+            for result in player_turn_results:
+                message = result.get('message')
+
+                if message: 
+                    message_log.add_message(Message(message, libtcod.yellow))
+                    fov_recompute = True
 
         """
         Handle targeting.

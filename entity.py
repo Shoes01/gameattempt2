@@ -107,13 +107,16 @@ class Entity:
         return results
 
     def damage_entity(self, entity, damage):
-        results = []
+        result = {}
+        
+        if entity is None:
+            return result
         
         entity.mech.hp -= damage
 
-        results = {'message': '{0} was dealth {1} damage.'.format(entity.name.capitalize(), damage)}
+        result = {'message': '{0} was dealt {1} damage.'.format(entity.name.capitalize(), damage)}
 
-        return results
+        return result
 
     def get_entity_at_location(self, location, entities):
         x, y = location
