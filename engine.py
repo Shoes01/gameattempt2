@@ -207,6 +207,9 @@ def main():
                     turn_state = TurnStates.POST_ATTACK_PHASE
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
+                # Fire the weapon
+                player.fire_weapon(game_map, entities)
+
                 # Reset the mech for the next turn.
                 player.reset()
                 

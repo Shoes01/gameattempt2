@@ -5,6 +5,7 @@ class GameStates(Enum):
    PLAYER_TURN = auto()
    ENEMY_TURN = auto()
    TARGETING = auto()
+   PLAYER_DEAD = auto()
 
 class TurnStates(Enum):
 

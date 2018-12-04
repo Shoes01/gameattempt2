@@ -26,6 +26,7 @@ Need to find a way to ensure the enemy turn will eventually become the player tu
   - [x] Allow the player to cancel targeting entirely and restart
   - [X] Implement a RenderOrder
 - [ ] Enemy NPC: Destroyable
+  - [ ] Implement death function
   - [ ] Implement weapon damage
   - [ ] Implement a turn summary variable (found in part 6)
 - [ ] Animation

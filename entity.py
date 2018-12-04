@@ -90,3 +90,36 @@ class Entity:
         Calculate the Manhanttan distance from self to coordinate (x, y)
         """
         return abs(self.x - x) + abs(self.y - y)
+    
+    def fire_weapon(self, game_map, entities):
+        """
+        Fire the entity's weapon.
+        """
+        results = []
+
+        if self.weapon is None: 
+            return results
+        
+        for target in self.weapon.targets:
+            entity = self.get_entity_at_location(target, entities)
+            results.append(self.damage_entity(entity, self.weapon.damage))
+        
+        return results
+
+    def damage_entity(self, entity, damage):
+        results = []
+        
+        entity.mech.hp -= damage
+
+        results = {'message': '{0} was dealth {1} damage.'.format(entity.name.capitalize(), damage)}
+
+        return results
+
+    def get_entity_at_location(self, location, entities):
+        x, y = location
+
+        for entity in entities:
+            if x == entity.x and y == entity.y:
+                return entity
+        
+        return None
