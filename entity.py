@@ -91,7 +91,7 @@ class Entity:
         """
         return abs(self.x - x) + abs(self.y - y)
     
-    def fire_weapon(self, game_map, entities):
+    def fire_weapon(self, entities, weapon):
         """
         Fire the entity's weapon.
         """
@@ -100,7 +100,7 @@ class Entity:
         if self.weapon is None: 
             return results
         
-        for target in self.weapon.targets:
+        for target in weapon.targets:
             entity = self.get_entity_at_location(target, entities)
             results.append(self.damage_entity(entity, self.weapon.damage))
         

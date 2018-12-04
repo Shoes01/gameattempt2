@@ -56,7 +56,8 @@ def main():
     weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
     ai_component = DoNothing()
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=mech_component, ai=ai_component)
+    NPC_mech_component = Mech(max_hp=20, peak_momentum=4)
+    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=NPC_mech_component, ai=ai_component)
     cursor_component = Cursor()
     cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
     entities = [npc, player, cursor]
@@ -205,7 +206,7 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player_turn_results.extend(player.fire_weapon(game_map, entities))
+                player_turn_results.extend(player.fire_weapon(entities, player.weapon))
 
                 # Reset the mech for the next turn.
                 player.reset()
