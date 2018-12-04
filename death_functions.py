@@ -10,14 +10,14 @@ def kill_player(player):
     return 'You died!', GameStates.PLAYER_DEAD
 
 
-def kill_monster(monster):
-    death_message = '{0} is dead!'.format(monster.name.capitalize())
+def kill_enemy(enemy):
+    death_message = '{0} is dead!'.format(enemy.name.capitalize())
 
-    monster.char = '%'
-    monster.color = libtcod.dark_red
-    monster.blocks = False
-    monster.fighter = None
-    monster.ai = None
-    monster.name = 'remains of ' + monster.name
+    enemy.char = '%'
+    enemy.color = libtcod.dark_red
+    enemy.blocks = False
+    enemy.fighter = None
+    enemy.ai = None
+    enemy.name = 'remains of ' + enemy.name
 
     return death_message

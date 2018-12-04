@@ -24,19 +24,19 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
   - [x] Allow the player to "set and forget" momentum level
   - [x] Allow the player to cancel targeting entirely and restart
   - [X] Implement a RenderOrder
-- [ ] Enemy NPC: Destroyable
-  - [ ] Implement death function
+- [x] Enemy NPC: Destroyable
+  - [x] Implement death function
   - [x] Implement weapon damage
   - [x] Implement a turn summary variable
+- [ ] Improve code
+  - [ ] Provide adequate documentation
+  - [ ] Decouple what can be decoupled
+  - [ ] Move things out of engine.py
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics
   - [ ] Code logic to handle an entity with multiple weapons
   - [ ] Allow the player to target a tile multiple times
-- [ ] Improve code
-  - [ ] Provide adequate documentation
-  - [ ] Decouple what can be decoupled
-  - [ ] Move things out of engine.py
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
@@ -53,6 +53,7 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
   - [ ] Implement a more cohesive UI
 - [ ] QoL Maintenance II
 - [ ] Enemy NPC: Firing logic
+  - [ ] Ensure the player is able to die correctly
 - [ ] Momentum based weapons
   - [ ] Weapons impart momentum on user and target
 - [ ] Radar Based Detection

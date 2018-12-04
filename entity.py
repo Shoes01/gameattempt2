@@ -1,5 +1,6 @@
 import math
 
+from death_functions import kill_enemy, kill_player
 from render_functions import RenderOrder
 
 class Entity:
@@ -114,7 +115,10 @@ class Entity:
         
         entity.mech.hp -= damage
 
-        result = {'message': '{0} was dealt {1} damage.'.format(entity.name.capitalize(), damage)}
+        if entity.mech.hp > 0:
+            result = {'message': '{0} was dealt {1} damage.'.format(entity.name.capitalize(), damage)}
+        else:
+            result = {'dead': entity}
 
         return result
 

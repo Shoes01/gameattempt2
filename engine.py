@@ -4,6 +4,7 @@ from components.ai import DoNothing
 from components.cursor import Cursor
 from components.mech import Mech
 from components.weapon import Weapon
+from death_functions import kill_enemy, kill_player
 from entity import Entity
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
@@ -222,8 +223,17 @@ def main():
             
             for result in player_turn_results:
                 message = result.get('message')
+                dead_entity = result.get('dead')
 
                 if message: 
+                    message_log.add_message(Message(message, libtcod.yellow))
+                    fov_recompute = True
+                
+                if dead_entity:
+                    if dead_entity == player:
+                        message, game_state = kill_player(dead_entity)
+                    else:
+                        message = kill_enemy(dead_entity)
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
 
@@ -291,10 +301,25 @@ def main():
             
             for result in enemy_turn_results:
                 message = result.get('message')
+                dead_entity = result.get('dead')
 
                 if message:
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
+                
+                if dead_entity:
+                    if dead_entity == player:
+                        message, game_state = kill_player(dead_entity)
+                    else:
+                        message = kill_enemy(dead_entity)
+                    message_log.add_message(Message(message, libtcod.yellow))
+                    fov_recompute = True
+                
+        """
+        Handle the death of the player.
+        """
+        if game_state == GameStates.PLAYER_DEAD:
+            break
 
 if __name__ == '__main__':
     main()

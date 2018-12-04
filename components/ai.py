@@ -2,8 +2,8 @@ class DoNothing:
     def take_turn(self):
         results = []
 
-        monster = self.owner
+        enemy = self.owner
 
-        results.append({'message': '{0} does nothing.'.format(monster.name.capitalize())})
+        results.append({'message': '{0} does nothing.'.format(enemy.name.capitalize())})
 
         return results
