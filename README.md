@@ -18,7 +18,7 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
 - [x] Multi Tile Targeting
 - [x] Basic UI
   - [x] Display momentum and impulse levels
-  - [x] Display weapon information (number of current targets, max targets, total damage output)
+  - [x] Display weapon information
   - [x] Display remaining HP
 - [x] QoL Maintenance
   - [x] Allow the player to "set and forget" momentum level
@@ -52,6 +52,7 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
   - [ ] Consider changing fonts
   - [ ] Implement a more cohesive UI
 - [ ] QoL Maintenance II
+  - [ ] Visually indicate to the user that a tile has been targeted multiple times (display a numeral on it)
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
 - [ ] Momentum based weapons

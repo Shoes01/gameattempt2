@@ -10,91 +10,49 @@ from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
+from loader_functions.initialize_new_game import get_constants, get_game_variables
 from map_objects.game_map import GameMap
 from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all, RenderOrder
 
 def main():
-    screen_width = 80
-    screen_height = 50
-
-    bar_width = 20
-    panel_height = 7
-    panel_y = screen_height - panel_height
-
-    message_x = bar_width + 2
-    message_width = screen_width - bar_width - 2
-    message_height = panel_height - 1
-
-    status_width = 15
-    status_height = screen_height - panel_height
-    status_x = screen_width - status_width
-
-    map_width = 80
-    map_height = screen_height - panel_height
-
-    fov_algorithm = 0
-    fov_light_walls = True
-    fov_radius = 10
-
-    colors = {
-        'dark_wall': (0, 0, 100),
-        'dark_ground': (50, 50, 150),
-        'light_wall': (130, 110, 50),
-        'light_ground': (200, 180, 50),
-        'white': (255, 255, 255),
-        'black': (0, 0, 0),
-        'light red': (255, 100, 100),
-        'red': (255, 0, 0),
-        'yellow': (255, 255, 0),
-        'orange': (255, 127, 0),
-        'green': (0, 255, 0,),
-        'light_red': (255, 114, 114),   
-        'darker_red': (127, 0, 0),
-        'highlight': (199, 234, 70)
-    }
-
-    mech_component = Mech(max_hp=30, peak_momentum=6)
-    weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=colors.get('green'), range=10)
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', colors.get('white'), "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
-    ai_component = DoNothing()
-    NPC_mech_component = Mech(max_hp=20, peak_momentum=4)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', colors.get('yellow'), "NPC", RenderOrder.ACTOR, mech=NPC_mech_component, ai=ai_component)
-    cursor_component = Cursor()
-    cursor = Entity(-1, -1, ' ', colors.get('red'), "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
-    entities = [npc, player, cursor]
+    constants = get_constants()
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(screen_width, screen_height, title='MVP v0.0')
+    libtcod.console_init_root(constants['screen_width'], constants['screen_height'], title='MVP v0.0')
 
-    con = libtcod.console_new(screen_width, screen_height)
-    panel = libtcod.console_new(screen_width, panel_height)
-    status = libtcod.console_new(status_width, status_height)
+    con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
+    panel = libtcod.console_new(constants['screen_width'], constants['screen_height'])
+    status = libtcod.console_new(constants['screen_width'], constants['screen_height'])  
 
-    game_map = GameMap(map_width, map_height)
+    player = None
+    cursor = None
+    entities = []
+    game_map = None
+    message_log = None
+    game_state = None
+    turn_state = None
 
-    message_log = MessageLog(message_x, message_width, message_height)
+    player, cursor, entities, game_map, message_log, game_state, turn_state = get_game_variables(constants)
+
+    previous_game_state = game_state    
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
-    game_state = GameStates.PLAYER_TURN
-    previous_game_state = game_state
-    turn_state = TurnStates.UPKEEP_PHASE
-
     fov_recompute = True
-
     fov_map = initialize_fov(game_map)
     
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
         render_all(
-            con, panel, entities, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, 
-            status, status_height, status_width, status_x, game_state, turn_state, player)
+            con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
+            constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
+            mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player)
 
         libtcod.console_flush()
 
@@ -141,7 +99,7 @@ def main():
         if game_state == GameStates.PLAYER_TURN:
             # See game_states.py for the turn structure.                                                    
             if turn_state == TurnStates.UPKEEP_PHASE:
-                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', colors.get('orange')))
+                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
                 fov_recompute = True
 
@@ -153,7 +111,7 @@ def main():
             elif turn_state == TurnStates.MOVEMENT_PHASE:
                 if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
-                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), colors.get('orange')))                    
+                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orang))                    
                     fov_recompute = True
                     highlight_legal_moves(player, game_map)
 
@@ -167,7 +125,7 @@ def main():
                 if next_turn_phase and player.mech.has_spent_minimum_momentum():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
                 elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
-                    message_log.add_message(Message('Must spend more momentum.', colors.get('red')))
+                    message_log.add_message(Message('Must spend more momentum.', libtcod.red))
 
             elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 game_map.reset_flags()                
@@ -176,7 +134,7 @@ def main():
                 turn_state = TurnStates.PRE_ATTACK_PHASE
 
             elif turn_state == TurnStates.PRE_ATTACK_PHASE:
-                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', colors.get('orange')))
+                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', libtcod.orange))
                 fov_recompute = True
 
                 turn_state = TurnStates.ATTACK_PHASE
@@ -249,7 +207,7 @@ def main():
                         cursor.fly(dx, dy)
                         fov_recompute = True
                     else:
-                        message_log.add_message(Message('Out of range.', colors.get('red')))
+                        message_log.add_message(Message('Out of range.', libtcod.red))
                 # Ensure that the next targets are adjacent to the previous target
                 elif len(player.weapon.targets) > 0:
                     tar_x, tar_y = player.weapon.targets[-1] # Get the most recent target added.
@@ -257,7 +215,7 @@ def main():
                         cursor.fly(dx, dy)
                         fov_recompute = True
                     else:
-                        message_log.add_message(Message('Invalid target.', colors.get('red')))
+                        message_log.add_message(Message('Invalid target.', libtcod.red))
 
             if select:
                 if len(player.weapon.targets) < player.weapon.max_targets:
@@ -265,7 +223,7 @@ def main():
                         fov_recompute = True
                         player.weapon.targets.append((cursor.x, cursor.y))
                 else:
-                    message_log.add_message(Message('Targeting failed.', colors.get('red')))
+                    message_log.add_message(Message('Targeting failed.', libtcod.red))
 
         """
         Handle the Enemy Turn.
