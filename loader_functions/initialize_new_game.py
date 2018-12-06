@@ -85,10 +85,10 @@ def get_game_variables(constants):
     
     # Create cursor.
     cursor_component = Cursor()
-    cursor = Entity(-1, -1, ' ', libtcod.red, "cursor", cursor=cursor_component) # The ' ' isn't actually "nothing". To have nothing, I would have to mess with a render order.
+    cursor = Entity(-1, -1, ' ', libtcod.red, "cursor", RenderOrder.CURSOR, cursor=cursor_component)
     
     # Create entities list.
-    entities = [npc, player, cursor]
+    entities = [player, cursor, npc]
 
     # Create game_map.
     game_map = GameMap(constants['map_width'], constants['map_height'])

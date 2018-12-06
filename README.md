@@ -31,7 +31,7 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
 - [ ] Improve code
   - [ ] Provide adequate documentation
   - [ ] Decouple what can be decoupled
-  - [ ] Move things out of engine.py
+  - [-] Move things out of engine.py
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics

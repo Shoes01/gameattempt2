@@ -77,22 +77,6 @@ def main():
         # Handle results from the player actions.
         player_turn_results = []
 
-        if exit:
-            if game_state == GameStates.TARGETING:
-                # Turn off cursor
-                cursor.char = ' '
-                cursor.x = -1
-                cursor.y = -1
-
-                fov_recompute = True
-                game_state = previous_game_state
-            
-            else:
-                return True
-
-        if fullscreen:
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
         """
         Handle the Player Turn.
         """
@@ -111,7 +95,7 @@ def main():
             elif turn_state == TurnStates.MOVEMENT_PHASE:
                 if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
-                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orang))                    
+                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
                     fov_recompute = True
                     highlight_legal_moves(player, game_map)
 
@@ -194,7 +178,7 @@ def main():
                         message = kill_enemy(dead_entity)
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
-
+        
         """
         Handle targeting.
         """
@@ -224,7 +208,7 @@ def main():
                         player.weapon.targets.append((cursor.x, cursor.y))
                 else:
                     message_log.add_message(Message('Targeting failed.', libtcod.red))
-
+        
         """
         Handle the Enemy Turn.
         """
@@ -278,6 +262,25 @@ def main():
         """
         if game_state == GameStates.PLAYER_DEAD:
             break
+        
+        """
+        Handle commands that activate regardless of game state.
+        """
+        if exit:
+            if game_state == GameStates.TARGETING:
+                # Turn off cursor
+                cursor.char = ' '
+                cursor.x = -1
+                cursor.y = -1
+
+                fov_recompute = True
+                game_state = previous_game_state
+            
+            else:
+                return True
+
+        if fullscreen:
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
 if __name__ == '__main__':
     main()

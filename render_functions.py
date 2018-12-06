@@ -6,8 +6,9 @@ from map_objects.game_map import GameMap
 from ui_functions import draw_card
 
 class RenderOrder(Enum):
-    CORPSE = auto()
+    CURSOR = auto()
     ACTOR = auto()
+    CORPSE = auto()
 
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)
@@ -70,7 +71,7 @@ def render_all(
                     libtcod.console_set_char_background(con, x, y, colors.get('highlight'), libtcod.BKGND_SET)
 
                 if targeted:
-                    libtcod.console_set_char_background(con, x, y, colors.get('light red'), libtcod.BKGND_SET)
+                    libtcod.console_set_char_background(con, x, y, libtcod.light_red, libtcod.BKGND_SET)
 
     # Draw all entities in the list
     for entity in entities:
