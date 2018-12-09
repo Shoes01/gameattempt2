@@ -12,13 +12,17 @@ class RenderOrder(Enum):
     ACTOR = auto()
     CURSOR = auto()
 
-def get_names_under_mouse(mouse, entities, fov_map):
+def get_names_under_mouse(mouse, entities, fov_map, cursor):
+    # Check to see if the cursor is active. If yes, then giev the names that are under it.
     (x, y) = (mouse.cx, mouse.cy)
+
+    if cursor.location is not None:
+        (x, y) = (cursor.location.x, cursor.location.y)
 
     names = []
 
     for entity in entities:
-        if entity.location is not None and entity.location.x == x and entity.location.y == y and libtcod.map_is_in_fov(fov_map, entity.location.x, entity.location.y):
+        if entity != cursor and entity.location.x == x and entity.location.y == y and libtcod.map_is_in_fov(fov_map, entity.location.x, entity.location.y):
             names.append(entity.name)
 
     names = ', '.join(names)
@@ -45,7 +49,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
 def render_all(
     con, panel, entities, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, 
-    status, status_height, status_width, status_x, game_state, turn_state, player):
+    status, status_height, status_width, status_x, game_state, turn_state, player, cursor):
     """
     Print con console.
     Displays the tiles and entities.
@@ -105,7 +109,7 @@ def render_all(
     # Print what is under the mouse.
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                             get_names_under_mouse(mouse, entities, fov_map))
+                             get_names_under_mouse(mouse, entities, fov_map, cursor))
 
     # Print the HP bar.
     render_bar(panel, 1, 1, bar_width, 'HP', player.chassis.hp, player.chassis.max_hp,

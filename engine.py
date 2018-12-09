@@ -52,7 +52,7 @@ def main():
         render_all(
             con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
             constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
-            mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player)
+            mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player, cursor)
 
         libtcod.console_flush()
 
@@ -73,6 +73,7 @@ def main():
         select = action.get('select')                           # A target has been selected via keyboard.
         show_weapons_menu = action.get('show_weapons_menu')     # Show the weapons menu in order to choose a weapon to fire.
         weapons_menu_index = action.get('weapons_menu_index')   # Choose an item from the weapons menu.
+        look = action.get('look')                               # Enter the LOOK game state.
         exit = action.get('exit')                               # Exit whatever screen is open.
         fullscreen = action.get('fullscreen')                   # Set game to full screen.
         
@@ -80,6 +81,13 @@ def main():
         Handle the Player Turn.
         """
         if game_state == GameStates.PLAYER_TURN:
+            # The player may look around during any game state.
+            if look:
+                previous_game_state = game_state
+                game_state = GameStates.LOOK
+                cursor.cursor.turn_on(player)
+                continue
+            
             # Handle results from the player actions.
             player_turn_results = []
 
@@ -214,6 +222,14 @@ def main():
                     fov_recompute = True
 
         """
+        Handle the Look game state.
+        """
+        if game_state == GameStates.LOOK:
+            if move:
+                dx, dy = move
+                cursor.location.move(dx, dy)
+        
+        """
         Handle the Enemy Turn.
         """
         if game_state == GameStates.ENEMY_TURN:
@@ -272,11 +288,12 @@ def main():
         Handle commands that activate regardless of game state.
         """
         if exit:
-            if game_state == GameStates.SHOW_WEAPONS_MENU:
+            if game_state == GameStates.SHOW_WEAPONS_MENU or game_state == GameStates.LOOK:
                 game_state = previous_game_state
-            
-            if game_state == GameStates.TARGETING:
                 cursor.cursor.turn_off()
+            
+            elif game_state == GameStates.TARGETING:
+                cursor.cursor.turn_off()    
 
                 fov_recompute = True
                 game_state = previous_game_state

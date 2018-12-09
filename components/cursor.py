@@ -7,7 +7,7 @@ class Cursor:
         self.so_far = 0         # The amount of tiles highlited so far.
         self.target_list = []   # Keep track of which coordinates have been targeted.
     
-    def turn_on(self, player, targets):
+    def turn_on(self, player, targets=[]):
         self.owner.location = Location()
 
         if len(targets) == 0:

@@ -37,7 +37,7 @@ None reported.
     - [ ] Move movement code to the Propulsion class
     - [x] Move damage code to the Chassis class
   - [x] Create a Location component
-  - [ ] Create a look function
+  - [x] Create a look function
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics
