@@ -24,7 +24,7 @@ def handle_player_turn_keys(key):
     # Movement keys
     result = generic_move_keys(key)
 
-    if key.vk == libtcod.KEY_ENTER:                     result = {'next turn phase': True}
+    if key.vk == libtcod.KEY_ENTER:                     result = {'next_turn_phase': True}
     
     # Change impulse
     if key.vk == libtcod.KEY_PAGEUP:                    result = {'impulse':  1}

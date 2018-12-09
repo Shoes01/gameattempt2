@@ -3,7 +3,7 @@ import tcod as libtcod
 from components.ai import DoNothing
 from components.chassis import Chassis
 from components.cursor import Cursor
-from components.manager import create_components, WeaponComponent
+from components.manager import create_components, ChassisComponent, PropulsionComponent, WeaponComponent
 from components.mech import Mech
 from entity import Entity
 from game_messages import MessageLog
@@ -39,15 +39,6 @@ def get_constants():
         'dark_ground': (50, 50, 150),
         'light_wall': (130, 110, 50),
         'light_ground': (200, 180, 50),
-        'white': (255, 255, 255),
-        'black': (0, 0, 0),
-        'light red': (255, 100, 100),
-        'red': (255, 0, 0),
-        'yellow': (255, 255, 0),
-        'orange': (255, 127, 0),
-        'green': (0, 255, 0,),
-        'light_red': (255, 114, 114),   
-        'darker_red': (127, 0, 0),
         'highlight': (199, 234, 70)
     }
 
@@ -75,18 +66,18 @@ def get_constants():
 
 def get_game_variables(constants):
     # Create player.
-    chassis_component = Chassis(max_hp=30)
-    mech_component = Mech(peak_momentum=6)
-    weapon_component = create_components({2: WeaponComponent.LASER})
+    chassis_component = create_components({ChassisComponent.BASIC_CHASSIS: 1})
+    mech_component = create_components({PropulsionComponent.BASIC_PROPULSION: 1})
+    weapon_component = create_components({WeaponComponent.LASER: 2})
     player = Entity(int(constants['screen_width'] / 2), int(constants['screen_height'] / 2), '@', libtcod.white, "player", 
                     render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=mech_component, weapon=weapon_component)
     
     # Create NPC.
     ai_component = DoNothing()
-    chassis_component = Chassis(max_hp=20)
-    NPC_mech_component = Mech(peak_momentum=4)
+    chassis_component = create_components({ChassisComponent.WEAK_CHASSIS: 1})
+    mech_component = create_components({PropulsionComponent.WEAK_PROPULSION: 1})
     npc = Entity(int(constants['screen_width'] / 2 - 5), int(constants['screen_height'] / 2), '@', libtcod.yellow, "NPC", 
-                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=NPC_mech_component, ai=ai_component)
+                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=mech_component, ai=ai_component)
     
     # Create cursor.
     cursor_component = Cursor()

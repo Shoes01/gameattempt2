@@ -60,14 +60,15 @@ def main():
 
         fov_recompute = False
 
-        # Handle actions by the player.
+        """
+        Handle the Player Turn.
+        """
         action = handle_keys(key, game_state)
         impulse = None           # This is to avoid logic problems.
 
         move = action.get('move')                               # Attempt to move.
         impulse = action.get('impulse')                         # Adjust mech impulse.
-        next_turn_phase = action.get('next turn phase')         # Move to the next phase.
-        change_game_state = action.get('change game state')     # Go to different game_state.
+        next_turn_phase = action.get('next_turn_phase')         # Move to the next phase.
         reset_targets = action.get('reset_targets')             # Reset targets.
         select = action.get('select')                           # A target has been selected via keyboard.
         show_weapons_menu = action.get('show_weapons_menu')     # Show the weapons menu in order to choose a weapon to fire.
