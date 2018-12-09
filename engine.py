@@ -47,7 +47,7 @@ def main():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
+            recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
         render_all(
             con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
@@ -103,7 +103,7 @@ def main():
 
                 if move:
                     dx, dy = move
-                    if not game_map.tiles[player.x + dx][player.y + dy].blocked:
+                    if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
                         player.mech.move(dx, dy)
 
                         fov_recompute = True
@@ -276,10 +276,7 @@ def main():
                 game_state = previous_game_state
             
             if game_state == GameStates.TARGETING:
-                # Turn off cursor
-                cursor.char = ' '
-                cursor.x = -1
-                cursor.y = -1
+                cursor.cursor.turn_off()
 
                 fov_recompute = True
                 game_state = previous_game_state

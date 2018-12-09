@@ -15,8 +15,12 @@ class RenderOrder(Enum):
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)
 
-    names = [entity.name for entity in entities
-             if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+    names = []
+
+    for entity in entities:
+        if entity.location is not None and entity.location.x == x and entity.location.y == y and libtcod.map_is_in_fov(fov_map, entity.location.x, entity.location.y):
+            names.append(entity.name)
+
     names = ', '.join(names)
 
     return names.capitalize()
@@ -79,7 +83,8 @@ def render_all(
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
     
     for entity in entities_in_render_order:
-        draw_entity(con, entity, fov_map, game_map)
+        if entity.location is not None:
+            draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
@@ -135,19 +140,19 @@ def render_all(
     if game_state == GameStates.SHOW_WEAPONS_MENU:
         weapon_menu(con, 'Choose your weapon to fire.', player.weapon, 50, screen_height, screen_width)
 
-
 def clear_all(con, entities):
     for entity in entities:
         clear_entity(con, entity)
 
 def draw_entity(con, entity, fov_map, game_map):
-    if libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
-        libtcod.console_set_default_foreground(con, entity.color)
-        libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)
+    if libtcod.map_is_in_fov(fov_map, entity.location.x, entity.location.y):
+            libtcod.console_set_default_foreground(con, entity.color)
+            libtcod.console_put_char(con, entity.location.x, entity.location.y, entity.char, libtcod.BKGND_NONE)
 
 def clear_entity(con, entity):
     # erase the character that represents this object
-    libtcod.console_put_char(con, entity.x, entity.y, ' ', libtcod.BKGND_NONE)
+    if entity.location is not None:
+        libtcod.console_put_char(con, entity.location.x, entity.location.y, ' ', libtcod.BKGND_NONE)
 
 def highlight_legal_moves(player, game_map):
     game_map.reset_flags()
@@ -169,14 +174,14 @@ def highlight_legal_moves(player, game_map):
                 # Now check to see that the direction matches the momentum.
                 if h_mom == 0:                                                                      # x can be anything.
                     if v_mom == 0:                                                                      # y can be anything (this is the trivial case).
-                        game_map.set_highlighted(player.x + x, player.y + y)
+                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.set_highlighted(player.x + x, player.y + y)
+                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
                 elif h_mom != 0 and ( x == 0 or math.copysign(1, x) == math.copysign(1, h_mom) ):   # x must be 0 or have the same sign as h_mom.
                     if v_mom == 0:                                                                      # y can be anything.
-                        game_map.set_highlighted(player.x + x, player.y + y)
+                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
                     elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.set_highlighted(player.x + x, player.y + y)
+                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
 
 def erase_cell(con, x, y):
     """

@@ -67,7 +67,7 @@ class Mech:
             # The trivial case: the mech is at rest.
             if self.maximum_horizontal_momentum == 0 and self.maximum_vertical_momentum == 0 and self.impulse == 1:
                 # Allow the player to move in any direction.
-                self.owner.move(dx, dy)
+                self.owner.location.move(dx, dy)
                 self.accumulated_horizontal_momentum += dx
                 self.accumulated_vertical_momentum += dy
                 self.has_spent_impulse = True
@@ -78,25 +78,25 @@ class Mech:
                 # The mech has momentum left. Check that it wants to move in the right direction.
                 if math.copysign(1, dx) == math.copysign(1, self.maximum_horizontal_momentum):
                     # Allow the player to move in the x axis
-                    self.owner.move(dx, 0)
+                    self.owner.location.move(dx, 0)
                     self.accumulated_horizontal_momentum += dx
             # Moving along the y-axis
             elif abs(self.accumulated_vertical_momentum) < abs(self.maximum_vertical_momentum) and dy != 0:
                 # The mech has momentum left. Check that it wants to move in the right direction.
                 if math.copysign(1, dy) == math.copysign(1, self.maximum_vertical_momentum):
                     # Allow the player to move in the y axis
-                    self.owner.move(0, dy)
+                    self.owner.location.move(0, dy)
                     self.accumulated_vertical_momentum += dy
             # Moving after all momentum has been spent
             elif abs(self.impulse) == 1 and not self.has_spent_impulse:
                 # Gain momentum in a direction.
                 # Check the x-axis.
                 if dx != 0 and self.maximum_horizontal_momentum == 0 or math.copysign(1, dx) == math.copysign(1, self.maximum_horizontal_momentum):
-                    self.owner.move(dx, 0)
+                    self.owner.location.move(dx, 0)
                     self.accumulated_horizontal_momentum += dx
                     self.has_spent_impulse = True
                 # Check the y-axis.
                 if dy != 0 and self.maximum_vertical_momentum == 0 or math.copysign(1, dy) == math.copysign(1, self.maximum_vertical_momentum):
-                    self.owner.move(0, dy)
+                    self.owner.location.move(0, dy)
                     self.accumulated_vertical_momentum += dy
                     self.has_spent_impulse = True

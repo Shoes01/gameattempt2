@@ -7,9 +7,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, chassis=None, mech=None, cursor=None, weapon=None, ai=None):
-        self.x = x
-        self.y = y
+    def __init__(self, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None):
         self.char = char
         self.color = color
         self.name = name
@@ -20,37 +18,31 @@ class Entity:
         self.cursor = cursor
         self.weapon = weapon                # A list of weapons.
         self.ai = ai
+        self.location = location
 
         if self.chassis:    self.chassis.owner = self
         if self.mech:       self.mech.owner = self
         if self.cursor:     self.cursor.owner = self
         if self.ai:         self.ai.owner = self
+        if self.location:   self.location.owner = self
         if self.weapon:
             for w in self.weapon:
                 w.owner = self
-
-    def move(self, dx, dy):
-        """
-        Move the entity regardless of everything.
-        """
-        self.x += dx
-        self.y += dy
-        self.has_moved = True
 
     def reset(self):
         """
         Reset the entity for the next turn.
         """
         self.mech.reset()
-        for w in self.weapon:
-            w.reset()
         self.has_moved = False
+        for w in self.weapon:
+            w.reset()        
     
     def distance(self, x, y):
         """
         Calculate the Manhanttan distance from self to coordinate (x, y).
         """
-        return abs(self.x - x) + abs(self.y - y)
+        return abs(self.location.x - x) + abs(self.location.y - y)
     
     def activate_weapon(self, chosen_weapon):
         """
@@ -91,7 +83,7 @@ def get_entity_at_location(location, entities):
     x, y = location
 
     for entity in entities:
-        if x == entity.x and y == entity.y:
+        if entity.location is not None and x == entity.location.x and y == entity.location.y:
             return entity
     
     return None

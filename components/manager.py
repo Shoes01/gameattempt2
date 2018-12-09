@@ -28,7 +28,10 @@ def create_components(component_dict):
             results.append(create_component(component))
             iter += 1
 
-    return results
+    if type(component) is not WeaponComponent:
+        return results.pop()    # Only multi-weapon entities are supported at the moment.
+    else:
+        return results
 
 def create_component(component):
     """

@@ -36,7 +36,7 @@ None reported.
   - [ ] Consider splitting the Mech class into a Propulsion class and a Chassis class (or something else that handles defense, HP, etc)
     - [ ] Move movement code to the Propulsion class
     - [x] Move damage code to the Chassis class
-  - [ ] Create a Location component
+  - [x] Create a Location component
   - [ ] Create a look function
 - [ ] Animation
 - [ ] Event Queue
