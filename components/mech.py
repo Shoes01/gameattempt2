@@ -1,9 +1,10 @@
 import math
 
 class Mech:
-    def __init__(self, max_hp, peak_momentum, max_impulse=1):
-        self.max_hp = max_hp                    # The max HP of the mech.
-        self.hp = max_hp                        # The current HP of the mech.
+    """
+    The Mech class stores the HP and the Momentum properties.
+    """
+    def __init__(self, peak_momentum, max_impulse=1):
         self.peak_momentum = peak_momentum      # The absolute highest momentum the mech can have
         self.maximum_horizontal_momentum = 0    # Positive: right
         self.maximum_vertical_momentum = 0      # Positive: down
@@ -54,3 +55,48 @@ class Mech:
         self.accumulated_horizontal_momentum = 0
         self.accumulated_vertical_momentum = 0
         self.has_spent_impulse = False
+    
+    def move(self, dx, dy):
+        """
+        Move the entity according to the rules of momentum.
+        Cares about obstacles.
+        """
+        if self.calculate_accumulated_momentum() < self.calculate_maximum_momentum():
+            # Allow the player to move.
+
+            # The trivial case: the mech is at rest.
+            if self.maximum_horizontal_momentum == 0 and self.maximum_vertical_momentum == 0 and self.impulse == 1:
+                # Allow the player to move in any direction.
+                self.owner.move(dx, dy)
+                self.accumulated_horizontal_momentum += dx
+                self.accumulated_vertical_momentum += dy
+                self.has_spent_impulse = True
+            
+            # The non-trivial case: the mech is moving, so there are some directions that are not allowed.
+            # Moving along the x-axis
+            elif abs(self.accumulated_horizontal_momentum) < abs(self.maximum_horizontal_momentum) and dx != 0:
+                # The mech has momentum left. Check that it wants to move in the right direction.
+                if math.copysign(1, dx) == math.copysign(1, self.maximum_horizontal_momentum):
+                    # Allow the player to move in the x axis
+                    self.owner.move(dx, 0)
+                    self.accumulated_horizontal_momentum += dx
+            # Moving along the y-axis
+            elif abs(self.accumulated_vertical_momentum) < abs(self.maximum_vertical_momentum) and dy != 0:
+                # The mech has momentum left. Check that it wants to move in the right direction.
+                if math.copysign(1, dy) == math.copysign(1, self.maximum_vertical_momentum):
+                    # Allow the player to move in the y axis
+                    self.owner.move(0, dy)
+                    self.accumulated_vertical_momentum += dy
+            # Moving after all momentum has been spent
+            elif abs(self.impulse) == 1 and not self.has_spent_impulse:
+                # Gain momentum in a direction.
+                # Check the x-axis.
+                if dx != 0 and self.maximum_horizontal_momentum == 0 or math.copysign(1, dx) == math.copysign(1, self.maximum_horizontal_momentum):
+                    self.owner.move(dx, 0)
+                    self.accumulated_horizontal_momentum += dx
+                    self.has_spent_impulse = True
+                # Check the y-axis.
+                if dy != 0 and self.maximum_vertical_momentum == 0 or math.copysign(1, dy) == math.copysign(1, self.maximum_vertical_momentum):
+                    self.owner.move(0, dy)
+                    self.accumulated_vertical_momentum += dy
+                    self.has_spent_impulse = True

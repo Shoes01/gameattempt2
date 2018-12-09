@@ -63,24 +63,25 @@ def main():
         # Handle actions by the player.
         action = handle_keys(key, game_state)
         impulse = None           # This is to avoid logic problems.
-        change_game_state = None # This is to avoid logic problems.
 
-        move = action.get('move')                           # Attempt to move.
-        impulse = action.get('impulse')                     # Adjust mech impulse.
-        next_turn_phase = action.get('next turn phase')     # Move to the next phase.
-        change_game_state = action.get('change game state') # Go to different game_state.
-        reset_targets = action.get('reset_targets')         # Reset targets.
-        select = action.get('select')                       # A target has been selected via keyboard.
-        exit = action.get('exit')                           # Exit whatever screen is open.
-        fullscreen = action.get('fullscreen')               # Set game to full screen.
+        move = action.get('move')                               # Attempt to move.
+        impulse = action.get('impulse')                         # Adjust mech impulse.
+        next_turn_phase = action.get('next turn phase')         # Move to the next phase.
+        change_game_state = action.get('change game state')     # Go to different game_state.
+        reset_targets = action.get('reset_targets')             # Reset targets.
+        select = action.get('select')                           # A target has been selected via keyboard.
+        show_weapons_menu = action.get('show_weapons_menu')     # Show the weapons menu in order to choose a weapon to fire.
+        weapons_menu_index = action.get('weapons_menu_index')   # Choose an item from the weapons menu.
+        exit = action.get('exit')                               # Exit whatever screen is open.
+        fullscreen = action.get('fullscreen')                   # Set game to full screen.
         
-        # Handle results from the player actions.
-        player_turn_results = []
-
         """
         Handle the Player Turn.
         """
         if game_state == GameStates.PLAYER_TURN:
+            # Handle results from the player actions.
+            player_turn_results = []
+
             # See game_states.py for the turn structure.                                                    
             if turn_state == TurnStates.UPKEEP_PHASE:
                 message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
@@ -102,7 +103,7 @@ def main():
                 if move:
                     dx, dy = move
                     if not game_map.tiles[player.x + dx][player.y + dy].blocked:
-                        player.move(dx, dy)
+                        player.mech.move(dx, dy)
 
                         fov_recompute = True
                 
@@ -118,25 +119,15 @@ def main():
                 turn_state = TurnStates.PRE_ATTACK_PHASE
 
             elif turn_state == TurnStates.PRE_ATTACK_PHASE:
-                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase.', libtcod.orange))
+                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase. Press r to choose new targets.', libtcod.orange))
                 fov_recompute = True
 
                 turn_state = TurnStates.ATTACK_PHASE
 
             elif turn_state == TurnStates.ATTACK_PHASE:
-                if change_game_state == GameStates.TARGETING:
-                    # Turn on cursor.
-                    cursor.char = 'X'
-                    # If there were no previous targets, start on the player.
-                    if len(player.weapon.targets) == 0:                        
-                        cursor.x = player.x
-                        cursor.y = player.y
-                    else:
-                        cursor.x, cursor.y = player.weapon.targets[-1]
-
-                    fov_recompute = True
+                if show_weapons_menu:
                     previous_game_state = game_state
-                    game_state = GameStates.TARGETING
+                    game_state = GameStates.SHOW_WEAPONS_MENU
 
                 if reset_targets:
                     player.weapon.reset()
@@ -149,15 +140,17 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player_turn_results.extend(player.fire_weapon(entities, player.weapon))
+                player_turn_results.extend(player.fire_active_weapon(entities))
 
                 # Reset the mech for the next turn.
                 player.reset()
                 
                 # Reset map flags and remove targets.
                 game_map.reset_flags()
-                for x, y in player.weapon.targets:
-                    erase_cell(con, x, y)
+                w = player.get_active_weapon()
+                if w is not None:
+                    for x, y in w.targets:
+                        erase_cell(con, x, y)
                 
                 fov_recompute = True
                 turn_state = TurnStates.UPKEEP_PHASE
@@ -167,48 +160,58 @@ def main():
                 message = result.get('message')
                 dead_entity = result.get('dead')
 
-                if message: 
-                    message_log.add_message(Message(message, libtcod.yellow))
-                    fov_recompute = True
-                
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
                     else:
                         message = kill_enemy(dead_entity)
+                
+                if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
-        
+                
         """
-        Handle targeting.
+        Handle the targeting cursor.
         """
         if game_state == GameStates.TARGETING:
+            targeting_results = []
+
             if move:
-                dx, dy = move
-                # Ensure the first target is in firing range.
-                if len(player.weapon.targets) == 0:
-                    if player.distance(cursor.x + dx, cursor.y + dy) <= player.weapon.range:
-                        cursor.fly(dx, dy)
-                        fov_recompute = True
-                    else:
-                        message_log.add_message(Message('Out of range.', libtcod.red))
-                # Ensure that the next targets are adjacent to the previous target
-                elif len(player.weapon.targets) > 0:
-                    tar_x, tar_y = player.weapon.targets[-1] # Get the most recent target added.
-                    if abs(tar_x - (cursor.x + dx)) + abs(tar_y - (cursor.y + dy)) <= 1:
-                        cursor.fly(dx, dy)
-                        fov_recompute = True
-                    else:
-                        message_log.add_message(Message('Invalid target.', libtcod.red))
+                cursor.cursor.move(move, player.get_active_weapon(), player)
 
             if select:
-                if len(player.weapon.targets) < player.weapon.max_targets:
-                    if game_map.set_targeted(cursor.x, cursor.y):  # At the moment, this always returns True. In the future, this may change.
-                        fov_recompute = True
-                        player.weapon.targets.append((cursor.x, cursor.y))
-                else:
-                    message_log.add_message(Message('Targeting failed.', libtcod.red))
-        
+                cursor.cursor.target(game_map, player.get_active_weapon())
+                fov_recompute = True
+            
+            for result in targeting_results:
+                message = result.get('message')
+                target = result.get('target')
+                
+                if message:
+                    message_log.add_message(Message(message, libtcod.red))
+                    fov_recompute = True
+                
+                if target:
+                    pass
+
+        """
+        Handle the Show Weapons Menu state.
+        """
+        if game_state == GameStates.SHOW_WEAPONS_MENU:
+            menu_results = []
+
+            if weapons_menu_index is not None and weapons_menu_index <= len(player.weapon) and previous_game_state != GameStates.PLAYER_DEAD:
+                menu_results.append(player.weapon[weapons_menu_index].activate())
+                cursor.cursor.turn_on(player, player.weapon[weapons_menu_index].targets)
+                game_state = GameStates.TARGETING
+            
+            for result in menu_results:
+                message = result.get('message')
+                
+                if message:
+                    message_log.add_message(Message(message, libtcod.dark_green))
+                    fov_recompute = True
+
         """
         Handle the Enemy Turn.
         """
@@ -261,12 +264,16 @@ def main():
         Handle the death of the player.
         """
         if game_state == GameStates.PLAYER_DEAD:
+            print('You are dead.')
             break
         
         """
         Handle commands that activate regardless of game state.
         """
         if exit:
+            if game_state == GameStates.SHOW_WEAPONS_MENU:
+                game_state = previous_game_state
+            
             if game_state == GameStates.TARGETING:
                 # Turn off cursor
                 cursor.char = ' '

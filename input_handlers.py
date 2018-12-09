@@ -7,6 +7,7 @@ def handle_keys(key, game_state):
         if game_state == GameStates.ENEMY_TURN:         return handle_enemy_turn_keys(key)
         elif game_state == GameStates.PLAYER_TURN:      return handle_player_turn_keys(key)
         elif game_state == GameStates.TARGETING:        return handle_targeting_keys(key)
+        elif game_state == GameStates.SHOW_WEAPONS_MENU:return handle_menu_keys(key)
         
     return {}
 
@@ -31,7 +32,7 @@ def handle_player_turn_keys(key):
     elif key.vk == libtcod.KEY_HOME:                    result = {'impulse':  0}
 
     # Other keys
-    if key_char == 'f':                                 result = {'change game state': GameStates.TARGETING}
+    if key_char == 'f':                                 result = {'show_weapons_menu': True}
     if key_char == 'r':                                 result = {'reset_targets': True}
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:        result = {'fullscreen': True}
@@ -40,14 +41,30 @@ def handle_player_turn_keys(key):
     return result
 
 def handle_targeting_keys(key):
+    key_char = chr(key.c)
     result = {}
 
     # Movement keys
     result = generic_move_keys(key)
 
+    # Other keys
+    if key_char == 'f':                                 result = {'exit': True}
+
     if key.vk == libtcod.KEY_ENTER:                     result = {'select': True}
     elif key.vk == libtcod.KEY_ESCAPE:                  result = {'exit': True}
     
+    return result
+
+def handle_menu_keys(key):
+    result = {}
+
+    index = key.c - ord('a')
+
+    if index >= 0:                                      result = {'weapons_menu_index': index}
+
+    if key.vk == libtcod.KEY_ENTER and key.lalt:        result = {'fullscreen': True}
+    elif key.vk == libtcod.KEY_ESCAPE:                  result = {'exit': True}
+
     return result
 
 def generic_move_keys(key):

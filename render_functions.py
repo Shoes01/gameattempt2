@@ -2,13 +2,15 @@ import math
 import tcod as libtcod
 
 from enum import auto, Enum
+from game_states import GameStates
 from map_objects.game_map import GameMap
+from menus import weapon_menu
 from ui_functions import draw_card
 
 class RenderOrder(Enum):
-    CURSOR = auto()
-    ACTOR = auto()
     CORPSE = auto()
+    ACTOR = auto()
+    CURSOR = auto()
 
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)
@@ -74,7 +76,9 @@ def render_all(
                     libtcod.console_set_char_background(con, x, y, libtcod.light_red, libtcod.BKGND_SET)
 
     # Draw all entities in the list
-    for entity in entities:
+    entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
+    
+    for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
@@ -99,7 +103,7 @@ def render_all(
                              get_names_under_mouse(mouse, entities, fov_map))
 
     # Print the HP bar.
-    render_bar(panel, 1, 1, bar_width, 'HP', player.mech.hp, player.mech.max_hp,
+    render_bar(panel, 1, 1, bar_width, 'HP', player.chassis.hp, player.chassis.max_hp,
                libtcod.light_red, libtcod.darker_red, libtcod.white)
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
@@ -112,14 +116,25 @@ def render_all(
     libtcod.console_set_default_background(status, libtcod.black)
     libtcod.console_clear(status)
 
-    draw_card(status, 0, 0, status_width, status_height, colors, 'white', 
+    draw_card(status, 0, 0, status_width, status_height, libtcod.white, 
         turn=game_state.name, phase=turn_state.name, 
         momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
 
-    draw_card(status, 0, 10, status_width, status_height, colors, 'green', 
-        weapon=player.weapon.name, dmg=player.weapon.damage, range=player.weapon.range, cur_targets=len(player.weapon.targets), max_targets=player.weapon.max_targets)
+    if len(player.weapon) > 0:
+        iterator = 1
+        for weapon in player.weapon:    
+            draw_card(status, 0, iterator*10, status_width, status_height, weapon.color, 
+                weapon=weapon.name, dmg=weapon.damage, range=weapon.range, cur_targets=len(weapon.targets), max_targets=weapon.max_targets)
+            iterator += 1
 
     libtcod.console_blit(status, 0, 0, status_width, status_height, 0, status_x, 0)
+
+    """
+    Print menus.
+    """
+    if game_state == GameStates.SHOW_WEAPONS_MENU:
+        weapon_menu(con, 'Choose your weapon to fire.', player.weapon, 50, screen_height, screen_width)
+
 
 def clear_all(con, entities):
     for entity in entities:

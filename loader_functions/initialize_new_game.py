@@ -1,9 +1,10 @@
 import tcod as libtcod
 
 from components.ai import DoNothing
+from components.chassis import Chassis
 from components.cursor import Cursor
+from components.manager import create_components, WeaponComponent
 from components.mech import Mech
-from components.weapon import Weapon
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
@@ -74,18 +75,22 @@ def get_constants():
 
 def get_game_variables(constants):
     # Create player.
-    mech_component = Mech(max_hp=30, peak_momentum=6)
-    weapon_component = Weapon(name="Laser", damage=5, min_targets=0, max_targets=5, color=libtcod.green, range=10)
-    player = Entity(int(constants['screen_width'] / 2), int(constants['screen_height'] / 2), '@', libtcod.white, "player", RenderOrder.ACTOR, mech=mech_component, weapon=weapon_component)
+    chassis_component = Chassis(max_hp=30)
+    mech_component = Mech(peak_momentum=6)
+    weapon_component = create_components({2: WeaponComponent.LASER})
+    player = Entity(int(constants['screen_width'] / 2), int(constants['screen_height'] / 2), '@', libtcod.white, "player", 
+                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=mech_component, weapon=weapon_component)
     
     # Create NPC.
     ai_component = DoNothing()
-    NPC_mech_component = Mech(max_hp=20, peak_momentum=4)
-    npc = Entity(int(constants['screen_width'] / 2 - 5), int(constants['screen_height'] / 2), '@', libtcod.yellow, "NPC", RenderOrder.ACTOR, mech=NPC_mech_component, ai=ai_component)
+    chassis_component = Chassis(max_hp=20)
+    NPC_mech_component = Mech(peak_momentum=4)
+    npc = Entity(int(constants['screen_width'] / 2 - 5), int(constants['screen_height'] / 2), '@', libtcod.yellow, "NPC", 
+                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=NPC_mech_component, ai=ai_component)
     
     # Create cursor.
     cursor_component = Cursor()
-    cursor = Entity(-1, -1, ' ', libtcod.red, "cursor", RenderOrder.CURSOR, cursor=cursor_component)
+    cursor = Entity(-1, -1, ' ', libtcod.red, "cursor", render_order=RenderOrder.CURSOR, cursor=cursor_component)
     
     # Create entities list.
     entities = [player, cursor, npc]

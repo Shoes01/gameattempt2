@@ -8,7 +8,7 @@ Run engine.py.
 ## BUGS
 __General__
 
-UI bug: When the NPC takes damage, the player HP bar goes down.
+None reported.
 
 ## ROAD MAP
 - [x] Momentum Based Momement
@@ -30,13 +30,19 @@ UI bug: When the NPC takes damage, the player HP bar goes down.
   - [x] Implement a turn summary variable
 - [ ] Improve code
   - [ ] Provide adequate documentation
-  - [ ] Decouple what can be decoupled
+  - [-] Decouple what can be decoupled
   - [-] Move things out of engine.py
+  - [x] Create component managers
+  - [ ] Consider splitting the Mech class into a Propulsion class and a Chassis class (or something else that handles defense, HP, etc)
+    - [ ] Move movement code to the Propulsion class
+    - [x] Move damage code to the Chassis class
+  - [ ] Create a Location component
+  - [ ] Create a look function
 - [ ] Animation
 - [ ] Event Queue
 - [ ] Second Weapon System: Ballistics
-  - [ ] Code logic to handle an entity with multiple weapons
-  - [ ] Allow the player to target a tile multiple times
+  - [x] Code logic to handle an entity with multiple weapons
+  - [x] Allow the player to target a tile multiple times
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
