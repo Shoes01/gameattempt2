@@ -126,7 +126,7 @@ def render_all(
     libtcod.console_clear(status)
 
     draw_card(status, 0, 0, status_width, status_height, libtcod.white, 
-        turn=game_state.name, phase=turn_state.name, 
+        turn=game_state.name, phase=turn_state.name, impulse=player.mech.impulse,
         momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
 
     if len(player.weapon) > 0:
@@ -171,7 +171,7 @@ def highlight_legal_moves(player, game_map):
 
     for x in range(minimum, maximum):
         for y in range(minimum, maximum):
-            if (abs(x) + abs(y) >= mech_momentum - 2 and         # Ensure the tile exceeds the minimum.
+            if (abs(x) + abs(y) >= mech_momentum and             # Ensure the tile exceeds the minimum.
                 abs(x) <= abs(h_mom) + abs(mech_impulse) and     # Ensure the x value is below the horizontal momentum.
                 abs(y) <= abs(v_mom) + abs(mech_impulse) and     # Ensure the y value is below the vertical momentum.
                 abs(x) + abs(y) <= mech_momentum):               # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)

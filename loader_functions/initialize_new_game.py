@@ -7,6 +7,7 @@ from components.location import Location
 from components.manager import create_components, ChassisComponent, PropulsionComponent, WeaponComponent
 from components.mech import Mech
 from entity import Entity
+from event_queue import EventQueue
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
 from map_objects.game_map import GameMap
@@ -102,4 +103,10 @@ def get_game_variables(constants):
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE
 
-    return player, cursor, entities, game_map, message_log, game_state, turn_state
+    # Open the event queue, and load it up.
+    event_queue = EventQueue()
+    for entity in entities:
+        if entity is not cursor:
+            event_queue.register(entity)
+
+    return player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue

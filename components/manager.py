@@ -39,12 +39,14 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='Laser', damage=5, min_targets=0, max_targets=5, color=libtcod.green, range=10)
+        return Weapon(name='Laser', damage=5, min_targets=0, max_targets=5, color=libtcod.green, range=10, cost=1)
+    
     # Chassis components.
     elif component == ChassisComponent.BASIC_CHASSIS:
         return Chassis(max_hp=30)
     elif component == ChassisComponent.WEAK_CHASSIS:
         return Chassis(max_hp=20)
+    
     # Propulsion components.
     elif component == PropulsionComponent.BASIC_PROPULSION:
         return Mech(peak_momentum=6, max_impulse=1)

@@ -24,13 +24,15 @@ class TurnStates(Enum):
    1) The player may adjust their impulse.
    2) Legal tiles to which the player can move are highlighted.
    3) This phase ends when the player begins to move.
+   3.1) At this time, the player is given action points for their pool, equal to TICKS_PER_TURN / speed.
+   3.2) TICKS_PER_TURN is the LCM(1:12) = 27720
    MOVEMENT_PHASE
    1) The player is given a limit of moves, based on their momentum. This determines time needed to move one tile.
       The player is free to use the moves in the order they wish; they are not forced to start with horizontal moves, then do vertical.
       The player may not "undo" moves.
       When the player begins to move, impulse can no longer be changed.
    2) As the player moves, the fov is updated.
-   3) As the player moves, all other projectiles move too, based on the player's time needed to move one tile.
+   3) As the player moves, enemy projectiles move too, based on their own speed. Faster projectiles will move more tiles for each single tile the player moves.
    4) If the player rams into projectiles, it will affect their next turn's momentum.
    5) If the player rams into obstacles, it will affect their next turn's momentum.
       Example: if they are forced to ram into a wall for three turns, that's a lot more damaging than ramming into a wall for one turn! The wall may also collapse.

@@ -19,6 +19,7 @@ class Entity:
         self.weapon = weapon                # A list of weapons.
         self.ai = ai
         self.location = location
+        self.action_points = 0          # TODO: Use a constant here.
 
         if self.chassis:    self.chassis.owner = self
         if self.mech:       self.mech.owner = self

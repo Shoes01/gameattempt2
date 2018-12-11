@@ -13,6 +13,10 @@ class Mech:
         self.has_spent_impulse = False          # When impulse is used to propel the mech further and gain momentum, this is set to True.
         self.accumulated_horizontal_momentum = 0# When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
         self.accumulated_vertical_momentum = 0  # When this number reaches maximum momentum, the player can no longer move in that direction, unless it has impulse.
+
+    @property
+    def speed(self):    
+        return self.calculate_maximum_momentum()
         
     def calculate_maximum_momentum(self):
         # Calculate the maximum momentum the mech can use this turn.
@@ -29,7 +33,7 @@ class Mech:
     
     def has_spent_minimum_momentum(self):
         # Check to see that the mech has moved the minimum tiles required by their momentum.
-        if self.calculate_accumulated_momentum() >= self.calculate_maximum_momentum() - 2:
+        if self.calculate_accumulated_momentum() >= self.calculate_maximum_momentum():
             return True
         return False
     
@@ -60,6 +64,7 @@ class Mech:
         """
         Move the entity according to the rules of momentum.
         Cares about obstacles.
+        TODO: Make use of "player turn results" here so that errors can be properly thrown.
         """
         if self.calculate_accumulated_momentum() < self.calculate_maximum_momentum():
             # Allow the player to move.

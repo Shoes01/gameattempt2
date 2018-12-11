@@ -32,8 +32,9 @@ def main():
     message_log = None
     game_state = None
     turn_state = None
+    event_queue = None
 
-    player, cursor, entities, game_map, message_log, game_state, turn_state = get_game_variables(constants)
+    player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
 
     previous_game_state = game_state    
 
@@ -77,6 +78,11 @@ def main():
         exit = action.get('exit')                               # Exit whatever screen is open.
         fullscreen = action.get('fullscreen')                   # Set game to full screen.
         
+        entity_to_act = event_queue.tick()
+        if entity_to_act is player and game_state is GameStates.ENEMY_TURN: # TODO: Is this the best way to do this? I don't know how to tell if all the enemies have gone.
+            game_state = GameStates.PLAYER_TURN
+            turn_state = TurnStates.UPKEEP_PHASE
+
         """
         Handle the Player Turn.
         """
@@ -103,6 +109,7 @@ def main():
                 fov_recompute = True
 
             elif turn_state == TurnStates.MOVEMENT_PHASE:
+                # TODO: Choosing impulse should be in the pre-movement phase. Otherwise, the impulse can be changed on the fly and it recalcultes the highlighting.
                 if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
@@ -119,7 +126,7 @@ def main():
                 if next_turn_phase and player.mech.has_spent_minimum_momentum():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
                 elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
-                    message_log.add_message(Message('Must spend more momentum.', libtcod.red))
+                    message_log.add_message(Message('Must spend more momentum.', libtcod.red))  # TODO: Move this to an "end the phase" action and use turn_results to display.
 
             elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 game_map.reset_flags()                
@@ -234,6 +241,9 @@ def main():
         """
         if game_state == GameStates.ENEMY_TURN:
             enemy_turn_results = {}
+            
+            if entity_to_act is not None:
+                enemy = entity_to_act
 
             if turn_state == TurnStates.UPKEEP_PHASE:
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
@@ -242,9 +252,7 @@ def main():
                 turn_state = TurnStates.MOVEMENT_PHASE
 
             elif turn_state == TurnStates.MOVEMENT_PHASE:
-                for enemy in entities:
-                    if enemy.ai:
-                        enemy_turn_results = enemy.ai.take_turn()
+                enemy_turn_results = enemy.ai.take_turn()
 
                 turn_state = TurnStates.POST_MOVEMENT_PHASE
 
@@ -259,21 +267,18 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 turn_state = TurnStates.UPKEEP_PHASE
-                game_state = GameStates.PLAYER_TURN
             
             for result in enemy_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
-
-                if message:
-                    message_log.add_message(Message(message, libtcod.yellow))
-                    fov_recompute = True
                 
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
                     else:
                         message = kill_enemy(dead_entity)
+
+                if message:
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
                 
@@ -281,7 +286,7 @@ def main():
         Handle the death of the player.
         """
         if game_state == GameStates.PLAYER_DEAD:
-            print('You are dead.')
+            print('You have died.')
             break
         
         """
