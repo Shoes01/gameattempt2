@@ -35,8 +35,6 @@ def get_constants():
     fov_light_walls = True
     fov_radius = 10
 
-    TICKS_PER_TURN = 26771144400 # LCM from 1 to 25.
-
     colors = {
         'dark_wall': (0, 0, 100),
         'dark_ground': (50, 50, 150),
@@ -62,8 +60,7 @@ def get_constants():
         'fov_algorithm': fov_algorithm,
         'fov_light_walls': fov_light_walls,
         'fov_radius': fov_radius,
-        'colors': colors,
-        'TICKS_PER_TURN' = TICKS_PER_TURN
+        'colors': colors
     }
 
     return constants

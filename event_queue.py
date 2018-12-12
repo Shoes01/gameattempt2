@@ -1,6 +1,7 @@
 ### TODO: Need to plug this into the engine. Maybe wrap it in a class.
 
 from collections import deque
+from global_variables import TICKS_PER_TURN
 
 class EventQueue:
     """
@@ -12,14 +13,12 @@ class EventQueue:
     def register(self, entity):
         """
         Add an entity to the queue.
-        TODO: There should be an entity manager that adds the entity to the queue.
         """
         self.queue.append(entity)
 
     def release(self, entity):
         """
         Remove an entity from the queue.
-        TODO: The death function should call this.
         """
         self.queue.remove(entity)
 
@@ -33,7 +32,7 @@ class EventQueue:
                 return entity                            # Taking turns drains from the pool of points. It may drain into the negative, and so the next time this entity comes up, it may do nothing.
             else:
                 self.queue.rotate()                          # Move it to the back of the list, because it does not have enough action points.
-                entity.action_points += 27720 # TODO: constants
+                entity.action_points += TICKS_PER_TURN
                 return None
 
         return None

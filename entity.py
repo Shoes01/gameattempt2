@@ -54,7 +54,7 @@ class Entity:
         self.weapon = weapon                # A list of weapons.
         self.ai = ai
         self.location = location
-        self.action_points = 0              # TODO: Use a constant here.
+        self.action_points = 0
         self.has_moved = False
         self.render_order = RenderOrder.ACTOR
 
