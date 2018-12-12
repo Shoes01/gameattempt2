@@ -25,7 +25,7 @@ class TurnStates(Enum):
    2) Legal tiles to which the player can move are highlighted.
    3) This phase ends when the player begins to move.
    3.1) At this time, the player is given action points for their pool, equal to TICKS_PER_TURN / speed.
-   3.2) TICKS_PER_TURN is the LCM(1:12) = 27720
+   3.2) TICKS_PER_TURN is the LCM(1:25) = 26771144400
    MOVEMENT_PHASE
    1) The player is given a limit of moves, based on their momentum. This determines time needed to move one tile.
       The player is free to use the moves in the order they wish; they are not forced to start with horizontal moves, then do vertical.

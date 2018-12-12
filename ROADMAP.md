@@ -32,15 +32,17 @@
   - [x] Update death function to remove from the queue
   - [ ] Weapons and movement are different. 
     - [ ] Movement uses the EQ, and is based on speed. 
-    - [x] Weapons simply have a cooldown, and ticks down at the end of the turn.
+    - [x] Weapons simply have a cooldown, and ticks down at the end of the turn
 - [ ] Second Weapon System: Ballistics
   - [x] Code logic to handle an entity with multiple weapons
   - [x] Allow the player to target a tile multiple times
   - [ ] Handle projectiles
+  - [ ] Instant speed projectiles need to communicate which tile is being hit every turn
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added
   - [ ] Ensure all player "actions" use the results variable to track events
   - [ ] Rename Mech class to Propulsion class
+  - [ ] Create g.py where I can store "global variables", such as TICKS_PER_TURN
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure

@@ -4,9 +4,9 @@ from components.ai import DoNothing
 from components.chassis import Chassis
 from components.cursor import Cursor
 from components.location import Location
-from components.manager import create_components, ChassisComponent, PropulsionComponent, WeaponComponent
+from components.manager import AIComponent, ChassisComponent, PropulsionComponent, WeaponComponent
 from components.mech import Mech
-from entity import Entity
+from entity import entity_manager, EntityType
 from event_queue import EventQueue
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
@@ -36,6 +36,8 @@ def get_constants():
     fov_light_walls = True
     fov_radius = 10
 
+    TICKS_PER_TURN = 26771144400 # LCM from 1 to 25.
+
     colors = {
         'dark_wall': (0, 0, 100),
         'dark_ground': (50, 50, 150),
@@ -61,27 +63,20 @@ def get_constants():
         'fov_algorithm': fov_algorithm,
         'fov_light_walls': fov_light_walls,
         'fov_radius': fov_radius,
-        'colors': colors
+        'colors': colors,
+        'TICKS_PER_TURN' = TICKS_PER_TURN
     }
 
     return constants
 
 def get_game_variables(constants):
     # Create player.
-    chassis_component = create_components({ChassisComponent.BASIC_CHASSIS: 1})
-    mech_component = create_components({PropulsionComponent.BASIC_PROPULSION: 1})
-    weapon_component = create_components({WeaponComponent.LASER: 2})
-    location_component = Location(x=int(constants['screen_width'] / 2), y=int(constants['screen_height'] / 2))
-    player = Entity('@', libtcod.white, "player", 
-                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+    location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
+    player = entity_manager(EntityType.PLAYER, location)
     
     # Create NPC.
-    ai_component = DoNothing()
-    chassis_component = create_components({ChassisComponent.WEAK_CHASSIS: 1})
-    mech_component = create_components({PropulsionComponent.WEAK_PROPULSION: 1})
-    location_component = Location(x=int(constants['screen_width'] / 2) - 5, y=int(constants['screen_height'] / 2))
-    npc = Entity('@', libtcod.yellow, "NPC", 
-                    render_order=RenderOrder.ACTOR, chassis=chassis_component, mech=mech_component, ai=ai_component, location=location_component)
+    location = (int(constants['screen_width'] / 2) - 5, int(constants['screen_height'] / 2))
+    npc = entity_manager(EntityType.NPC, location)
     
     # Create cursor.
     cursor_component = Cursor()

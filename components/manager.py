@@ -1,12 +1,13 @@
 import tcod as libtcod
 
+from components.ai import DoNothing
 from components.chassis import Chassis
 from components.mech import Mech
 from components.weapon import Weapon
 from enum import auto, Enum
 
-class WeaponComponent(Enum):
-    LASER = auto()
+class AIComponent(Enum):
+    DEBUG = auto()
 
 class ChassisComponent(Enum):
     BASIC_CHASSIS = auto()
@@ -15,6 +16,9 @@ class ChassisComponent(Enum):
 class PropulsionComponent(Enum):
     BASIC_PROPULSION = auto()
     WEAK_PROPULSION = auto()
+
+class WeaponComponent(Enum):
+    LASER = auto()
 
 def create_components(component_dict):
     """
@@ -52,5 +56,9 @@ def create_component(component):
         return Mech(peak_momentum=6, max_impulse=1)
     elif component == PropulsionComponent.WEAK_PROPULSION:
         return Mech(peak_momentum=4, max_impulse=1)
+    
+    # AI components.
+    elif component == AIComponent.DEBUG:
+        return DoNothing()
     
     return None

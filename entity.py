@@ -1,25 +1,56 @@
 import math
 
+from components.location import Location
+from components.manager import create_component, create_components, AIComponent, ChassisComponent, PropulsionComponent, WeaponComponent
 from death_functions import kill_enemy, kill_player
+from enum import auto, Enum
 from render_functions import RenderOrder
+
+class EntityType(Enum):
+    PLAYER = auto()
+    NPC = auto()
+
+def entity_manager(entity_type, location):
+    """
+    Build an entity with the specified components.
+    """
+    if entity_type == EntityType.PLAYER:
+        chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
+        mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
+        weapon_component = create_components({WeaponComponent: 1})
+        x, y = location
+        location_component = Location(x, y)
+
+        return Entity('@', libtcod.white, 'player', chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+
+    elif entity_type == EntityType.NPC:
+        ai_component = create_component(AIComponent.DEBUG)
+        chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
+        mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
+        x, y = location
+        location_component = Location(x, y)
+
+        return Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, ai=ai_component)
+
+    return None
 
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, char, color, name, has_moved=False, render_order=RenderOrder.CORPSE, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None):
+    def __init__(self, char, color, name, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None):
         self.char = char
         self.color = color
-        self.name = name
-        self.has_moved = False
-        self.render_order = render_order
+        self.name = name        
         self.chassis = chassis
         self.mech = mech
         self.cursor = cursor
         self.weapon = weapon                # A list of weapons.
         self.ai = ai
         self.location = location
-        self.action_points = 0          # TODO: Use a constant here.
+        self.action_points = 0              # TODO: Use a constant here.
+        self.has_moved = False
+        self.render_order = RenderOrder.ACTOR
 
         if self.chassis:    self.chassis.owner = self
         if self.mech:       self.mech.owner = self
