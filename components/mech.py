@@ -64,7 +64,6 @@ class Mech:
         """
         Move the entity according to the rules of momentum.
         Cares about obstacles.
-        TODO: Make use of "player turn results" here so that errors can be properly thrown.
         """
         if self.calculate_accumulated_momentum() < self.calculate_maximum_momentum():
             # Allow the player to move.

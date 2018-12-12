@@ -55,7 +55,6 @@ class Entity:
         self.ai = ai
         self.location = location
         self.action_points = 0
-        self.has_moved = False
         self.render_order = RenderOrder.ACTOR
 
         if self.chassis:    self.chassis.owner = self
@@ -72,7 +71,6 @@ class Entity:
         Reset the entity for the next turn.
         """
         self.mech.reset()
-        self.has_moved = False
         for w in self.weapon:
             w.reset()        
     

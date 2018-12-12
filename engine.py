@@ -79,7 +79,8 @@ def main():
         fullscreen = action.get('fullscreen')                   # Set game to full screen.
         
         entity_to_act = event_queue.tick()
-        if entity_to_act is player and game_state is GameStates.ENEMY_TURN: # TODO: Is this the best way to do this? I don't know how to tell if all the enemies have gone.
+        # TODO: Is this the best way to do this? I don't know how to tell if all the enemies have gone.
+        if entity_to_act is player and game_state is GameStates.ENEMY_TURN: 
             game_state = GameStates.PLAYER_TURN
             turn_state = TurnStates.UPKEEP_PHASE
 
@@ -104,18 +105,16 @@ def main():
                 fov_recompute = True
 
             elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                highlight_legal_moves(player, game_map)
-                turn_state = TurnStates.MOVEMENT_PHASE
-                fov_recompute = True
-
-            elif turn_state == TurnStates.MOVEMENT_PHASE:
-                # TODO: Choosing impulse should be in the pre-movement phase. Otherwise, the impulse can be changed on the fly and it recalcultes the highlighting.
-                if impulse is not None and not player.has_moved and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
+                if impulse is not None and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
                     fov_recompute = True
                     highlight_legal_moves(player, game_map)
+                
+                if move or next_turn_phase:
+                    turn_state = TurnStates.MOVEMENT_PHASE                
 
+            if turn_state == TurnStates.MOVEMENT_PHASE:
                 if move:
                     dx, dy = move
                     if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:

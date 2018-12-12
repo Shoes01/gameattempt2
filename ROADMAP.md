@@ -40,8 +40,10 @@
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added
   - [ ] Ensure all player "actions" use the results variable to track events
+    - [ ] Is this an Observer pattern?
   - [ ] Rename Mech class to Propulsion class
-  - [ ] Create g.py where I can store "global variables", such as TICKS_PER_TURN
+  - [x] Create global_variables.py to store some constants
+    - [ ] Should other constants be moved there..?
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure

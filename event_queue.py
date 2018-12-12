@@ -1,5 +1,3 @@
-### TODO: Need to plug this into the engine. Maybe wrap it in a class.
-
 from collections import deque
 from global_variables import TICKS_PER_TURN
 
@@ -39,7 +37,6 @@ class EventQueue:
 
         # QUESTION: Does this accurately allow entities to take turns "out of order"?
         ### I think so, but I think that means most entitiy will have negative points most of them. Which is fine.
-        # TODO: The speed of the entitiy will be based on their momentum. As they begin to move, the number of speed goes up.
         # CONSIDERATION: Taking a turn will take _a lot_ of action points, I think.
         ### This means that the queue will be rotated a lot of times with few actions taken.... this might cause problems.
         # CONSIDERATION: I don't need to stricly quantify how fast projectiles move and such. This queue will take care of things.
