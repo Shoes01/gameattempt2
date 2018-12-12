@@ -28,10 +28,10 @@
   - [x] Create a look function
 - [ ] Animation
 - [ ] Event Queue
-  - [ ] Create an entity manager which adds entities to the queue
+  - [x] Create an entity manager which adds entities to the queue
   - [x] Update death function to remove from the queue
   - [ ] Weapons and movement are different. 
-    - [ ] Movement uses the EQ, and is based on speed. 
+    - [x] Movement uses the EQ, and is based on speed. 
     - [x] Weapons simply have a cooldown, and ticks down at the end of the turn
 - [ ] Second Weapon System: Ballistics
   - [x] Code logic to handle an entity with multiple weapons

@@ -4,7 +4,6 @@ from components.ai import DoNothing
 from components.chassis import Chassis
 from components.cursor import Cursor
 from components.location import Location
-from components.manager import AIComponent, ChassisComponent, PropulsionComponent, WeaponComponent
 from components.mech import Mech
 from entity import entity_manager, EntityType
 from event_queue import EventQueue
@@ -70,13 +69,16 @@ def get_constants():
     return constants
 
 def get_game_variables(constants):
+    # Open the event queue, and load it up.
+    event_queue = EventQueue()
+
     # Create player.
     location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
-    player = entity_manager(EntityType.PLAYER, location)
+    player = entity_manager(EntityType.PLAYER, location, event_queue)
     
     # Create NPC.
     location = (int(constants['screen_width'] / 2) - 5, int(constants['screen_height'] / 2))
-    npc = entity_manager(EntityType.NPC, location)
+    npc = entity_manager(EntityType.NPC, location, event_queue)
     
     # Create cursor.
     cursor_component = Cursor()
@@ -97,11 +99,5 @@ def get_game_variables(constants):
     
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE
-
-    # Open the event queue, and load it up.
-    event_queue = EventQueue()
-    for entity in entities:
-        if entity is not cursor:
-            event_queue.register(entity)
 
     return player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue
