@@ -1,11 +1,6 @@
 import tcod as libtcod
 
-from components.ai import DoNothing
-from components.cursor import Cursor
-from components.mech import Mech
-from components.weapon import Weapon
 from death_functions import kill_enemy, kill_player
-from entity import Entity
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
@@ -102,14 +97,15 @@ def main():
             if turn_state == TurnStates.UPKEEP_PHASE:
                 message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
+                highlight_legal_moves(player, game_map)
                 fov_recompute = True
 
-            elif turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
                 if impulse is not None and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
-                    fov_recompute = True
                     highlight_legal_moves(player, game_map)
+                    fov_recompute = True
                 
                 if move or next_turn_phase:
                     turn_state = TurnStates.MOVEMENT_PHASE                

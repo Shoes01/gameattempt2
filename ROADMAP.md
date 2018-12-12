@@ -44,6 +44,7 @@
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
     - [ ] Should other constants be moved there..?
+  - [ ] Refactor Move logic
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure

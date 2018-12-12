@@ -129,7 +129,7 @@ def render_all(
         turn=game_state.name, phase=turn_state.name, impulse=player.mech.impulse,
         momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
 
-    if len(player.weapon) > 0:
+    if player.weapon is not None and len(player.weapon) > 0:
         iterator = 1
         for weapon in player.weapon:    
             draw_card(status, 0, iterator*10, status_width, status_height, weapon.color, 

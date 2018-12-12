@@ -1,3 +1,4 @@
+import tcod as libtcod
 import math
 
 from components.location import Location
@@ -20,7 +21,7 @@ def entity_manager(entity_type, location, event_queue):
     if entity_type == EntityType.PLAYER:
         chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
         mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
-        weapon_component = create_components({WeaponComponent: 1})
+        weapon_component = create_components({WeaponComponent.LASER: 1})
         x, y = location
         location_component = Location(x, y)
 
@@ -33,7 +34,7 @@ def entity_manager(entity_type, location, event_queue):
         x, y = location
         location_component = Location(x, y)
 
-        entity = Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, ai=ai_component)
+        entity = Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
 
     if entity is not None:
         event_queue.register(entity)
@@ -113,13 +114,3 @@ class Entity:
                 return w
         else:
             return None
-
-# Note that this is no longer part of the Entity class.
-def get_entity_at_location(location, entities):
-    x, y = location
-
-    for entity in entities:
-        if entity.location is not None and x == entity.location.x and y == entity.location.y:
-            return entity
-    
-    return None

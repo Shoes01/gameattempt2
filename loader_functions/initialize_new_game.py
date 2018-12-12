@@ -5,7 +5,7 @@ from components.chassis import Chassis
 from components.cursor import Cursor
 from components.location import Location
 from components.mech import Mech
-from entity import entity_manager, EntityType
+from entity import entity_manager, Entity, EntityType
 from event_queue import EventQueue
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
@@ -80,7 +80,8 @@ def get_game_variables(constants):
     # Create cursor.
     cursor_component = Cursor()
     location_component = Location()
-    cursor = Entity('X', libtcod.red, "cursor", render_order=RenderOrder.CURSOR, cursor=cursor_component, location=location_component)
+    cursor = Entity('X', libtcod.red, "cursor", cursor=cursor_component, location=location_component)
+    cursor.render_order=RenderOrder.CURSOR
     
     # Create entities list.
     entities = [player, cursor, npc]

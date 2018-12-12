@@ -1,5 +1,3 @@
-from entity import get_entity_at_location
-
 class Weapon:
     """
     The Weapon class stores the damage, target, and range properties of a weapon.
@@ -49,3 +47,13 @@ class Weapon:
             results.append(entity.chassis.take_damage(self.damage))
         
         return results
+
+# TODO: Find a better place for this.
+def get_entity_at_location(location, entities):
+    x, y = location
+
+    for entity in entities:
+        if entity.location is not None and x == entity.location.x and y == entity.location.y:
+            return entity
+    
+    return None

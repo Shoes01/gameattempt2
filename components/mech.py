@@ -1,5 +1,24 @@
 import math
 
+"""
+
+PLANNED REFACTOR
+
+If Impulse is positive, the Entity moves to (h_mov, v_mov), + 1 tile in the direction of h_mov or v_mov.
+If Impulse is null, the Entity moves exactly to (h_mov, v_mov)
+If Impulse is negative, the Entity moves to (h_mov, v_mov), - 1 tile in the direction of h_mov or v_mov.
+* If h_mov or v_mov is 0, then both directions are allowed.
+
+The Entity must move a number of tiles equal to h_mov + v_mov + Impulse.
+    When Impulse can be any number, the above requirement will force the Entity to "circle back" if Impulse exceeds Momentum.
+
+The highlighting code should be genrealizable. Given Location, h_mov, v_mov and Impulse, the code should work.
+    This will allow "two step" highlighting, and highlighting of other Impulse values.
+    This should also decouple it from the Entity
+
+"""
+
+
 class Mech:
     """
     The Mech class stores the HP and the Momentum properties.

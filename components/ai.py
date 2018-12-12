@@ -7,7 +7,7 @@ class DoNothing:
 
         enemy = self.owner
 
-        enemy.action_points -= 50000
+        enemy.action_points -= 26771144400 + 1
 
         results.append({'message': '{0} does nothing.'.format(enemy.name.capitalize())})
 
