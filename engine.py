@@ -181,6 +181,8 @@ def main():
                         message, game_state = kill_player(dead_entity)
                     else:
                         message = kill_enemy(dead_entity)
+                    
+                    event_queue.release(dead_entity)
                 
                 if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
@@ -277,6 +279,8 @@ def main():
                         message, game_state = kill_player(dead_entity)
                     else:
                         message = kill_enemy(dead_entity)
+                    
+                    event_queue.release(dead_entity)
 
                 if message:
                     message_log.add_message(Message(message, libtcod.yellow))

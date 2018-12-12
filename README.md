@@ -9,6 +9,7 @@ Run engine.py.
 __General__
 
 Movement highlighting logic: when h_mov = 2, v_mom = 1 and impulse = -1, the mech can move to three places. That's not right.
+  Mech should really just be: highlight tile (x + h_mov, y + v_mom)
 
 ## ROAD MAP
 - [x] Momentum Based Momement
@@ -41,7 +42,7 @@ Movement highlighting logic: when h_mov = 2, v_mom = 1 and impulse = -1, the mec
 - [ ] Animation
 - [ ] Event Queue
   - [ ] Create an entity manager which adds entities to the queue
-  - [ ] Update death function to remove from the queue
+  - [x] Update death function to remove from the queue
   - [ ] Weapons and movement are different. 
     - [ ] Movement uses the EQ, and is based on speed. 
     - [x] Weapons simply have a cooldown, and ticks down at the end of the turn.
