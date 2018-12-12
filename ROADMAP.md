@@ -16,21 +16,20 @@
   - [x] Implement death function
   - [x] Implement weapon damage
   - [x] Implement a turn summary variable
-- [-] Improve code
+- [x] Improve code
   - [x] Provide adequate documentation
   - [x] Decouple what can be decoupled
   - [x] Move things out of engine.py
   - [x] Create component managers
   - [x] Consider splitting the Mech class into a Propulsion class and a Chassis class (or something else that handles defense, HP, etc)    
-    - [-] Move movement code to the Propulsion class
+    - [x] Move movement code to the Propulsion class
     - [x] Move damage code to the Chassis class
   - [x] Create a Location component
   - [x] Create a look function
-- [ ] Animation
-- [ ] Event Queue
+- [x] Event Queue
   - [x] Create an entity manager which adds entities to the queue
   - [x] Update death function to remove from the queue
-  - [ ] Weapons and movement are different. 
+  - [x] Weapons and movement are different. 
     - [x] Movement uses the EQ, and is based on speed. 
     - [x] Weapons simply have a cooldown, and ticks down at the end of the turn
 - [ ] Second Weapon System: Ballistics
@@ -64,6 +63,7 @@
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
+- [ ] Animation
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
 - [ ] Momentum based weapons
