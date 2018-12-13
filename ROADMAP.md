@@ -44,7 +44,7 @@
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
     - [ ] Should other constants be moved there..?
-  - [ ] Refactor Move logic
+  - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this.
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
@@ -60,6 +60,7 @@
 - [ ] Revisit UI
   - [ ] Consider changing fonts
   - [ ] Implement a more cohesive UI
+  - [ ] Cursor can't be seen in the fog of war
 - [ ] QoL Maintenance II
   - [ ] Visually indicate to the user that a tile has been targeted multiple times (display a numeral on it)
   - [ ] Improve SHOW_WEAPONS_MENU 

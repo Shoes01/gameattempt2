@@ -8,4 +8,5 @@ class Location:
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
-        self.owner.action_points -= int(TICKS_PER_TURN / self.owner.mech.speed)
+        if self.owner.cursor is None:
+            self.owner.action_points -= int(TICKS_PER_TURN / self.owner.mech.speed)
