@@ -1,12 +1,10 @@
 import tcod as libtcod
 
-from components.ai import DoNothing
-from components.chassis import Chassis
 from components.cursor import Cursor
 from components.location import Location
-from components.mech import Mech
-from entity import entity_manager, Entity, EntityType
+from entity import Entity
 from event_queue import EventQueue
+from factory import entity_manager, EntityType
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
 from map_objects.game_map import GameMap

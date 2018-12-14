@@ -2,8 +2,10 @@ import tcod as libtcod
 
 from components.ai import DoNothing
 from components.chassis import Chassis
+from components.location import Location
 from components.mech import Mech
 from components.weapon import Weapon
+from entity import Entity
 from enum import auto, Enum
 
 class AIComponent(Enum):
@@ -19,6 +21,39 @@ class PropulsionComponent(Enum):
 
 class WeaponComponent(Enum):
     LASER = auto()
+
+class EntityType(Enum):
+    PLAYER = auto()
+    NPC = auto()
+
+def entity_manager(entity_type, location, event_queue):
+    """
+    Build an entity with the specified components.
+    """
+    entity = None
+
+    if entity_type == EntityType.PLAYER:
+        chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
+        mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
+        weapon_component = create_components({WeaponComponent.LASER: 1})
+        x, y = location
+        location_component = Location(x, y)
+
+        entity = Entity('@', libtcod.white, 'player', chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+
+    elif entity_type == EntityType.NPC:
+        ai_component = create_component(AIComponent.DEBUG)
+        chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
+        mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
+        x, y = location
+        location_component = Location(x, y)
+
+        entity = Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
+
+    if entity is not None:
+        event_queue.register(entity)
+
+    return entity
 
 def create_components(component_dict):
     """
