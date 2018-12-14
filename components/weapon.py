@@ -1,8 +1,12 @@
+import tcod as libtcod
+
+import factory
+
 class Weapon:
     """
     The Weapon class stores the damage, target, and range properties of a weapon.
     """
-    def __init__(self, name, damage, min_targets, max_targets, color, range, cost):
+    def __init__(self, name, damage, min_targets, max_targets, color, range, cost, projectile=None):
         self.name = name
         self.damage = damage
         self.min_targets = min_targets
@@ -10,6 +14,7 @@ class Weapon:
         self.color = color
         self.range = range
         self.cost = cost
+        self.projectile = projectile    # Type
         self.targets = []
         self.active = False
         self.cooldown = 0
@@ -32,13 +37,28 @@ class Weapon:
             self.active = True
             return {'message': '{0} online.'.format(self.name.capitalize())}
 
-    def fire(self, entities):
+    def fire(self, entities, event_queue):
         """
         Fire the weapon at all targets.
         """
         results = []
         self.cooldown += self.cost
         
+        # Projectile code
+        # TODO: This assumes only one projectile is fired at the moment. Will need to "loop" through the targets later.
+        for target in self.targets:
+            if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
+                (x, y) = (self.owner.location.x, self.owner.location.y)
+                projectile = factory.entity_factory(self.projectile, (x, y), event_queue)
+                xo, yo = projectile.location.x, projectile.location.y
+                xd, yd = target
+                projectile.path = list(libtcod.line_iter(xo, yo, xd, yd))
+
+                print(projectile.path)
+
+                entities.append(projectile)
+
+        # Simple laser code
         for target in self.targets:
             entity = get_entity_at_location(target, entities)
             if entity is None: 

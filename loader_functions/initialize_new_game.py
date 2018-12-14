@@ -4,7 +4,7 @@ from components.cursor import Cursor
 from components.location import Location
 from entity import Entity
 from event_queue import EventQueue
-from factory import entity_manager, EntityType
+from factory import entity_factory, EntityType
 from game_messages import MessageLog
 from game_states import GameStates, TurnStates
 from map_objects.game_map import GameMap
@@ -69,11 +69,11 @@ def get_game_variables(constants):
 
     # Create player.
     location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
-    player = entity_manager(EntityType.PLAYER, location, event_queue)
+    player = entity_factory(EntityType.PLAYER, location, event_queue)
     
     # Create NPC.
     location = (int(constants['screen_width'] / 2) - 5, int(constants['screen_height'] / 2))
-    npc = entity_manager(EntityType.NPC, location, event_queue)
+    npc = entity_factory(EntityType.NPC, location, event_queue)
     
     # Create cursor.
     cursor_component = Cursor()

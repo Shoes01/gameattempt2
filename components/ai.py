@@ -12,3 +12,16 @@ class DoNothing:
         results.append({'message': '{0} does nothing.'.format(enemy.name.capitalize())})
 
         return results
+
+class MoveAlongPath:
+    """
+    This AI moves an entity along a given path.
+    """
+    def take_turn(self):
+        results = []
+
+        projectile = self.owner
+
+        # Do other stuff.
+
+        return results

@@ -131,8 +131,9 @@ def render_all(
 
     if player.weapon is not None and len(player.weapon) > 0:
         iterator = 1
+        # TODO: The weapon color is really determined by its projectile.
         for weapon in player.weapon:    
-            draw_card(status, 0, iterator*10, status_width, status_height, weapon.color, 
+            draw_card(status, 0, iterator*10, status_width, status_height, libtcod.green, 
                 weapon=weapon.name, dmg=weapon.damage, range=weapon.range, cur_targets=len(weapon.targets), max_targets=weapon.max_targets)
             iterator += 1
 

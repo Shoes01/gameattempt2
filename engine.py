@@ -151,7 +151,7 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player_turn_results.extend(player.fire_active_weapon(entities))
+                player_turn_results.extend(player.fire_active_weapon(entities, event_queue))
 
                 # Reset the mech for the next turn.
                 player.reset()

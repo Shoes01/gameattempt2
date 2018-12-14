@@ -1,15 +1,17 @@
 import tcod as libtcod
 
-from components.ai import DoNothing
+from components.ai import DoNothing, MoveAlongPath
 from components.chassis import Chassis
 from components.location import Location
 from components.mech import Mech
+from components.projectile import Projectile
 from components.weapon import Weapon
 from entity import Entity
 from enum import auto, Enum
 
 class AIComponent(Enum):
     DEBUG = auto()
+    PROJECTILE = auto()
 
 class ChassisComponent(Enum):
     BASIC_CHASSIS = auto()
@@ -21,21 +23,26 @@ class PropulsionComponent(Enum):
 
 class WeaponComponent(Enum):
     LASER = auto()
+    GUN = auto()
 
 class EntityType(Enum):
     PLAYER = auto()
     NPC = auto()
 
-def entity_manager(entity_type, location, event_queue):
+class ProjectileType(Enum):
+    BASIC_PROJECTILE = auto()
+
+def entity_factory(entity_type, location, event_queue):
     """
     Build an entity with the specified components.
     """
     entity = None
 
+    # Unit entities.
     if entity_type == EntityType.PLAYER:
         chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
         mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
-        weapon_component = create_components({WeaponComponent.LASER: 1})
+        weapon_component = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
 
@@ -49,6 +56,17 @@ def entity_manager(entity_type, location, event_queue):
         location_component = Location(x, y)
 
         entity = Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
+
+    # Projectile entities.
+    elif entity_type == ProjectileType.BASIC_PROJECTILE:
+        ai_component = create_component(AIComponent.PROJECTILE)
+        mech_component = Mech(peak_momentum=100, max_impulse=100)
+        mech_component.impulse = 10 # This essentially sets the speed of the projectile.
+        x, y = location
+        location_component = Location(x, y)
+        projectile_component = Projectile(damage=10, damage_type='direct')
+
+        entity = Entity('o', libtcod.orange, 'projectile', friendly=True, ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
 
     if entity is not None:
         event_queue.register(entity)
@@ -78,7 +96,11 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='Laser', damage=5, min_targets=0, max_targets=5, color=libtcod.green, range=10, cost=1)
+        return Weapon(name='Laser', damage=5, min_targets=0, max_targets=5, color=libtcod.red, range=10, cost=1)
+    
+    elif component == WeaponComponent.GUN:
+        projectile_component = Projectile(damage=5, damage_type='gun')
+        return Weapon(name='gun', damage=5, min_targets=1, max_targets=1, color=libtcod.red, range=10, cost=1, projectile=ProjectileType.BASIC_PROJECTILE)
     
     # Chassis components.
     elif component == ChassisComponent.BASIC_CHASSIS:
@@ -95,5 +117,7 @@ def create_component(component):
     # AI components.
     elif component == AIComponent.DEBUG:
         return DoNothing()
+    elif component == AIComponent.PROJECTILE:
+        return MoveAlongPath()
     
     return None

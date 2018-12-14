@@ -8,16 +8,18 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, char, color, name, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None):
+    def __init__(self, char, color, name, friendly=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
         self.char = char
         self.color = color
         self.name = name        
+        self.friendly = friendly
         self.chassis = chassis
         self.mech = mech
         self.cursor = cursor
         self.weapon = weapon                # A list of weapons.
         self.ai = ai
         self.location = location
+        self.projectile = projectile
         self.action_points = 0
         self.render_order = RenderOrder.ACTOR
 
@@ -26,6 +28,7 @@ class Entity:
         if self.cursor:     self.cursor.owner = self
         if self.ai:         self.ai.owner = self
         if self.location:   self.location.owner = self
+        if self.projectile: self.projectile.owner = self
         if self.weapon:
             for w in self.weapon:
                 w.owner = self
@@ -56,7 +59,7 @@ class Entity:
 
         return result
 
-    def fire_active_weapon(self, entities):
+    def fire_active_weapon(self, entities, event_queue):
         """
         Fire weapon at target.
         """
@@ -64,7 +67,7 @@ class Entity:
         
         for w in self.weapon:
             if w.active:
-                result.extend(w.fire(entities))
+                result.extend(w.fire(entities, event_queue))
         
         return result
     

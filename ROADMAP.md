@@ -1,3 +1,29 @@
+## PROJECTILE BRANCH
+The weapon component will use the entity_factory() to create a projectile.
+The factory will create a projectile Entity with the following:
+  - name, char, color
+  - projectile component: speed, damage
+    - path and friendly are set after the fact (entity needs a faction component!)
+  - location component: the first tile on the path
+  - ai component: simply moves to a new tile
+
+Player projectiles move on the enemy's turn. Vice versa.
+
+Need to rewrite how damage is done, as the gun is not the one doing damage.
+    Damage_type: pulse_laser
+        The "entity" that is created should be more of a manager. It has no location.
+        It is given a path and a speed. It deals damage to first target in the path. (Also draws a line)
+
+    Damage_type: ballistic
+        The "entity" that is created is a moving bullet.
+        When it moves into something blockable, it deals damage.
+    
+    Damage_type: missile
+        The "entity" that is created is a moving missile.
+        It is given the tile where the player is currently standing at the start of the turn.
+        It updates position at the beginning of every turn.
+            This allows the player to outurn the missile, or to put an obstacle between them and it.
+
 ## ROAD MAP
 - [x] Momentum Based Momement
 - [x] Basic obstacles
@@ -44,7 +70,8 @@
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
     - [ ] Should other constants be moved there..?
-  - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this.
+  - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
+  - [ ] The move function should be the one that cares about obstacles
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
