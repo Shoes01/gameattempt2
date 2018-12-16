@@ -2,17 +2,18 @@ import tcod as libtcod
 import math
 
 from death_functions import kill_enemy, kill_player
+from global_variables import TICKS_PER_TURN
 from render_functions import RenderOrder
 
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, char, color, name, friendly=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
+    def __init__(self, char, color, name, moves_with_player=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
         self.char = char
         self.color = color
         self.name = name        
-        self.friendly = friendly
+        self.moves_with_player = moves_with_player
         self.chassis = chassis
         self.mech = mech
         self.cursor = cursor
@@ -20,7 +21,7 @@ class Entity:
         self.ai = ai
         self.location = location
         self.projectile = projectile
-        self.action_points = 0
+        self.action_points = TICKS_PER_TURN
         self.render_order = RenderOrder.ACTOR
 
         if self.chassis:    self.chassis.owner = self

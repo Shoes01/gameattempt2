@@ -3,7 +3,7 @@ The weapon component will use the entity_factory() to create a projectile.
 The factory will create a projectile Entity with the following:
   - name, char, color
   - projectile component: speed, damage
-    - path and friendly are set after the fact (entity needs a faction component!)
+    - path and moves_with_player are set after the fact (entity needs a faction component!)
   - location component: the first tile on the path
   - ai component: simply moves to a new tile
 
@@ -23,6 +23,24 @@ Need to rewrite how damage is done, as the gun is not the one doing damage.
         It is given the tile where the player is currently standing at the start of the turn.
         It updates position at the beginning of every turn.
             This allows the player to outurn the missile, or to put an obstacle between them and it.
+
+# BUG #
+Not moving spends no time, so the player may shoot indefinitely. APs need to be zeroed after the move phase.
+QUESTION: Why have ticks at all? The turn order shouldn't change, so speed should just be how many moves per turn a player can do.
+
+# TICKS PER TURN #
+Entities can't overload their turn. Their speed means "moves per turn", and will never go into the negatives.
+
+# TURN ORDER #
+Player Turn and Enemy Turn seem to be artificial, or at least only serve to ensure everyone gets their turn.
+
+Things that move on Player Turn:
+Player controlled entities
+Enemey fired projectiles
+
+Things that move on Enemy Turn:
+Enemy controlled entities
+Enemy fired projectiles
 
 ## ROAD MAP
 - [x] Momentum Based Momement
@@ -112,3 +130,8 @@ Need to rewrite how damage is done, as the gun is not the one doing damage.
 - [ ] Experience Gain
 - [ ] Loot
 - [ ] Lore
+- [ ] Player controlled entities
+  - [ ] PRE_MOVE phase: set all the impulses
+  - [ ] MOVE phase: draw a path for the entity to travel (or have it do this automatically)
+  - [ ] POST_MOVE phase: move the entities to their target according to their speed, simultaneously and according to the path
+  - [ ] COMBAT phase: choose and fire weapons for each entity

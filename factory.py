@@ -46,7 +46,7 @@ def entity_factory(entity_type, location, event_queue):
         x, y = location
         location_component = Location(x, y)
 
-        entity = Entity('@', libtcod.white, 'player', chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+        entity = Entity('@', libtcod.white, 'player', moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
@@ -61,12 +61,12 @@ def entity_factory(entity_type, location, event_queue):
     elif entity_type == ProjectileType.BASIC_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
         mech_component = Mech(peak_momentum=100, max_impulse=100)
-        mech_component.impulse = 10 # This essentially sets the speed of the projectile.
+        mech_component.impulse = 4 # This essentially sets the speed of the projectile.
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
 
-        entity = Entity('o', libtcod.orange, 'projectile', friendly=True, ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+        entity = Entity('o', libtcod.orange, 'projectile', ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
 
     if entity is not None:
         event_queue.register(entity)

@@ -30,7 +30,7 @@ class Weapon:
         Active the weapon, rendering it usable for targeting.
         """
         if self.active == True:
-            return {'message': '{0} is already online.'.format(self.name.capitalize())}, 
+            return {'message': '{0} is already online.'.format(self.name.capitalize())}
         elif self.cooldown > 0:
             return {'message': '{0} has not cooled down yet.'.format(self.name.capitalize())}
         else:
@@ -45,16 +45,19 @@ class Weapon:
         self.cooldown += self.cost
         
         # Projectile code
-        # TODO: This assumes only one projectile is fired at the moment. Will need to "loop" through the targets later.
         for target in self.targets:
             if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
                 (x, y) = (self.owner.location.x, self.owner.location.y)
                 projectile = factory.entity_factory(self.projectile, (x, y), event_queue)
+                if projectile.moves_with_player:
+                    self.owner.moves_with_player = False
+                else:
+                    self.owner.moves_with_player = True
+
                 xo, yo = projectile.location.x, projectile.location.y
                 xd, yd = target
-                projectile.path = list(libtcod.line_iter(xo, yo, xd, yd))
-
-                print(projectile.path)
+                
+                projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
 
                 entities.append(projectile)
 

@@ -78,6 +78,8 @@ def main():
         if entity_to_act is player and game_state is GameStates.ENEMY_TURN: 
             game_state = GameStates.PLAYER_TURN
             turn_state = TurnStates.UPKEEP_PHASE
+        elif entity_to_act is None:
+            continue
 
         """
         Handle the Player Turn.
@@ -111,6 +113,9 @@ def main():
                     turn_state = TurnStates.MOVEMENT_PHASE                
 
             if turn_state == TurnStates.MOVEMENT_PHASE:
+                """
+                Player movement code.
+                """
                 if move:
                     dx, dy = move
                     if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
@@ -122,6 +127,12 @@ def main():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
                 elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
                     message_log.add_message(Message('Must spend more momentum.', libtcod.red))  # TODO: Move this to an "end the phase" action and use turn_results to display.
+
+                """
+                Enemy projectile code.
+                """
+                if entity_to_act.projectile is not None and entity_to_act.moves_with_player is True:
+                    player_turn_results.extend(entity_to_act.ai.take_turn())
 
             elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 game_map.reset_flags()                
@@ -174,10 +185,12 @@ def main():
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
-                    else:
+                    elif dead_entity.projecitle is None:
                         message = kill_enemy(dead_entity)
+                    else:
+                        entities.remove(dead_entity)
                     
-                    event_queue.release(dead_entity)
+                    event_queue.release(dead_entity)            
                 
                 if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
@@ -205,7 +218,7 @@ def main():
                     fov_recompute = True
                 
                 if target:
-                    pass
+                    pass                
 
         """
         Handle the Show Weapons Menu state.
@@ -237,10 +250,9 @@ def main():
         Handle the Enemy Turn.
         """
         if game_state == GameStates.ENEMY_TURN:
-            enemy_turn_results = {}
+            enemy_turn_results = []
             
-            if entity_to_act is not None:
-                enemy = entity_to_act
+            enemy = entity_to_act
 
             if turn_state == TurnStates.UPKEEP_PHASE:
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
@@ -249,7 +261,8 @@ def main():
                 turn_state = TurnStates.MOVEMENT_PHASE
 
             elif turn_state == TurnStates.MOVEMENT_PHASE:
-                enemy_turn_results = enemy.ai.take_turn()
+                if enemy.moves_with_player is False:
+                    enemy_turn_results.extend(enemy.ai.take_turn())
 
                 turn_state = TurnStates.POST_MOVEMENT_PHASE
 
@@ -272,8 +285,10 @@ def main():
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
-                    else:
+                    elif dead_entity.projectile is None:
                         message = kill_enemy(dead_entity)
+                    else:
+                        entities.remove(dead_entity)
                     
                     event_queue.release(dead_entity)
 

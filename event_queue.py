@@ -13,7 +13,7 @@ class EventQueue:
         Add an entity to the queue.
         """
         self.queue.append(entity)
-
+    
     def release(self, entity):
         """
         Remove an entity from the queue.
@@ -30,7 +30,7 @@ class EventQueue:
                 return entity                            # Taking turns drains from the pool of points. It may drain into the negative, and so the next time this entity comes up, it may do nothing.
             else:
                 self.queue.rotate()                          # Move it to the back of the list, because it does not have enough action points.
-                entity.action_points += TICKS_PER_TURN
+                entity.action_points = TICKS_PER_TURN   # TODO: This means the queue order never changes. 
                 return None
 
         return None

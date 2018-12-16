@@ -7,7 +7,7 @@ class DoNothing:
 
         enemy = self.owner
 
-        enemy.action_points -= 26771144400 + 1
+        enemy.action_points -= 26771144400 / 2
 
         results.append({'message': '{0} does nothing.'.format(enemy.name.capitalize())})
 
@@ -22,6 +22,17 @@ class MoveAlongPath:
 
         projectile = self.owner
 
-        # Do other stuff.
+        if len(projectile.projectile.path) > 0:
+            x, y = projectile.projectile.path.pop()
+            dx = x - projectile.location.x
+            dy = y - projectile.location.y
+
+            projectile.location.move(dx, dy)
+
+            results.append({'message': '{0} hopefully moved.'.format(projectile.name.capitalize())})
+
+        else:
+            results.append({'message': '{0} hopefully stopped.'.format(projectile.name.capitalize())})
+            results.append({'dead': projectile})
 
         return results
