@@ -22,14 +22,15 @@ def main():
 
     player = None
     cursor = None
-    entities = []
+    entities_player_turn = []
+    entities_enemy_turn = []
     game_map = None
     message_log = None
     game_state = None
     turn_state = None
     event_queue = None
 
-    player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
+    player, cursor, entities_player_turn, entities_enemy_turn, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
 
     previous_game_state = game_state    
 
@@ -46,13 +47,13 @@ def main():
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
         render_all(
-            con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
+            con, panel, entities_player_turn.extend(entities_enemy_turn), game_map, fov_map, fov_recompute, message_log, 
             constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
             mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player, cursor)
 
         libtcod.console_flush()
 
-        clear_all(con, entities)
+        clear_all(con, entities_player_turn.extend(entities_enemy_turn))
 
         fov_recompute = False
 
@@ -60,7 +61,7 @@ def main():
         Handle the Player Turn.
         """
         action = handle_keys(key, game_state)
-        impulse = None           # This is to avoid logic problems.
+        impulse = None # This is to avoid logic problems.
 
         move = action.get('move')                               # Attempt to move.
         impulse = action.get('impulse')                         # Adjust mech impulse.

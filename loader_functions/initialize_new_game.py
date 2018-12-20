@@ -67,23 +67,24 @@ def get_game_variables(constants):
     # Open the event queue, and load it up.
     event_queue = EventQueue()
 
-    # Create entities list.
-    entities = []
+    # Create entities lists.
+    entities_player_turn = []
+    entities_enemy_turn = []
 
     # Create player.
     location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
-    player = entity_factory(EntityType.PLAYER, location, event_queue, entities)
+    player = entity_factory(EntityType.PLAYER, location, event_queue, entities_player_turn)
     
     # Create NPC.
     location = (int(constants['screen_width'] / 2) - 5, int(constants['screen_height'] / 2))
-    npc = entity_factory(EntityType.NPC, location, event_queue, entities)
+    entity_factory(EntityType.NPC, location, event_queue, entities_enemy_turn)
     
     # Create cursor.
     cursor_component = Cursor()
     location_component = Location()
     cursor = Entity('X', libtcod.red, "cursor", cursor=cursor_component, location=location_component)
     cursor.render_order=RenderOrder.CURSOR
-    entities.append(cursor)
+    entities_player_turn.append(cursor)
 
     # Create game_map.
     game_map = GameMap(constants['map_width'], constants['map_height'])
@@ -97,4 +98,4 @@ def get_game_variables(constants):
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE
 
-    return player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue
+    return player, cursor, entities_player_turn, entities_enemy_turn, game_map, message_log, game_state, turn_state, event_queue
