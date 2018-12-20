@@ -32,7 +32,7 @@ class EntityType(Enum):
 class ProjectileType(Enum):
     BASIC_PROJECTILE = auto()
 
-def entity_factory(entity_type, location, event_queue):
+def entity_factory(entity_type, location, event_queue, entities):
     """
     Build an entity with the specified components.
     """
@@ -70,6 +70,7 @@ def entity_factory(entity_type, location, event_queue):
 
     if entity is not None:
         event_queue.register(entity)
+        entities.append(entity)
 
     return entity
 

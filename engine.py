@@ -301,7 +301,7 @@ def main():
         """
         if game_state == GameStates.PLAYER_DEAD:
             print('You have died.')
-            break
+            return True
         
         """
         Handle commands that activate regardless of game state.

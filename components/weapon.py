@@ -48,7 +48,7 @@ class Weapon:
         for target in self.targets:
             if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
                 (x, y) = (self.owner.location.x, self.owner.location.y)
-                projectile = factory.entity_factory(self.projectile, (x, y), event_queue)
+                projectile = factory.entity_factory(self.projectile, (x, y), event_queue, entities)
                 if projectile.moves_with_player:
                     self.owner.moves_with_player = False
                 else:
@@ -58,8 +58,6 @@ class Weapon:
                 xd, yd = target
                 
                 projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
-
-                entities.append(projectile)
 
         # Simple laser code
         for target in self.targets:
