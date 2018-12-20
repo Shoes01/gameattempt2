@@ -34,6 +34,10 @@ class Entity:
             for w in self.weapon:
                 w.owner = self
 
+    @property
+    def action_points_used(self):
+        return TICKS_PER_TURN - self.action_points
+
     def reset(self):
         """
         Reset the entity for the next turn.

@@ -70,6 +70,7 @@ def get_game_variables(constants):
     # Create entities lists.
     entities_player_turn = []
     entities_enemy_turn = []
+    entities_special = []
 
     # Create player.
     location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
@@ -84,7 +85,7 @@ def get_game_variables(constants):
     location_component = Location()
     cursor = Entity('X', libtcod.red, "cursor", cursor=cursor_component, location=location_component)
     cursor.render_order=RenderOrder.CURSOR
-    entities_player_turn.append(cursor)
+    entities_special.append(cursor)
 
     # Create game_map.
     game_map = GameMap(constants['map_width'], constants['map_height'])
@@ -98,4 +99,4 @@ def get_game_variables(constants):
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE
 
-    return player, cursor, entities_player_turn, entities_enemy_turn, game_map, message_log, game_state, turn_state, event_queue
+    return player, cursor, entities_player_turn, entities_enemy_turn, entities_special, game_map, message_log, game_state, turn_state, event_queue

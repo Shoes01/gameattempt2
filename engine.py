@@ -24,13 +24,14 @@ def main():
     cursor = None
     entities_player_turn = []
     entities_enemy_turn = []
+    entities_special = []
     game_map = None
     message_log = None
     game_state = None
     turn_state = None
     event_queue = None
 
-    player, cursor, entities_player_turn, entities_enemy_turn, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
+    player, cursor, entities_player_turn, entities_enemy_turn, entities_special, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
 
     previous_game_state = game_state    
 
@@ -46,14 +47,19 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
+        all_entities = entities_player_turn
+        all_entities.extend(entities_enemy_turn)
+        all_entities.extend(entities_special)
+        
+
         render_all(
-            con, panel, entities_player_turn.extend(entities_enemy_turn), game_map, fov_map, fov_recompute, message_log, 
+            con, panel, all_entities, game_map, fov_map, fov_recompute, message_log, 
             constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
             mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player, cursor)
 
         libtcod.console_flush()
 
-        clear_all(con, entities_player_turn.extend(entities_enemy_turn))
+        clear_all(con, all_entities)
 
         fov_recompute = False
 
@@ -74,7 +80,7 @@ def main():
         exit = action.get('exit')                               # Exit whatever screen is open.
         fullscreen = action.get('fullscreen')                   # Set game to full screen.
         
-        entity_to_act = event_queue.tick()
+        entity_to_act = event_queue.fetch()
         # TODO: Is this the best way to do this? I don't know how to tell if all the enemies have gone.
         if entity_to_act is player and game_state is GameStates.ENEMY_TURN: 
             game_state = GameStates.PLAYER_TURN
