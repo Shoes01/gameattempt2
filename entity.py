@@ -9,10 +9,11 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, char, color, name, moves_with_player=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
+    def __init__(self, char, color, name, uuid, moves_with_player=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
         self.char = char
         self.color = color
-        self.name = name        
+        self.name = name
+        self.uuid = uuid
         self.moves_with_player = moves_with_player
         self.chassis = chassis
         self.mech = mech
@@ -34,14 +35,11 @@ class Entity:
             for w in self.weapon:
                 w.owner = self
 
-    @property
-    def action_points_used(self):
-        return TICKS_PER_TURN - self.action_points
-
     def reset(self):
         """
         Reset the entity for the next turn.
         """
+        self.action_points = TICKS_PER_TURN
         self.mech.reset()
         for w in self.weapon:
             w.reset()        

@@ -47,10 +47,10 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
-        all_entities = entities_player_turn
+        all_entities = []
+        all_entities.extend(entities_player_turn)
         all_entities.extend(entities_enemy_turn)
         all_entities.extend(entities_special)
-        
 
         render_all(
             con, panel, all_entities, game_map, fov_map, fov_recompute, message_log, 
@@ -64,7 +64,35 @@ def main():
         fov_recompute = False
 
         """
-        Handle the Player Turn.
+        Handle the turn order, and the entity whose turn it is.
+        """
+        entity_to_act = None
+
+        if event_queue.empty():
+            if game_state == GameStates.PLAYER_TURN:
+                game_state = GameStates.ENEMY_TURN
+                event_queue.register_list(entities_enemy_turn)
+
+            elif game_state == GameStates.ENEMY_TURN:
+                game_state = GameStates.PLAYER_TURN
+                event_queue.register_list(entities_player_turn)
+                
+        else:
+            entity_uuid = event_queue.fetch()
+            
+            if game_state == GameStates.ENEMY_TURN:
+                for entity in entities_enemy_turn:
+                    if entity_uuid == entity.uuid:
+                        entity_to_act = entity
+
+            elif game_state == GameStates.PLAYER_TURN:
+                for entity in entities_player_turn:
+                    if entity_uuid == entity.uuid:
+                        entity_to_act = entity
+            
+
+        """
+        Handle the Player Actions.
         """
         action = handle_keys(key, game_state)
         impulse = None # This is to avoid logic problems.
@@ -78,31 +106,22 @@ def main():
         weapons_menu_index = action.get('weapons_menu_index')   # Choose an item from the weapons menu.
         look = action.get('look')                               # Enter the LOOK game state.
         exit = action.get('exit')                               # Exit whatever screen is open.
-        fullscreen = action.get('fullscreen')                   # Set game to full screen.
-        
-        entity_to_act = event_queue.fetch()
-        # TODO: Is this the best way to do this? I don't know how to tell if all the enemies have gone.
-        if entity_to_act is player and game_state is GameStates.ENEMY_TURN: 
-            game_state = GameStates.PLAYER_TURN
-            turn_state = TurnStates.UPKEEP_PHASE
-        elif entity_to_act is None:
-            continue
+        fullscreen = action.get('fullscreen')                   # Set game to full screen.        
 
         """
         Handle the Player Turn.
         """
         if game_state == GameStates.PLAYER_TURN:
+            # Handle results from the player actions.
+            player_turn_results = []
+            
             # The player may look around during any game state.
             if look:
                 previous_game_state = game_state
                 game_state = GameStates.LOOK
                 cursor.cursor.turn_on(player)
                 continue
-            
-            # Handle results from the player actions.
-            player_turn_results = []
 
-            # See game_states.py for the turn structure.                                                    
             if turn_state == TurnStates.UPKEEP_PHASE:
                 message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
@@ -120,26 +139,22 @@ def main():
                     turn_state = TurnStates.MOVEMENT_PHASE                
 
             if turn_state == TurnStates.MOVEMENT_PHASE:
-                """
-                Player movement code.
-                """
-                if move:
-                    dx, dy = move
-                    if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
-                        player.mech.move(dx, dy)
-
-                        fov_recompute = True
+                # Player movement code.
+                if entity_to_act is player:
+                    if move:
+                        dx, dy = move
+                        if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
+                            player.mech.move(dx, dy)
+                            fov_recompute = True
                 
-                if next_turn_phase and player.mech.has_spent_minimum_momentum():
-                    turn_state = TurnStates.POST_MOVEMENT_PHASE
-                elif next_turn_phase and not player.mech.has_spent_minimum_momentum():
-                    message_log.add_message(Message('Must spend more momentum.', libtcod.red))  # TODO: Move this to an "end the phase" action and use turn_results to display.
-
-                """
-                Enemy projectile code.
-                """
-                if entity_to_act.projectile is not None and entity_to_act.moves_with_player is True:
+                # Enemy projectile code.
+                elif entity_to_act.projectile is not None and entity_to_act.moves_with_player is True: # TODO: The moves with player variable is deprecated.
                     player_turn_results.extend(entity_to_act.ai.take_turn())
+                    fov_recompute = True
+                
+                # End of movement code.
+                if next_turn_phase and event_queue.empty():
+                    turn_state = TurnStates.POST_MOVEMENT_PHASE
 
             elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
                 game_map.reset_flags()                
@@ -169,9 +184,9 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player_turn_results.extend(player.fire_active_weapon(entities, event_queue))
+                player_turn_results.extend(player.fire_active_weapon(entities_enemy_turn, event_queue))
 
-                # Reset the mech for the next turn.
+                # Reset the mech for the next turn. TODO: Move this to a cleanup phase?
                 player.reset()
                 
                 # Reset map flags and remove targets.
@@ -185,6 +200,7 @@ def main():
                 turn_state = TurnStates.UPKEEP_PHASE
                 game_state = GameStates.ENEMY_TURN
             
+            # TODO: This could also go into a cleanup phase.
             for result in player_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
@@ -195,13 +211,17 @@ def main():
                     elif dead_entity.projecitle is None:
                         message = kill_enemy(dead_entity)
                     else:
-                        entities.remove(dead_entity)
+                        entities_player_turn.remove(dead_entity)
                     
                     event_queue.release(dead_entity)            
                 
                 if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
+            
+            # If the entity_to_act hasn't acted, then presumably they will be in the same spot on the queue.
+            if entity_to_act is not None and entity_to_act.action_points > 0 and entity_to_act is not cursor:
+                event_queue.register(entity_to_act)
                 
         """
         Handle the targeting cursor.
@@ -258,8 +278,11 @@ def main():
         """
         if game_state == GameStates.ENEMY_TURN:
             enemy_turn_results = []
-            
-            enemy = entity_to_act
+
+            if entity_to_act is not None:
+                enemy = entity_to_act
+            else:
+                continue
 
             if turn_state == TurnStates.UPKEEP_PHASE:
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
@@ -268,8 +291,9 @@ def main():
                 turn_state = TurnStates.MOVEMENT_PHASE
 
             elif turn_state == TurnStates.MOVEMENT_PHASE:
-                if enemy.moves_with_player is False:
+                if enemy.moves_with_player is False: # TODO: I think this is also deprecated.
                     enemy_turn_results.extend(enemy.ai.take_turn())
+                    fov_recompute = True
 
                 turn_state = TurnStates.POST_MOVEMENT_PHASE
 
@@ -295,13 +319,17 @@ def main():
                     elif dead_entity.projectile is None:
                         message = kill_enemy(dead_entity)
                     else:
-                        entities.remove(dead_entity)
+                        entities_enemy_turn.remove(dead_entity)
                     
                     event_queue.release(dead_entity)
 
                 if message:
                     message_log.add_message(Message(message, libtcod.yellow))
                     fov_recompute = True
+            
+            # If the entity_to_act hasn't acted, then presumably they will be in the same spot on the queue.
+            if entity_to_act is not None and entity_to_act.action_points > 0 and entity_to_act is not cursor:
+                event_queue.register(entity_to_act)
                 
         """
         Handle the death of the player.

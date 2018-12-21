@@ -83,7 +83,7 @@ def get_game_variables(constants):
     # Create cursor.
     cursor_component = Cursor()
     location_component = Location()
-    cursor = Entity('X', libtcod.red, "cursor", cursor=cursor_component, location=location_component)
+    cursor = Entity('X', libtcod.red, "cursor", 0, cursor=cursor_component, location=location_component)
     cursor.render_order=RenderOrder.CURSOR
     entities_special.append(cursor)
 
@@ -94,7 +94,7 @@ def get_game_variables(constants):
     message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 
     # Set game_state.
-    game_state = GameStates.PLAYER_TURN
+    game_state = GameStates.ENEMY_TURN
     
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE

@@ -60,6 +60,7 @@ class Weapon:
                 projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
 
         # Simple laser code
+        # TODO: Without using an entity for the laser code, it may only hit the "entities_enenmy_turn". This means no friendly fire.
         for target in self.targets:
             entity = get_entity_at_location(target, entities)
             if entity is None: 

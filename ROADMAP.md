@@ -26,7 +26,6 @@ Need to rewrite how damage is done, as the gun is not the one doing damage.
 
 # BUG #
 Not moving spends no time, so the player may shoot indefinitely. APs need to be zeroed after the move phase.
-QUESTION: Why have ticks at all? The turn order shouldn't change, so speed should just be how many moves per turn a player can do.
 
 # TICKS PER TURN #
 Entities can't overload their turn. Their speed means "moves per turn", and will never go into the negatives.

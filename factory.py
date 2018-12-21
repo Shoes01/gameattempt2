@@ -1,4 +1,5 @@
 import tcod as libtcod
+import uuid
 
 from components.ai import DoNothing, MoveAlongPath
 from components.chassis import Chassis
@@ -46,7 +47,7 @@ def entity_factory(entity_type, location, event_queue, entities):
         x, y = location
         location_component = Location(x, y)
 
-        entity = Entity('@', libtcod.white, 'player', moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+        entity = Entity('@', libtcod.white, 'player', uuid.uuid4(), moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
@@ -55,7 +56,7 @@ def entity_factory(entity_type, location, event_queue, entities):
         x, y = location
         location_component = Location(x, y)
 
-        entity = Entity('@', libtcod.yellow, 'npc', chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
+        entity = Entity('@', libtcod.yellow, 'npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
 
     # Projectile entities.
     elif entity_type == ProjectileType.BASIC_PROJECTILE:
@@ -66,7 +67,7 @@ def entity_factory(entity_type, location, event_queue, entities):
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
 
-        entity = Entity('o', libtcod.orange, 'projectile', ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+        entity = Entity('o', libtcod.orange, 'projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
 
     if entity is not None:
         event_queue.register(entity)
