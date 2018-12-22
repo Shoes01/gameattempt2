@@ -29,10 +29,7 @@ class MoveAlongPath:
 
             projectile.location.move(dx, dy)
 
-            results.append({'message': '{0} hopefully moved.'.format(projectile.name.capitalize())})
-
         else:
-            results.append({'message': '{0} hopefully stopped.'.format(projectile.name.capitalize())})
             results.append({'dead': projectile})
 
         return results

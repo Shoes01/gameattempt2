@@ -1,6 +1,3 @@
-# BUG #
-Not moving spends no time, so the player may shoot indefinitely. APs need to be zeroed after the move phase.
-
 ## ROAD MAP
 - [x] Momentum Based Momement
 - [x] Basic obstacles
