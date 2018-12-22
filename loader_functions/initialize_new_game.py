@@ -74,11 +74,11 @@ def get_game_variables(constants):
 
     # Create player.
     location = (int(constants['screen_width'] / 2), int(constants['screen_height'] / 2))
-    player = entity_factory(EntityType.PLAYER, location, event_queue, entities_player_turn)
+    player = entity_factory(EntityType.PLAYER, location, entities_player_turn)
     
     # Create NPC.
     location = (int(constants['screen_width'] / 2) - 5, int(constants['screen_height'] / 2))
-    entity_factory(EntityType.NPC, location, event_queue, entities_enemy_turn)
+    entity_factory(EntityType.NPC, location, entities_enemy_turn)
     
     # Create cursor.
     cursor_component = Cursor()

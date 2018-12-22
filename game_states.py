@@ -58,10 +58,11 @@ class TurnStates(Enum):
 
    """
 
-   UPKEEP_PHASE = auto()        # Messages related to the previous enemy turn are relayed.
-   PRE_MOVEMENT_PHASE = auto()  # Impulse is chosen, legal tiles are highlighted for the player.
-   MOVEMENT_PHASE = auto()      # Mech moves to a permitted position, projectiles move as well.
-   POST_MOVEMENT_PHASE = auto() # Legal tiles are unhighlighted.
-   PRE_ATTACK_PHASE = auto()    # Messages are displayed for the player.
-   ATTACK_PHASE = auto()        # Mech decides what to fire where.
-   POST_ATTACK_PHASE = auto()   # Final cleanup.
+   UPKEEP_PHASE = auto()         # Messages related to the previous enemy turn are relayed.
+   PRE_MOVEMENT_PHASE = auto()   # Impulse is chosen, legal tiles are highlighted for the player.
+   MOVEMENT_PHASE = auto()       # Mech moves to a permitted position, projectiles move as well.
+   POST_MOVEMENT_PHASE = auto()  # Legal tiles are unhighlighted.
+   PRE_ATTACK_PHASE = auto()     # Messages are displayed for the player.
+   ATTACK_PHASE = auto()         # Mech decides what to fire where.
+   POST_ATTACK_PHASE = auto()    # Weapon is fired, targeted tiles are unhighlighted.
+   CLEANUP_PHASE = auto()        # Final cleanup.

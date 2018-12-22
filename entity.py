@@ -40,9 +40,11 @@ class Entity:
         Reset the entity for the next turn.
         """
         self.action_points = TICKS_PER_TURN
-        self.mech.reset()
-        for w in self.weapon:
-            w.reset()        
+        if self.mech is not None: 
+            self.mech.reset()
+        if self.weapon is not None:
+            for w in self.weapon:
+                w.reset()        
     
     def distance(self, x, y):
         """

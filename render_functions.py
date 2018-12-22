@@ -54,8 +54,8 @@ def render_all(
     Print con console.
     Displays the tiles and entities.
     """
-    if fov_recompute:
-        # Draw all the tiles in the game map
+    # Draw all the tiles in the game map
+    if fov_recompute:        
         for y in range(game_map.height):
             for x in range(game_map.width):
                 visible = libtcod.map_is_in_fov(fov_map, x, y)

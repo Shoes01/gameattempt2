@@ -33,7 +33,7 @@ class EntityType(Enum):
 class ProjectileType(Enum):
     BASIC_PROJECTILE = auto()
 
-def entity_factory(entity_type, location, event_queue, entities):
+def entity_factory(entity_type, location, entities):
     """
     Build an entity with the specified components.
     """
@@ -70,7 +70,6 @@ def entity_factory(entity_type, location, event_queue, entities):
         entity = Entity('o', libtcod.orange, 'projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
 
     if entity is not None:
-        event_queue.register(entity)
         entities.append(entity)
 
     return entity

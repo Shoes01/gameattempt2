@@ -27,6 +27,10 @@ Need to rewrite how damage is done, as the gun is not the one doing damage.
 # BUG #
 Not moving spends no time, so the player may shoot indefinitely. APs need to be zeroed after the move phase.
 
+# EVENT QUEUE BUG #
+When the last entity has their turn, the queue is empty... so how do we decide when the turn is over?
+
+
 # TICKS PER TURN #
 Entities can't overload their turn. Their speed means "moves per turn", and will never go into the negatives.
 
@@ -95,6 +99,7 @@ Enemy fired projectiles
   - [ ] Decide where radar detection should happen
   - [ ] Decide where staggering should happen
   - [ ] Decide where damage should happen
+  - [ ] Add a cleanup phase
 - [ ] Revisit momentum logic
   - [ ] Should the player have fewer choices?
   - [ ] Should the player have a harder time slowing time?
@@ -111,7 +116,6 @@ Enemy fired projectiles
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
-- [ ] Animation
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
 - [ ] Momentum based weapons
@@ -123,6 +127,7 @@ Enemy fired projectiles
   - [ ] Having the AI move will require it lock in its momentum before starting, so that it's speed is constant
 - [ ] Fifth Weapon System: Shock Combo
 - [ ] Radar Based Stealth
+- [ ] Animation
 - [ ] City Generation
 - [ ] Objectives
 - [ ] Mission Hub
@@ -131,6 +136,6 @@ Enemy fired projectiles
 - [ ] Lore
 - [ ] Player controlled entities
   - [ ] PRE_MOVE phase: set all the impulses
-  - [ ] MOVE phase: draw a path for the entity to travel (or have it do this automatically)
+  - [ ] MOVE phase: Choose the tile the entity will end on. AI will move it there.
   - [ ] POST_MOVE phase: move the entities to their target according to their speed, simultaneously and according to the path
   - [ ] COMBAT phase: choose and fire weapons for each entity
