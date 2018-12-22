@@ -44,8 +44,9 @@ Once the Q is empty, the turn changes, and the Q is refilled.
         """
         Remove an entity from the queue.
         """
-        self.queue.remove(entity)
-        heapq.heapify(self.queue)
+        if entity in self.queue: 
+            self.queue.remove(entity)
+            heapq.heapify(self.queue)
 
     def fetch(self):
         """

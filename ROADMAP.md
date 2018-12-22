@@ -1,49 +1,5 @@
-## PROJECTILE BRANCH
-The weapon component will use the entity_factory() to create a projectile.
-The factory will create a projectile Entity with the following:
-  - name, char, color
-  - projectile component: speed, damage
-    - path and moves_with_player are set after the fact (entity needs a faction component!)
-  - location component: the first tile on the path
-  - ai component: simply moves to a new tile
-
-Player projectiles move on the enemy's turn. Vice versa.
-
-Need to rewrite how damage is done, as the gun is not the one doing damage.
-    Damage_type: pulse_laser
-        The "entity" that is created should be more of a manager. It has no location.
-        It is given a path and a speed. It deals damage to first target in the path. (Also draws a line)
-
-    Damage_type: ballistic
-        The "entity" that is created is a moving bullet.
-        When it moves into something blockable, it deals damage.
-    
-    Damage_type: missile
-        The "entity" that is created is a moving missile.
-        It is given the tile where the player is currently standing at the start of the turn.
-        It updates position at the beginning of every turn.
-            This allows the player to outurn the missile, or to put an obstacle between them and it.
-
 # BUG #
 Not moving spends no time, so the player may shoot indefinitely. APs need to be zeroed after the move phase.
-
-# EVENT QUEUE BUG #
-When the last entity has their turn, the queue is empty... so how do we decide when the turn is over?
-
-
-# TICKS PER TURN #
-Entities can't overload their turn. Their speed means "moves per turn", and will never go into the negatives.
-
-# TURN ORDER #
-Player Turn and Enemy Turn seem to be artificial, or at least only serve to ensure everyone gets their turn.
-
-Things that move on Player Turn:
-Player controlled entities
-Enemey fired projectiles
-
-Things that move on Enemy Turn:
-Enemy controlled entities
-Enemy fired projectiles
 
 ## ROAD MAP
 - [x] Momentum Based Momement
@@ -79,27 +35,31 @@ Enemy fired projectiles
   - [x] Weapons and movement are different. 
     - [x] Movement uses the EQ, and is based on speed. 
     - [x] Weapons simply have a cooldown, and ticks down at the end of the turn
-- [ ] Second Weapon System: Ballistics
+- [x] Priority Queue
+- [x] Second Weapon System: Ballistics
   - [x] Code logic to handle an entity with multiple weapons
   - [x] Allow the player to target a tile multiple times
-  - [ ] Handle projectiles
-  - [ ] Instant speed projectiles need to communicate which tile is being hit every turn
+  - [x] Handle projectiles
+- [ ] Revisit Laser code
+  - [ ] The laser should damage its target tile any time an entity steps into it.
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added
   - [ ] Ensure all player "actions" use the results variable to track events
-    - [ ] Is this an Observer pattern?
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
-    - [ ] Should other constants be moved there..?
   - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
-  - [ ] The move function should be the one that cares about obstacles
+  - [ ] The move function should be the one that cares about collision detections
+- [ ] Enemy NPC: Unintelligent movement
+  - [ ] Make enemy entities spend their action points on moving.
+  - [ ] Make enemy entities attempt to move in a square.
+    - [ ] Move in one direction, then slow down to a stop, then change direction.
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
 - [ ] Revisit turn structure
   - [ ] Decide where radar detection should happen
   - [ ] Decide where staggering should happen
   - [ ] Decide where damage should happen
-  - [ ] Add a cleanup phase
+  - [x] Add a cleanup phase
 - [ ] Revisit momentum logic
   - [ ] Should the player have fewer choices?
   - [ ] Should the player have a harder time slowing time?
@@ -116,6 +76,7 @@ Enemy fired projectiles
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
+  - [ ] BUG: When the player has no momentum and impulse is set to -1, there are no highlighted tiles, but the player may still "pass" the turn and not move.
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
 - [ ] Momentum based weapons

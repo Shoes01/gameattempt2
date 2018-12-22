@@ -48,7 +48,7 @@ class Weapon:
         for target in self.targets:
             if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
                 (x, y) = (self.owner.location.x, self.owner.location.y)
-                projectile = factory.entity_factory(self.projectile, (x, y), event_queue, entities)
+                projectile = factory.entity_factory(self.projectile, (x, y), entities)
                 if projectile.moves_with_player:
                     self.owner.moves_with_player = False
                 else:
@@ -66,7 +66,8 @@ class Weapon:
             if entity is None: 
                 continue
             
-            results.append(entity.chassis.take_damage(self.damage))
+            if entity.chassis:
+                results.append(entity.chassis.take_damage(self.damage))
         
         return results
 

@@ -225,7 +225,7 @@ def main():
                     message_log.add_message(Message(message, libtcod.yellow))
             
             # Put the entity back in the queue, if it has action points left.
-            if entity_to_act and entity_to_act.action_points > 0 and entity_to_act is not cursor:
+            if entity_to_act and entity_to_act.action_points > 0 and entity_to_act is not cursor and turn_state is not TurnStates.CLEANUP_PHASE:
                 event_queue.register(entity_to_act)
                 
         """
@@ -342,7 +342,7 @@ def main():
                     message_log.add_message(Message(message, libtcod.yellow))
             
             # Put the entity back in the queue, if it has action points left.
-            if entity_to_act and entity_to_act.action_points > 0 and entity_to_act is not cursor:
+            if entity_to_act and entity_to_act.action_points > 0 and entity_to_act is not cursor and turn_state is not TurnStates.CLEANUP_PHASE:
                 event_queue.register(entity_to_act)
                 
         """

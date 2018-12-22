@@ -97,11 +97,10 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='Laser', damage=5, min_targets=0, max_targets=5, color=libtcod.red, range=10, cost=1)
+        return Weapon(name='Laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1)
     
     elif component == WeaponComponent.GUN:
-        projectile_component = Projectile(damage=5, damage_type='gun')
-        return Weapon(name='gun', damage=5, min_targets=1, max_targets=1, color=libtcod.red, range=10, cost=1, projectile=ProjectileType.BASIC_PROJECTILE)
+        return Weapon(name='gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, projectile=ProjectileType.BASIC_PROJECTILE)
     
     # Chassis components.
     elif component == ChassisComponent.BASIC_CHASSIS:
