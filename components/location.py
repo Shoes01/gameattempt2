@@ -9,4 +9,4 @@ class Location:
         self.x += dx
         self.y += dy
         if self.owner.cursor is None:
-            self.owner.action_points -= int(TICKS_PER_TURN / self.owner.mech.speed)
+            self.owner.action_points -= TICKS_PER_TURN // self.owner.mech.speed

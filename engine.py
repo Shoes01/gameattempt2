@@ -204,8 +204,8 @@ def main():
                 turn_state = TurnStates.CLEANUP_PHASE
             
             if turn_state == TurnStates.CLEANUP_PHASE:
-                # Reset the entity for the next turn.
-                player.reset()
+                for entity in entities_player_turn:
+                    entity.reset()
             
             for result in player_turn_results:
                 message = result.get('message')
@@ -321,8 +321,8 @@ def main():
                 turn_state = TurnStates.CLEANUP_PHASE
             
             if turn_state == TurnStates.CLEANUP_PHASE:
-                if enemy: enemy.reset()
-                if projectile: projectile.reset()
+                for entity in entities_enemy_turn:
+                    entity.reset()
 
             for result in enemy_turn_results:
                 message = result.get('message')
