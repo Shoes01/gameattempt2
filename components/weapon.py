@@ -46,18 +46,32 @@ class Weapon:
         
         # Projectile code
         for target in self.targets:
-            if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
-                (x, y) = (self.owner.location.x, self.owner.location.y)
-                projectile = factory.entity_factory(self.projectile, (x, y), entities)
-                if projectile.moves_with_player:
-                    self.owner.moves_with_player = False
-                else:
-                    self.owner.moves_with_player = True
+            # Prepare the projectile
+            (x, y) = (self.owner.location.x, self.owner.location.y)
+            projectile = factory.entity_factory(self.projectile, (x, y), entities)
+            if projectile.moves_with_player:
+                self.owner.moves_with_player = False
+            else:
+                self.owner.moves_with_player = True
 
+            if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
+                # Ballistic projectiles follow a path and collide with things.
                 xo, yo = projectile.location.x, projectile.location.y
                 xd, yd = target
                 
                 projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
+            
+            elif self.projectile is factory.ProjectileType.LASER_COMMANDER:
+                # Laser commander is an invisible entity that fires laser projectiles at the target
+                pass
+                # Do nothing?
+            elif self.projectile is factory.ProjectileType.LASER_PROJECTILE:
+                # What does it do here?
+                pass
+            
+                
+
+
 
         # Simple laser code
         # TODO: Without using an entity for the laser code, it may only hit the "entities_enenmy_turn". This means no friendly fire.

@@ -32,6 +32,8 @@ class EntityType(Enum):
 
 class ProjectileType(Enum):
     BASIC_PROJECTILE = auto()
+    LASER_PROJECTILE = auto()
+    LASER_OVERSEER = auto()
 
 def entity_factory(entity_type, location, entities):
     """
@@ -67,7 +69,17 @@ def entity_factory(entity_type, location, entities):
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
 
-        entity = Entity('o', libtcod.orange, 'projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+        entity = Entity('o', libtcod.orange, 'ballistic projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+
+    elif entity_type == ProjectileType.LASER_PROJECTILE:
+        ai_component = create_component(AIComponent.PROJECTILE)
+        mech_component = Mech(peak_momentum=100, max_impulse=100)
+        mech_component.impulse = 3600 # This essentially sets the speed of the projectile.
+        x, y = location
+        location_component = Location(x, y)
+        projectile_component = Projectile(damage=10, damage_type='direct')
+
+        entity = Entity('-', libtcod.dark_green, 'laser pulse', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
 
     if entity is not None:
         entities.append(entity)
@@ -97,7 +109,7 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='Laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1)
+        return Weapon(name='Laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, projectile=ProjectileType.LASER_PROJECTILE)
     
     elif component == WeaponComponent.GUN:
         return Weapon(name='gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, projectile=ProjectileType.BASIC_PROJECTILE)

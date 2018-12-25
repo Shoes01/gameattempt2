@@ -37,15 +37,22 @@
   - [x] Code logic to handle an entity with multiple weapons
   - [x] Allow the player to target a tile multiple times
   - [x] Handle projectiles
-- [ ] Revisit Laser code
-  - [ ] The laser should damage its target tile any time an entity steps into it.
+- [ ] Refactor ballistic code
+  - [ ] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added
   - [ ] Ensure all player "actions" use the results variable to track events
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
   - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
-  - [ ] The move function should be the one that cares about collision detections
+  - [ ] Rendering component
+    - [ ] Decides if this entity gets rendered (character, name, color)
+  - [ ] User input component
+    - [ ] The player controlled entities have this; it's like an AI that awaits input
+- [ ] Collision detection
+  - [ ] Entities having their movement blocked
+  - [ ] Ballistic projectiles are blocked, or penetrate and move slower
+  - [ ] Laser "projectiles" are blocked
 - [ ] Enemy NPC: Unintelligent movement
   - [ ] Make enemy entities spend their action points on moving.
   - [ ] Make enemy entities attempt to move in a square.
@@ -76,6 +83,7 @@
   - [ ] BUG: When the player has no momentum and impulse is set to -1, there are no highlighted tiles, but the player may still "pass" the turn and not move.
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
+  - [ ] Decide if projectiles will travel indefinitely or not
 - [ ] Momentum based weapons
   - [ ] Weapons impart momentum on user and target
 - [ ] Radar Based Detection
@@ -84,6 +92,9 @@
 - [ ] Enemy NPC: Moving Logic
   - [ ] Having the AI move will require it lock in its momentum before starting, so that it's speed is constant
 - [ ] Fifth Weapon System: Shock Combo
+- [ ] Sixth Weapon System: Denial of Area
+  - [ ] May be fire, acid, EMP, or some other element
+  - [ ] Is less effective against fast moving targets
 - [ ] Radar Based Stealth
 - [ ] Animation
 - [ ] City Generation
