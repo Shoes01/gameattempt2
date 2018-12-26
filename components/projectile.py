@@ -4,6 +4,6 @@ class Projectile:
     """
     def __init__(self, damage, damage_type):
         self.damage = damage
-        self.damage_type = damage_type
+        self.damage_type = damage_type      # Direct and indirect.
         self.path = []                      # List of targets.
     

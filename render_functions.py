@@ -16,7 +16,7 @@ def get_names_under_mouse(mouse, entities, fov_map, cursor):
     # Check to see if the cursor is active. If yes, then giev the names that are under it.
     (x, y) = (mouse.cx, mouse.cy)
 
-    if cursor.location is not None:
+    if cursor.location is not None and cursor.location.x is not -1:
         (x, y) = (cursor.location.x, cursor.location.y)
 
     names = []
