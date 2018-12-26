@@ -2,6 +2,7 @@ import tcod as libtcod
 
 from components.cursor import Cursor
 from components.location import Location
+from components.render import Render
 from entity import Entity
 from event_queue import EventQueue
 from factory import entity_factory, EntityType
@@ -83,7 +84,8 @@ def get_game_variables(constants):
     # Create cursor.
     cursor_component = Cursor()
     location_component = Location()
-    cursor = Entity('X', libtcod.red, "cursor", 0, cursor=cursor_component, location=location_component)
+    render_component = Render('X', libtcod.red)
+    cursor = Entity('cursor', 0, cursor=cursor_component, location=location_component, render=render_component)
     cursor.render_order=RenderOrder.CURSOR
     entities_special.append(cursor)
 

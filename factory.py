@@ -6,6 +6,7 @@ from components.chassis import Chassis
 from components.location import Location
 from components.mech import Mech
 from components.projectile import Projectile
+from components.render import Render
 from components.weapon import Weapon
 from entity import Entity
 from enum import auto, Enum
@@ -48,8 +49,9 @@ def entity_factory(entity_type, location, entities):
         weapon_component = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
+        render_component = Render('@', libtcod.white)
 
-        entity = Entity('@', libtcod.white, 'player', uuid.uuid4(), moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component)
+        entity = Entity('player', uuid.uuid4(), moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, render=render_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
@@ -57,8 +59,9 @@ def entity_factory(entity_type, location, entities):
         mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
         x, y = location
         location_component = Location(x, y)
+        render_component = Render('@', libtcod.yellow)
 
-        entity = Entity('@', libtcod.yellow, 'npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component)
+        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component, render=render_component)
 
     # Projectile entities.
     elif entity_type == ProjectileType.BASIC_PROJECTILE:
@@ -68,8 +71,9 @@ def entity_factory(entity_type, location, entities):
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
+        render_component = Render('o', libtcod.orange)
 
-        entity = Entity('o', libtcod.orange, 'ballistic projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+        entity = Entity('ballistic projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component, render=render_component)
 
     elif entity_type == ProjectileType.LASER_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
@@ -78,8 +82,9 @@ def entity_factory(entity_type, location, entities):
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
+        render_component = Render('-', libtcod.dark_green)
 
-        entity = Entity('-', libtcod.dark_green, 'laser pulse', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component)
+        entity = Entity('laser pulse', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component, render=render_component)
 
     if entity is not None:
         entities.append(entity)

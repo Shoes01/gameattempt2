@@ -87,7 +87,7 @@ def render_all(
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
     
     for entity in entities_in_render_order:
-        if entity.location is not None:
+        if entity.location is not None and entity.render:
             draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
@@ -151,8 +151,8 @@ def clear_all(con, entities):
 
 def draw_entity(con, entity, fov_map, game_map):
     if libtcod.map_is_in_fov(fov_map, entity.location.x, entity.location.y):
-            libtcod.console_set_default_foreground(con, entity.color)
-            libtcod.console_put_char(con, entity.location.x, entity.location.y, entity.char, libtcod.BKGND_NONE)
+            libtcod.console_set_default_foreground(con, entity.render.color)
+            libtcod.console_put_char(con, entity.location.x, entity.location.y, entity.render.char, libtcod.BKGND_NONE)
 
 def clear_entity(con, entity):
     # erase the character that represents this object

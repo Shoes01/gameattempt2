@@ -9,9 +9,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, char, color, name, uuid, moves_with_player=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None):
-        self.char = char
-        self.color = color
+    def __init__(self, name, uuid, moves_with_player=False, chassis=None, mech=None, cursor=None, weapon=None, ai=None, location=None, projectile=None, render=None):
         self.name = name
         self.uuid = uuid
         self.moves_with_player = moves_with_player
@@ -22,6 +20,7 @@ class Entity:
         self.ai = ai
         self.location = location
         self.projectile = projectile
+        self.render = render
         self.action_points = TICKS_PER_TURN
         self.render_order = RenderOrder.ACTOR
 
@@ -31,6 +30,7 @@ class Entity:
         if self.ai:         self.ai.owner = self
         if self.location:   self.location.owner = self
         if self.projectile: self.projectile.owner = self
+        if self.render:     self.render.owner = self
         if self.weapon:
             for w in self.weapon:
                 w.owner = self
