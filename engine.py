@@ -210,16 +210,19 @@ def main():
             for result in player_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
+                remove_entity = relust.get('remove')
 
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
-                    elif dead_entity.projectile is None:
-                        message = kill_enemy(dead_entity)
                     else:
-                        entities_player_turn.remove(dead_entity)
+                        message = kill_enemy(dead_entity)
+                
+                    event_queue.release(dead_entity)
+                
+                if remove_entity:
+                    entities_player_turn.remove(remove_entity)
                     
-                    event_queue.release(dead_entity)            
                 
                 if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
@@ -327,17 +330,19 @@ def main():
             for result in enemy_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
+                remove_entity = result.get('remove')
                 
                 if dead_entity:
                     if dead_entity == player:
                         message, game_state = kill_player(dead_entity)
-                    elif dead_entity.projectile is None:
-                        message = kill_enemy(dead_entity)
                     else:
-                        entities_enemy_turn.remove(dead_entity)
-                    
+                        message = kill_enemy(dead_entity)
+                
                     event_queue.release(dead_entity)
 
+                if remove_entity:
+                    entities_enemy_turn.remove(remove_entity)
+                    
                 if message:
                     message_log.add_message(Message(message, libtcod.yellow))
             

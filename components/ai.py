@@ -30,6 +30,20 @@ class MoveAlongPath:
             projectile.location.move(dx, dy)
 
         else:
-            results.append({'dead': projectile})
+            results.append({'remove': projectile})
 
+        return results
+
+class Overseer:
+    """
+    This AI controls how projectiles are made.
+    """
+    def take_turn(self):
+        results = []
+
+        overseer = self.owner
+
+        if overseer.action_points == 0:
+            results.append({'remove': overseer})
+        
         return results
