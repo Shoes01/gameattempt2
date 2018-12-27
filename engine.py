@@ -1,5 +1,7 @@
 import tcod as libtcod
 
+import factory
+
 from death_functions import kill_enemy, kill_player
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
@@ -331,6 +333,7 @@ def main():
                 message = result.get('message')
                 dead_entity = result.get('dead')
                 remove_entity = result.get('remove')
+                new_projectile = result.get('new_projectile')
                 
                 if dead_entity:
                     if dead_entity == player:
@@ -339,6 +342,16 @@ def main():
                         message = kill_enemy(dead_entity)
                 
                     event_queue.release(dead_entity)
+
+                if new_projectile:
+                    overseer, weapon = new_projectile
+                    if len(weapon.targets) > 0:
+                        xo, yo = overseer.location.x, overseer.location.y                
+                        xd, yd = weapon.targets.pop()
+                        
+                        overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities_enemy_turn)                
+                        overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
+                        overseer_projectile.action_points = overseer.action_points
 
                 if remove_entity:
                     entities_enemy_turn.remove(remove_entity)

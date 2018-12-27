@@ -1,3 +1,7 @@
+import tcod as libtcod
+
+from global_variables import TICKS_PER_TURN
+
 class DoNothing:
     """
     This is a place holder AI.
@@ -7,7 +11,7 @@ class DoNothing:
 
         enemy = self.owner
 
-        enemy.action_points -= 26771144400 // 2
+        enemy.action_points -= TICKS_PER_TURN // 2
 
         results.append({'message': '{0} does nothing.'.format(enemy.name.capitalize())})
 
@@ -28,6 +32,7 @@ class MoveAlongPath:
             dy = y - projectile.location.y
 
             projectile.location.move(dx, dy)
+            print('Projectile is moving (ID: {0})'.format(projectile.uuid))
 
         else:
             results.append({'remove': projectile})
@@ -42,6 +47,11 @@ class Overseer:
         results = []
 
         overseer = self.owner
+        weapon = overseer.weapon[0]
+        
+        overseer.action_points -= TICKS_PER_TURN // weapon.rate_of_fire
+
+        results.append({'new_projectile': (overseer, weapon)})
 
         if overseer.action_points == 0:
             results.append({'remove': overseer})

@@ -45,12 +45,14 @@
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
   - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
-  - [ ] Rendering component
+  - [x] Rendering component
     - [ ] Decides if this entity gets rendered (character, name, color)
   - [ ] User input component
     - [ ] The player controlled entities have this; it's like an AI that awaits input
   - [ ] Sort arugments in functions alphabetically
   - [ ] Rethink how the cursor should be handled
+  - [ ] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
+    - [ ] Have an "Arsenal" class that is made up of Weapon Components.
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower

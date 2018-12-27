@@ -1,7 +1,7 @@
 import tcod as libtcod
 import uuid
 
-from components.ai import DoNothing, MoveAlongPath
+from components.ai import DoNothing, MoveAlongPath, Overseer
 from components.chassis import Chassis
 from components.location import Location
 from components.mech import Mech
@@ -14,6 +14,7 @@ from enum import auto, Enum
 class AIComponent(Enum):
     DEBUG = auto()
     PROJECTILE = auto()
+    OVERSEER_AI = auto()
 
 class ChassisComponent(Enum):
     BASIC_CHASSIS = auto()
@@ -30,13 +31,13 @@ class WeaponComponent(Enum):
 class EntityType(Enum):
     PLAYER = auto()
     NPC = auto()
+    OVERSEER = auto()
 
 class ProjectileType(Enum):
     BASIC_PROJECTILE = auto()
     LASER_PROJECTILE = auto()
-    LASER_OVERSEER = auto()
 
-def entity_factory(entity_type, location, entities):
+def entity_factory(entity_type, location, entities, weapon=None):
     """
     Build an entity with the specified components.
     """
@@ -62,6 +63,19 @@ def entity_factory(entity_type, location, entities):
         render_component = Render('@', libtcod.yellow)
 
         entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component, render=render_component)
+
+    elif entity_type == EntityType.OVERSEER:
+        ai_component = create_component(AIComponent.OVERSEER_AI)
+        mech_component = Mech(peak_momentum=100, max_impulse=100)
+        mech_component.impulse = weapon.rate_of_fire
+        x, y = location
+        location_component = Location(x, y)
+        weapon_component = []
+        new_weapon = Weapon(weapon.name, weapon.damage, weapon.min_targets, weapon.max_targets, weapon.color, weapon.range, weapon.cost, weapon.rate_of_fire, projectile=weapon.projectile)
+        new_weapon.targets = weapon.targets
+        weapon_component.append(new_weapon)
+
+        entity = Entity('overseer', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, weapon=weapon_component)
 
     # Projectile entities.
     elif entity_type == ProjectileType.BASIC_PROJECTILE:
@@ -114,10 +128,10 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='Laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, projectile=ProjectileType.LASER_PROJECTILE)
+        return Weapon(name='pulse laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, rate_of_fire=10, projectile=ProjectileType.LASER_PROJECTILE)
     
     elif component == WeaponComponent.GUN:
-        return Weapon(name='gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, projectile=ProjectileType.BASIC_PROJECTILE)
+        return Weapon(name='gattling gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, rate_of_fire=10, projectile=ProjectileType.BASIC_PROJECTILE)
     
     # Chassis components.
     elif component == ChassisComponent.BASIC_CHASSIS:
@@ -136,5 +150,7 @@ def create_component(component):
         return DoNothing()
     elif component == AIComponent.PROJECTILE:
         return MoveAlongPath()
+    elif component == AIComponent.OVERSEER_AI:
+        return Overseer()
     
     return None
