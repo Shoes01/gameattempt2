@@ -351,6 +351,7 @@ def main():
 
                         overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities_enemy_turn)                
                         overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
+                        overseer_projectile.projectile.path.pop() # I want to remove the first entry.
                         overseer_projectile.action_points = overseer.action_points
 
                         event_queue.register(overseer_projectile)

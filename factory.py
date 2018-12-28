@@ -128,10 +128,10 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='pulse laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, rate_of_fire=10, projectile=ProjectileType.LASER_PROJECTILE)
+        return Weapon(name='pulse laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, rate_of_fire=3600, projectile=ProjectileType.LASER_PROJECTILE)
     
     elif component == WeaponComponent.GUN:
-        return Weapon(name='gattling gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, rate_of_fire=10, projectile=ProjectileType.BASIC_PROJECTILE)
+        return Weapon(name='gattling gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, rate_of_fire=4, projectile=ProjectileType.BASIC_PROJECTILE)
     
     # Chassis components.
     elif component == ChassisComponent.BASIC_CHASSIS:
