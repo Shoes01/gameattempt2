@@ -163,6 +163,9 @@ def main():
                     fov_recompute = True
 
                 if next_turn_phase:
+                    player.action_points = 0
+                
+                if event_queue.empty() and entity_to_act is None:
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
 
             elif turn_state == TurnStates.POST_MOVEMENT_PHASE:        
