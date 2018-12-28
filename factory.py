@@ -58,11 +58,12 @@ def entity_factory(entity_type, location, entities, weapon=None):
         ai_component = create_component(AIComponent.DEBUG)
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
         mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
+        weapon_component = create_components({WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.yellow)
 
-        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, location=location_component, ai=ai_component, render=render_component)
+        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, ai=ai_component, render=render_component)
 
     elif entity_type == EntityType.OVERSEER:
         ai_component = create_component(AIComponent.OVERSEER_AI)

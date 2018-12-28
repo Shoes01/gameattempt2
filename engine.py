@@ -147,24 +147,21 @@ def main():
                     highlight_legal_moves(player, game_map)
                     fov_recompute = True
                 
-                if move or next_turn_phase:
+                if move or next_turn_phase: # TODO: The player is rarely the first to go, so moving to the next phase using the "move" key doesn't actually move the player.
+                    next_turn_phase = False
                     turn_state = TurnStates.MOVEMENT_PHASE                
 
             if turn_state == TurnStates.MOVEMENT_PHASE: # This is not elif, so that the "move" action from above moves the player.
-                # Player movement code.
                 if entity_to_act is player:
                     if move:
                         dx, dy = move
                         if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
                             player.mech.move(dx, dy)
                             fov_recompute = True
-                
-                # Enemy projectile code.
-                elif projectile is not None and projectile.moves_with_player is True: # TODO: The moves with player variable is deprecated.
-                    player_turn_results.extend(projectile.ai.take_turn())
+                elif entity_to_act and entity_to_act.ai:
+                    player_turn_results.extend(entity_to_act.ai.take_turn())
                     fov_recompute = True
-                
-                # End of movement code.
+
                 if next_turn_phase:
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
 
@@ -212,7 +209,8 @@ def main():
             for result in player_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
-                remove_entity = relust.get('remove')
+                remove_entity = result.get('remove')
+                new_projectile = result.get('new_projectile')
 
                 if dead_entity:
                     if dead_entity == player:
@@ -222,6 +220,19 @@ def main():
                 
                     event_queue.release(dead_entity)
                 
+                if new_projectile:
+                    overseer, weapon = new_projectile
+                    if len(weapon.targets) > 0:
+                        xo, yo = overseer.location.x, overseer.location.y                
+                        xd, yd = weapon.targets.pop()
+
+                        overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities_player_turn)                
+                        overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
+                        overseer_projectile.projectile.path.pop() # I want to remove the first entry.
+                        overseer_projectile.action_points = overseer.action_points
+
+                        event_queue.register(overseer_projectile)
+
                 if remove_entity:
                     entities_player_turn.remove(remove_entity)
                     
@@ -320,6 +331,14 @@ def main():
                 turn_state = TurnStates.ATTACK_PHASE    
             
             elif turn_state == TurnStates.ATTACK_PHASE:
+                for entity in entities_enemy_turn:
+                    if entity.weapon:
+                        enemy = entity
+                        # Fire the weapon at the player. The NPC has only one weapon.
+                        enemy.weapon[0].targets.append((player.location.x, player.location.y))
+                        enemy.activate_weapon(enemy.weapon[0])
+                        enemy.fire_active_weapon(entities_player_turn, event_queue)
+
                 turn_state = TurnStates.POST_ATTACK_PHASE
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
