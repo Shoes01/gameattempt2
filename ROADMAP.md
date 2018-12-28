@@ -37,22 +37,21 @@
   - [x] Code logic to handle an entity with multiple weapons
   - [x] Allow the player to target a tile multiple times
   - [x] Handle projectiles
-- [ ] Refactor ballistic code
-  - [ ] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
+- [x] Refactor ballistic code
+  - [x] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
 - [ ] Improve code II
-  - [ ] Lot's of messy features have been added
+  - [ ] Lot's of messy features have been added that need to be made unmessy
   - [ ] Ensure all player "actions" use the results variable to track events
   - [ ] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
   - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
+    * Decide how else to handle the Cursor
   - [x] Rendering component
-    - [ ] Decides if this entity gets rendered (character, name, color)
   - [ ] User input component
-    - [ ] The player controlled entities have this; it's like an AI that awaits input
+    * The player controlled entities have this; it's like an AI that awaits input
   - [ ] Sort arugments in functions alphabetically
-  - [ ] Rethink how the cursor should be handled
   - [ ] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
-    - [ ] Have an "Arsenal" class that is made up of Weapon Components.
+    * Have an "Arsenal" class that is made up of Weapon Components.
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower
