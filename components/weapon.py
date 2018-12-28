@@ -48,44 +48,6 @@ class Weapon:
         # Projectile code
         (x, y) = (self.owner.location.x, self.owner.location.y)
         factory.entity_factory(factory.EntityType.OVERSEER, (x, y), entities, self) # TODO: Which list of entities is this added to? I suppose all weapons will be using the Overseer
-        ## The Overseer will be added to the queue via the factory
-        ## The Overseer AI will take care of the rest!
-
-        """
-        for target in self.targets:
-            # Prepare the projectile
-            
-            projectile = factory.entity_factory(self.projectile, (x, y), entities)
-            if projectile.moves_with_player:
-                self.owner.moves_with_player = False
-            else:
-                self.owner.moves_with_player = True
-
-            if self.projectile is factory.ProjectileType.BASIC_PROJECTILE:
-                # Ballistic projectiles follow a path and collide with things.
-                xo, yo = projectile.location.x, projectile.location.y
-                xd, yd = target
-                
-                projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
-            
-            elif self.projectile is factory.ProjectileType.LASER_COMMANDER:
-                # Laser commander is an invisible entity that fires laser projectiles at the target
-                pass
-                # Do nothing?
-            elif self.projectile is factory.ProjectileType.LASER_PROJECTILE:
-                # What does it do here?
-                pass            
-
-        # Simple laser code
-        # TODO: Without using an entity for the laser code, it may only hit the "entities_enenmy_turn". This means no friendly fire.
-        for target in self.targets:
-            entity = get_entity_at_location(target, entities)
-            if entity is None: 
-                continue
-            
-            if entity.chassis:
-                results.append(entity.chassis.take_damage(self.damage))
-        """
         
         return results # TODO: results is always empty
 

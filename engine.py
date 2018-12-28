@@ -348,10 +348,12 @@ def main():
                     if len(weapon.targets) > 0:
                         xo, yo = overseer.location.x, overseer.location.y                
                         xd, yd = weapon.targets.pop()
-                        
+
                         overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities_enemy_turn)                
                         overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
                         overseer_projectile.action_points = overseer.action_points
+
+                        event_queue.register(overseer_projectile)
 
                 if remove_entity:
                     entities_enemy_turn.remove(remove_entity)

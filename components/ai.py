@@ -32,8 +32,6 @@ class MoveAlongPath:
             dy = y - projectile.location.y
 
             projectile.location.move(dx, dy)
-            print('Projectile is moving (ID: {0})'.format(projectile.uuid))
-
         else:
             results.append({'remove': projectile})
 
