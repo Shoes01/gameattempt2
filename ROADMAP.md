@@ -39,6 +39,7 @@
   - [x] Handle projectiles
 - [x] Refactor ballistic code
   - [x] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
+  - [ ] Ensure that the Overseer fires the correct number of times..!
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added that need to be made unmessy
   - [ ] Ensure all player "actions" use the results variable to track events

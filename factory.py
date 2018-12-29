@@ -58,7 +58,7 @@ def entity_factory(entity_type, location, entities, weapon=None):
         ai_component = create_component(AIComponent.DEBUG)
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
         mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
-        weapon_component = create_components({WeaponComponent.GUN: 1})
+        weapon_component = create_components({WeaponComponent.LASER: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.yellow)
@@ -93,7 +93,7 @@ def entity_factory(entity_type, location, entities, weapon=None):
     elif entity_type == ProjectileType.LASER_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
         mech_component = Mech(peak_momentum=100, max_impulse=100)
-        mech_component.impulse = 3600 # This essentially sets the speed of the projectile.
+        mech_component.impulse = 10 # This essentially sets the speed of the projectile.
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
@@ -129,7 +129,7 @@ def create_component(component):
     """
     # Weapon components.
     if component == WeaponComponent.LASER:
-        return Weapon(name='pulse laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, rate_of_fire=3600, projectile=ProjectileType.LASER_PROJECTILE)
+        return Weapon(name='pulse laser', damage=5, min_targets=1, max_targets=5, color=libtcod.green, range=10, cost=1, rate_of_fire=10, projectile=ProjectileType.LASER_PROJECTILE)
     
     elif component == WeaponComponent.GUN:
         return Weapon(name='gattling gun', damage=5, min_targets=1, max_targets=3, color=libtcod.red, range=10, cost=1, rate_of_fire=4, projectile=ProjectileType.BASIC_PROJECTILE)

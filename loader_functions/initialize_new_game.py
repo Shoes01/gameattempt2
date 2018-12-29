@@ -32,7 +32,7 @@ def get_constants():
 
     fov_algorithm = 0
     fov_light_walls = True
-    fov_radius = 10
+    fov_radius = 18
 
     colors = {
         'dark_wall': (0, 0, 100),
