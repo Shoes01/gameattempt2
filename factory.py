@@ -2,6 +2,7 @@ import tcod as libtcod
 import uuid
 
 from components.ai import DoNothing, MoveAlongPath, Overseer
+from components.arsenal import Arsenal
 from components.chassis import Chassis
 from components.location import Location
 from components.mech import Mech
