@@ -309,11 +309,11 @@ def main():
                 turn_state = TurnStates.MOVEMENT_PHASE
 
             elif turn_state == TurnStates.MOVEMENT_PHASE:
-                if enemy and not enemy.moves_with_player: # TODO: moves with player may be deprecated?
+                if enemy and enemy.required_game_state == game_state:
                     enemy_turn_results.extend(enemy.ai.take_turn())
                     fov_recompute = True
                 
-                if projectile and not projectile.moves_with_player:
+                if projectile and projectile.required_game_state == game_state:
                     enemy_turn_results.extend(projectile.ai.take_turn())
                     fov_recompute = True
                     

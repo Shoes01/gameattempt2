@@ -10,6 +10,7 @@ from components.render import Render
 from components.weapon import Weapon
 from entity import Entity
 from enum import auto, Enum
+from game_states import GameStates
 
 class AIComponent(Enum):
     DEBUG = auto()
@@ -52,7 +53,7 @@ def entity_factory(entity_type, location, entities, weapon=None):
         location_component = Location(x, y)
         render_component = Render('@', libtcod.white)
 
-        entity = Entity('player', uuid.uuid4(), moves_with_player=True, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, render=render_component)
+        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, render=render_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
