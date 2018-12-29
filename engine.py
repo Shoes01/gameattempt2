@@ -24,16 +24,14 @@ def main():
 
     player = None
     cursor = None
-    entities_player_turn = []
-    entities_enemy_turn = []
-    entities_special = []
+    entities = []
     game_map = None
     message_log = None
     game_state = None
     turn_state = None
     event_queue = None
 
-    player, cursor, entities_player_turn, entities_enemy_turn, entities_special, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
+    player, cursor, entities, game_map, message_log, game_state, turn_state, event_queue = get_game_variables(constants)
 
     previous_game_state = game_state    
 
@@ -49,19 +47,14 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
-        all_entities = []
-        all_entities.extend(entities_player_turn)
-        all_entities.extend(entities_enemy_turn)
-        all_entities.extend(entities_special)
-
         render_all(
-            con, panel, all_entities, game_map, fov_map, fov_recompute, message_log, 
+            con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
             constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
             mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player, cursor)
 
         libtcod.console_flush()
 
-        clear_all(con, all_entities)
+        clear_all(con, entities)
 
         fov_recompute = False
 
@@ -75,12 +68,12 @@ def main():
             if game_state == GameStates.PLAYER_TURN:
                 game_state = GameStates.ENEMY_TURN
                 turn_state = TurnStates.UPKEEP_PHASE
-                event_queue.register_list(entities_enemy_turn)
+                event_queue.register_list(entities)
 
             elif game_state == GameStates.ENEMY_TURN:
                 game_state = GameStates.PLAYER_TURN
                 turn_state = TurnStates.UPKEEP_PHASE
-                event_queue.register_list(entities_player_turn)
+                event_queue.register_list(entities)
             else:
                 print('Why is the queue empty?')
                 return True
@@ -88,12 +81,12 @@ def main():
         entity_uuid = event_queue.fetch()
         
         if game_state == GameStates.ENEMY_TURN:
-            for entity in entities_enemy_turn:
+            for entity in entities:
                 if entity_uuid == entity.uuid:
                     entity_to_act = entity
 
         elif game_state == GameStates.PLAYER_TURN:
-            for entity in entities_player_turn:
+            for entity in entities:
                 if entity_uuid == entity.uuid:
                     entity_to_act = entity
             
@@ -193,7 +186,7 @@ def main():
 
             elif turn_state == TurnStates.POST_ATTACK_PHASE:
                 # Fire the weapon
-                player_turn_results.extend(player.fire_active_weapon(entities_enemy_turn, event_queue))
+                player_turn_results.extend(player.fire_active_weapon(entities, event_queue))
 
                 # Reset map flags and remove targets.
                 game_map.reset_flags()
@@ -206,7 +199,7 @@ def main():
                 turn_state = TurnStates.CLEANUP_PHASE
             
             if turn_state == TurnStates.CLEANUP_PHASE:
-                for entity in entities_player_turn:
+                for entity in entities:
                     entity.reset()
             
             for result in player_turn_results:
@@ -229,7 +222,7 @@ def main():
                         xo, yo = overseer.location.x, overseer.location.y                
                         xd, yd = weapon.targets.pop()
 
-                        overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities_player_turn)                
+                        overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities)                
                         overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
                         overseer_projectile.projectile.path.pop() # I want to remove the first entry.
                         overseer_projectile.action_points = overseer.action_points
@@ -237,7 +230,7 @@ def main():
                         event_queue.register(overseer_projectile)
 
                 if remove_entity:
-                    entities_player_turn.remove(remove_entity)
+                    entities.remove(remove_entity)
                     
                 
                 if message: 
@@ -334,13 +327,13 @@ def main():
                 turn_state = TurnStates.ATTACK_PHASE    
             
             elif turn_state == TurnStates.ATTACK_PHASE:
-                for entity in entities_enemy_turn:
+                for entity in entities:
                     if entity.weapon:
                         enemy = entity
                         # Fire the weapon at the player. The NPC has only one weapon.
                         enemy.weapon[0].targets.append((player.location.x, player.location.y))
                         enemy.activate_weapon(enemy.weapon[0])
-                        enemy.fire_active_weapon(entities_player_turn, event_queue)
+                        enemy.fire_active_weapon(entities, event_queue)
 
                 turn_state = TurnStates.POST_ATTACK_PHASE
 
@@ -348,7 +341,7 @@ def main():
                 turn_state = TurnStates.CLEANUP_PHASE
             
             if turn_state == TurnStates.CLEANUP_PHASE:
-                for entity in entities_enemy_turn:
+                for entity in entities:
                     entity.reset()
 
             for result in enemy_turn_results:
@@ -379,7 +372,7 @@ def main():
                         event_queue.register(overseer_projectile)
 
                 if remove_entity:
-                    entities_enemy_turn.remove(remove_entity)
+                    entities.remove(remove_entity)
                     
                 if message:
                     message_log.add_message(Message(message, libtcod.yellow))
