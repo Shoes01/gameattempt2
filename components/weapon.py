@@ -42,14 +42,15 @@ class Weapon:
         """
         Fire the weapon at all targets.
         """
+        # TODO: This needs to be refactored
         results = []
         self.cooldown += self.cost
         
         # Projectile code
         (x, y) = (self.owner.location.x, self.owner.location.y)
-        factory.entity_factory(factory.EntityType.OVERSEER, (x, y), entities, self) # TODO: Which list of entities is this added to? I suppose all weapons will be using the Overseer
+        factory.entity_factory(factory.EntityType.OVERSEER, (x, y), entities, self)
         
-        return results # TODO: results is always empty
+        return results
 
 # TODO: Find a better place for this.
 def get_entity_at_location(location, entities):

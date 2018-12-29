@@ -129,10 +129,10 @@ def render_all(
         turn=game_state.name, phase=turn_state.name, impulse=player.mech.impulse,
         momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
 
-    if player.weapon is not None and len(player.weapon) > 0:
+    if player.arsenal:
         iterator = 1
         # TODO: The weapon color is really determined by its projectile.
-        for weapon in player.weapon:    
+        for weapon in player.arsenal.weapons:
             draw_card(status, 0, iterator*10, status_width, status_height, libtcod.green, 
                 weapon=weapon.name, dmg=weapon.damage, range=weapon.range, cur_targets=len(weapon.targets), max_targets=weapon.max_targets)
             iterator += 1
@@ -143,7 +143,7 @@ def render_all(
     Print menus.
     """
     if game_state == GameStates.SHOW_WEAPONS_MENU:
-        weapon_menu(con, 'Choose your weapon to fire.', player.weapon, 50, screen_height, screen_width)
+        weapon_menu(con, 'Choose your weapon to fire.', player.arsenal.weapons, 50, screen_height, screen_width)
 
 def clear_all(con, entities):
     for entity in entities:

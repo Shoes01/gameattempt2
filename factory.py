@@ -49,23 +49,25 @@ def entity_factory(entity_type, location, entities, weapon=None):
     if entity_type == EntityType.PLAYER:
         chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
         mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
-        weapon_component = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
+        arsenal_component = Arsenal()
+        arsenal_component.weapons = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.white)
 
-        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, render=render_component)
+        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, render=render_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
         mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
-        weapon_component = create_components({WeaponComponent.LASER: 1})
+        arsenal_component = Arsenal()
+        arsenal_component.weapons = create_components({WeaponComponent.LASER: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.yellow)
 
-        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, weapon=weapon_component, location=location_component, ai=ai_component, render=render_component)
+        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, ai=ai_component, render=render_component)
 
     elif entity_type == EntityType.OVERSEER:
         ai_component = create_component(AIComponent.OVERSEER_AI)
@@ -73,12 +75,12 @@ def entity_factory(entity_type, location, entities, weapon=None):
         mech_component.impulse = weapon.rate_of_fire
         x, y = location
         location_component = Location(x, y)
-        weapon_component = []
+        arsenal_component = Arsenal()
         new_weapon = Weapon(weapon.name, weapon.damage, weapon.min_targets, weapon.max_targets, weapon.color, weapon.range, weapon.cost, weapon.rate_of_fire, projectile=weapon.projectile)
         new_weapon.targets = weapon.targets
-        weapon_component.append(new_weapon)
+        arsenal_component.add_weapon(new_weapon)
 
-        entity = Entity('overseer', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, weapon=weapon_component)
+        entity = Entity('overseer', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, arsenal=arsenal_component)
 
     # Projectile entities.
     elif entity_type == ProjectileType.BASIC_PROJECTILE:

@@ -148,11 +148,11 @@ def main():
                     pass
             
             elif not active_entity.projectile:
-                turn_results.extend(active_entity.ai.take_turn())
+                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
                 fov_recompute = True
             
             elif not entity.required_game_state == game_state:
-                turn_results.extend(active_entity.ai.take_turn())
+                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
                 fov_recompute = True
             
             if active_entity is None and event_queue.empty():
@@ -195,7 +195,7 @@ def main():
                     active_entity.action_points = 0
             
             elif active_entity.arsenal:
-                turn_results.extend(active_entity.ai.take_turn())
+                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
             
             if active_entity is None and event_queue.empty():
                 turn_state = TurnStates.POST_ATTACK_PHASE
