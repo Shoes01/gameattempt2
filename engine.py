@@ -253,7 +253,7 @@ def main():
                     xo, yo = location
                     xd, yd = target
                     projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
-                    projectile.projectile.path.pop() # TODO: Do I still remove the first target?
+                    projectile.projectile.path.pop()
                     projectile.required_game_state = required_game_state
 
                     event_queue.register(projectile)
@@ -293,7 +293,7 @@ def main():
         if game_state == GameStates.SHOW_WEAPONS_MENU:
             menu_results = []
 
-            if weapons_menu_index and weapons_menu_index <= len(player.arsenal.weapons) and previous_game_state != GameStates.PLAYER_DEAD:
+            if weapons_menu_index is not None and weapons_menu_index < len(player.arsenal.weapons) and previous_game_state != GameStates.PLAYER_DEAD:
                 menu_results.append(player.arsenal.weapons[weapons_menu_index].activate())
                 cursor.cursor.turn_on(player, player.arsenal.weapons[weapons_menu_index].targets)
                 game_state = GameStates.TARGETING

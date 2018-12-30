@@ -12,16 +12,19 @@ class DoNothing:
 
         enemy = self.owner
 
-        enemy.action_points -= TICKS_PER_TURN // 2 # TODO: This is debug code.
-
         if enemy.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
+                enemy.action_points -= TICKS_PER_TURN // 2 # TODO: This is debug code.
                 results.append({'message': '{0} does not move.'.format(enemy.name.capitalize())})
             if turn_state == TurnStates.ATTACK_PHASE:
+                enemy.action_points -= TICKS_PER_TURN      # TODO: This is debug code.
                 results.append({'message': '{0} does not choose a weapon.'.format(enemy.name.capitalize())})
         if not enemy.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
+                enemy.action_points -= TICKS_PER_TURN      # TODO: This is debug code.
                 results.append({'message': '{0} does not fire its weapon.'.format(enemy.name.capitalize())})
+            if turn_state == TurnStates.ATTACK_PHASE:
+                enemy.action_points = 0
 
         return results
 
