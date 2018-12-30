@@ -43,6 +43,8 @@ class Arsenal:
         for w in self.weapons:
             if w.active:
                 results.extend(w.fire())
+        else:
+            self.owner.action_points = 0
         
         return results
     

@@ -85,7 +85,6 @@ def get_game_variables(constants):
     render_component = Render('X', libtcod.red)
     cursor = Entity('cursor', 0, cursor=cursor_component, location=location_component, render=render_component)
     cursor.render_order=RenderOrder.CURSOR
-    entities.append(cursor)
 
     # Create game_map.
     game_map = GameMap(constants['map_width'], constants['map_height'])
@@ -94,7 +93,7 @@ def get_game_variables(constants):
     message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 
     # Set game_state.
-    game_state = GameStates.ENEMY_TURN
+    game_state = GameStates.PLAYER_TURN
     
     # Set turn_state.
     turn_state = TurnStates.UPKEEP_PHASE

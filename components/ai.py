@@ -12,6 +12,8 @@ class DoNothing:
 
         enemy = self.owner
 
+        enemy.action_points -= TICKS_PER_TURN // 2 # TODO: This is debug code.
+
         if enemy.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 results.append({'message': '{0} does not move.'.format(enemy.name.capitalize())})
@@ -45,15 +47,11 @@ class MoveAlongPath:
                     results.append({'remove': projectile})
 
             if turn_state == TurnStates.ATTACK_PHASE:
-                # Nothing... unless it has an arsenal, then it fires its weapons.
-                ### Notice that the projectiles fired by projectiles maintains the required_game_state.
-                pass
+                projectile.action_points = 0
         if not projectile.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
-                # Nothing.
-                pass
+                projectile.action_points = 0
             if turn_state == TurnStates.ATTACK_PHASE:
-                # Nothing.
-                pass
+                projectile.action_points = 0
 
         return results

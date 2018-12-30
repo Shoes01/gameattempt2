@@ -47,14 +47,17 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
+        entities_extended = entities.copy()
+        entities_extended.append(cursor)
+
         render_all(
-            con, panel, entities, game_map, fov_map, fov_recompute, message_log, 
+            con, panel, entities_extended, game_map, fov_map, fov_recompute, message_log, 
             constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'],
             mouse, constants['colors'], status, constants['status_height'], constants['status_width'], constants['status_x'], game_state, turn_state, player, cursor)
 
         libtcod.console_flush()
 
-        clear_all(con, entities)
+        clear_all(con, entities_extended)
 
         fov_recompute = False
             
@@ -86,170 +89,180 @@ def main():
         """
         Handle the turn.
         """
-        turn_results = []
-        active_entity = None
+        if game_state == GameStates.ENEMY_TURN or game_state == GameStates.PLAYER_TURN:
+            turn_results = []
+            active_entity = None
 
-        # Choose the active entity.
-        if not event_queue.empty():
-            entity_uuid = event_queue.fetch()
-            for entity in entities:
-                if entity.uuid == entity_uuid:
-                    active_entity = entity
+            # Choose the active entity.
+            if not event_queue.empty():
+                entity_uuid = event_queue.fetch()
+                for entity in entities:
+                    if entity.uuid == entity_uuid:
+                        active_entity = entity
 
-        # This phase is not for the active_entity.
-        if turn_state == TurnStates.UPKEEP_PHASE:
-            if game_state == GameStates.PLAYER_TURN:
-                message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
-                highlight_legal_moves(player, game_map)
-                fov_recompute = True
-            
-            for active_entity in entities:
-                if active_entity.required_game_state == game_state:
-                    active_entity.reset()
-                else:
-                    active_entity.reset(only_action_points=True)
-            
-            event_queue.register_list(entities)
-            turn_state = TurnStates.PRE_MOVEMENT_PHASE
+            # This phase is not for the active_entity.
+            if turn_state == TurnStates.UPKEEP_PHASE:
+                if game_state == GameStates.PLAYER_TURN:
+                    message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
+                    highlight_legal_moves(player, game_map)
+                    fov_recompute = True
+                
+                for entity in entities:
+                    if entity.required_game_state == game_state:
+                        entity.reset()
+                    else:
+                        entity.reset(only_action_points=True)
+                
+                event_queue.register_list(entities)
+                turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
-        # This phase is for the player only.
-        if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-            if active_entity is player and active_entity.required_game_state == game_state:
-                if impulse and abs(active_entity.mech.impulse) <= abs(active_entity.mech.max_impulse): 
-                    active_entity.mech.change_impulse(impulse)
+            # This phase is for the player only.
+            # PROBLEM: The priority queue doesn't rotate through entities. The one at the top is always at the top. If it is not the player, we get locked here.
+            # I also want this solution to work for several player controlled entities.
+            if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+                # if active_entity is player and active_entity.required_game_state == game_state:
+                if impulse and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
+                    player.mech.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
                     highlight_legal_moves(player, game_map)
                     fov_recompute = True
 
-                if more or next_turn_phase:
+                if move or next_turn_phase:
                     next_turn_phase = False
                     turn_state = TurnStates.MOVEMENT_PHASE   
-            
-            elif game_state == GameStates.ENEMY_TURN:
-                turn_state = TurnStates.MOVEMENT_PHASE
-
-        # This phase is the big one. All entities act, except for projectiles of this game_state.
-        # This phase ends when all entities have spent their action_points.
-        if turn_state == TurnStates.MOVEMENT_PHASE:
-            if active_entity is player:
-                if active_entity.required_game_state == game_state:
-                    if move:
-                        dx, dy = move
-                        if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
-                            player.mech.move(dx, dy)
-                            fov_recompute = True
-                    
-                    if next_turn_phase:
-                        next_turn_phase = False
-                        player.action_points = 0
                 
-                elif not active_entity.required_game_state == game_state:
-                    turn_results.extend(player.arsenal.fire_active_weapon())
-            
-            elif not active_entity.projectile:
-                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
-                fov_recompute = True
-            
-            elif not entity.required_game_state == game_state:
-                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
-                fov_recompute = True
-            
-            if active_entity is None and event_queue.empty():
-                turn_state = TurnStates.POST_MOVEMENT_PHASE
-                
-        # This phase is not for the active_entity.
-        if turn_state == TurnStates.POST_MOVEMENT_PHASE:
-            game_map.reset_flags()                
-            fov_recompute = True
-            turn_state = TurnStates.PRE_ATTACK_PHASE
+                elif game_state == GameStates.ENEMY_TURN:
+                    turn_state = TurnStates.MOVEMENT_PHASE
 
-        # This phase is not for the active_entity.
-        # Entities have their action points refilled in order to use their weapons.
-        if turn_state == TurnStates.PRE_ATTACK_PHASE:
-            if game_state == GameStates.PLAYER_TURN:
-                message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase. Press r to choose new targets.', libtcod.orange))
-
-            for entity in entities:
-                entitiy.reset(only_action_points=True)
-            
-            event_queue.register_list(entities)
-            turn_state = TurnStates.ATTACK_PHASE
-        
-        # This phase is for active_entity of the required game_state.
-        # They choose their weapons and targets.
-        if turn_state == TurnStates.ATTACK_PHASE:
-            if active_entity is player and active_entity.required_game_state == game_state:
-                if show_weapons_menu:
-                    previous_game_state = game_state
-                    game_state = GameStates.SHOW_WEAPONS_MENU
-
-                if reset_targets:
-                    active_entity.arsenal.reset()
-                    message_log.add_message(Message('Targeting reset.', libtcod.light_blue))
-                    game_map.reset_flags()
-                    fov_recompute = True
-
-                if next_turn_phase:
-                    next_turn_phase = False
-                    active_entity.action_points = 0
-            
-            elif active_entity.arsenal:
-                turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
-            
-            if active_entity is None and event_queue.empty():
-                turn_state = TurnStates.POST_ATTACK_PHASE
-
-        # This phase is not for active_entity.
-        if turn_state == TurnStates.POST_ATTACK_PHASE:
-            fov_recompute = True
-            game_map.reset_flags()
-            w = player.arsenal.get_active_weapon()
-            if w is not None:
-                for x, y in w.targets:
-                    erase_cell(con, x, y)
-
-            turn_state = TurnStates.CLEANUP_PHASE
-        
-        # This phase is useless?
-        if turn_state == TurnStates.CLEANUP_PHASE:
-            turn_state = TurnStates.UPKEEP_PHASE
-        
-        # Refill the queue with the active_entity, if appropriate.
-        if active_entity and active_entity.action_points > 0:
-            event_queue.register(active_entity)
-
-        # Communicate turn_results.
-        for result in turn_results:
-            message = result.get('message')
-            dead_entity = result.get('dead')
-            remove_entity = result.get('remove')
-            new_projectile = result.get('new_projectile')
-
-            if dead_entity:
-                if dead_entity == player:
-                    message, game_state = kill_player(dead_entity)
-                else:
-                    message = kill_enemy(dead_entity)
-            
-                event_queue.release(dead_entity)
-            
-            if new_projectile:
-                entity_type, location, target, APs, required_game_state = new_projectile
-                projectile = factory.entity_factory(entity_type, location, entities)
-                projectile.action_points = APs
-                xo, yo = location
-                xd, yd = target
-                projectile.projectile.path = libtcod.line_iter(xo, yo, xd, yd)
-                projectile.projectile.path.pop() # TODO: Do I still remove the first target?
-                projectile.required_game_state = required_game_state
-
-                event_queue.register(projectile)
-
-            if remove_entity:
-                entities.remove(remove_entity)
+            # This phase is the big one. All entities act, except for projectiles of this game_state.
+            # This phase ends when all entities have spent their action_points.
+            if turn_state == TurnStates.MOVEMENT_PHASE:
+                if active_entity:
+                    if active_entity is player:
+                        if active_entity.required_game_state == game_state:
+                            if move:
+                                dx, dy = move
+                                if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
+                                    player.mech.move(dx, dy)
+                                    fov_recompute = True
                             
-            if message: 
-                message_log.add_message(Message(message, libtcod.yellow))
+                            if next_turn_phase:
+                                next_turn_phase = False
+                                player.action_points = 0
+                        
+                        elif not active_entity.required_game_state == game_state:
+                            turn_results.extend(player.arsenal.fire_active_weapon())
+                
+                    else:
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
+                        fov_recompute = True
+                
+                if active_entity is None and event_queue.empty():
+                    turn_state = TurnStates.POST_MOVEMENT_PHASE
+                    
+            # This phase is not for the active_entity.
+            if turn_state == TurnStates.POST_MOVEMENT_PHASE:
+                game_map.reset_flags()                
+                fov_recompute = True
+                turn_state = TurnStates.PRE_ATTACK_PHASE
+
+            # This phase is not for the active_entity.
+            # Entities have their action points refilled in order to use their weapons.
+            if turn_state == TurnStates.PRE_ATTACK_PHASE:
+                if game_state == GameStates.PLAYER_TURN:
+                    message_log.add_message(Message('Press f to target. Press ESC to stop targeting. Enter to change phase. Press r to choose new targets.', libtcod.orange))
+
+                for entity in entities:
+                    entity.reset(only_action_points=True)
+                
+                event_queue.register_list(entities)
+                turn_state = TurnStates.ATTACK_PHASE
+            
+            # This phase is for active_entity of the required game_state.
+            # They choose their weapons and targets.
+            if turn_state == TurnStates.ATTACK_PHASE:
+                if active_entity:
+                    if active_entity is player:
+                        if active_entity.required_game_state == game_state:
+                            if show_weapons_menu:
+                                previous_game_state = game_state
+                                game_state = GameStates.SHOW_WEAPONS_MENU
+
+                            if reset_targets:
+                                active_entity.arsenal.reset()
+                                message_log.add_message(Message('Targeting reset.', libtcod.light_blue))
+                                game_map.reset_flags()
+                                fov_recompute = True
+
+                            if next_turn_phase:
+                                next_turn_phase = False
+                                active_entity.action_points = 0
+
+                        else:
+                            active_entity.action_points = 0
+
+                    elif active_entity.ai:
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
+                
+                if active_entity is None and event_queue.empty():
+                    turn_state = TurnStates.POST_ATTACK_PHASE
+
+            # This phase is not for active_entity.
+            if turn_state == TurnStates.POST_ATTACK_PHASE:
+                fov_recompute = True
+                game_map.reset_flags()
+                w = player.arsenal.get_active_weapon()
+                if w is not None:
+                    for x, y in w.targets:
+                        erase_cell(con, x, y)
+
+                turn_state = TurnStates.CLEANUP_PHASE
+            
+            # This phase is useless?
+            if turn_state == TurnStates.CLEANUP_PHASE:
+                if game_state == GameStates.PLAYER_TURN:
+                    game_state = GameStates.ENEMY_TURN
+                elif game_state == GameStates.ENEMY_TURN:
+                    game_state = GameStates.PLAYER_TURN
+                
+                turn_state = TurnStates.UPKEEP_PHASE
+            
+            # Refill the queue with the active_entity, if appropriate.
+            if active_entity and active_entity.action_points > 0:
+                event_queue.register(active_entity)
+
+            # Communicate turn_results.
+            for result in turn_results:
+                message = result.get('message')
+                dead_entity = result.get('dead')
+                remove_entity = result.get('remove')
+                new_projectile = result.get('new_projectile')
+
+                if dead_entity:
+                    if dead_entity == player:
+                        message, game_state = kill_player(dead_entity)
+                    else:
+                        message = kill_enemy(dead_entity)
+                
+                    event_queue.release(dead_entity)
+                
+                if new_projectile:
+                    entity_type, location, target, APs, required_game_state = new_projectile
+                    projectile = factory.entity_factory(entity_type, location, entities)
+                    projectile.action_points = APs
+                    xo, yo = location
+                    xd, yd = target
+                    projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
+                    projectile.projectile.path.pop() # TODO: Do I still remove the first target?
+                    projectile.required_game_state = required_game_state
+
+                    event_queue.register(projectile)
+
+                if remove_entity:
+                    entities.remove(remove_entity)
+                                
+                if message: 
+                    message_log.add_message(Message(message, libtcod.yellow))
                 
         """
         Handle the targeting cursor.
