@@ -6,6 +6,7 @@ class Arsenal:
         self.weapons = []
     
     def add_weapon(self, weapon):
+        weapon.owner = self.owner
         self.weapons.append(weapon)
     
     def remove_weapon(self, weapon):
@@ -33,7 +34,7 @@ class Arsenal:
         else:
             return None
 
-    def fire_active_weapon(self, entities, event_queue):
+    def fire_active_weapon(self):
         """
         Fire weapon at target.
         """
@@ -41,8 +42,7 @@ class Arsenal:
         
         for w in self.weapons:
             if w.active:
-                results.extend(w.fire(entities, event_queue))
-                # TODO: Reduce action points here. Need to give a weapon an AP cost and a Cooldown cost.
+                results.extend(w.fire())
         
         return results
     

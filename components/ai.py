@@ -57,21 +57,3 @@ class MoveAlongPath:
                 pass
 
         return results
-
-class Overseer:
-    """
-    This AI controls how projectiles are made.
-    """
-    def take_turn(self):
-        results = []
-
-        overseer = self.owner
-        weapon = overseer.weapon[0]
-
-        if overseer.action_points == 0 or len(weapon.targets) == 0:
-            results.append({'remove': overseer})
-        else:
-            overseer.action_points -= TICKS_PER_TURN // weapon.rate_of_fire
-            results.append({'new_projectile': (overseer, weapon)})
-        
-        return results

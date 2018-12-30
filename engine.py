@@ -144,8 +144,7 @@ def main():
                         player.action_points = 0
                 
                 elif not active_entity.required_game_state == game_state:
-                    player.arsenal.fire_active_weapon(entities, event_queue)
-                    pass
+                    turn_results.extend(player.arsenal.fire_active_weapon())
             
             elif not active_entity.projectile:
                 turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
@@ -235,17 +234,16 @@ def main():
                 event_queue.release(dead_entity)
             
             if new_projectile:
-                overseer, weapon = new_projectile
-                if len(weapon.targets) > 0:
-                    xo, yo = overseer.location.x, overseer.location.y                
-                    xd, yd = weapon.targets.pop()
+                entity_type, location, target, APs, required_game_state = new_projectile
+                projectile = factory.entity_factory(entity_type, location, entities)
+                projectile.action_points = APs
+                xo, yo = location
+                xd, yd = target
+                projectile.projectile.path = libtcod.line_iter(xo, yo, xd, yd)
+                projectile.projectile.path.pop() # TODO: Do I still remove the first target?
+                projectile.required_game_state = required_game_state
 
-                    overseer_projectile = factory.entity_factory(weapon.projectile, (xo, yo), entities)                
-                    overseer_projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
-                    overseer_projectile.projectile.path.pop() # I want to remove the first entry.
-                    overseer_projectile.action_points = overseer.action_points
-
-                    event_queue.register(overseer_projectile)
+                event_queue.register(projectile)
 
             if remove_entity:
                 entities.remove(remove_entity)

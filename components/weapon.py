@@ -2,6 +2,9 @@ import tcod as libtcod
 
 import factory
 
+from game_states import GameStates
+from global_variables import TICKS_PER_TURN
+
 class Weapon:
     """
     The Weapon class stores the damage, target, and range properties of a weapon.
@@ -38,17 +41,26 @@ class Weapon:
             self.active = True
             return {'message': '{0} online.'.format(self.name.capitalize())}
 
-    def fire(self, entities, event_queue):
+    def fire(self):
         """
         Fire the weapon at all targets.
         """
-        # TODO: This needs to be refactored
         results = []
+        location = (self.owner.location.x, self.owner.location.y)
         self.cooldown += self.cost
-        
-        # Projectile code
-        (x, y) = (self.owner.location.x, self.owner.location.y)
-        factory.entity_factory(factory.EntityType.OVERSEER, (x, y), entities, self)
+
+        if self.owner.required_game_state == GameStates.PLAYER_TURN:
+            required_game_state = GameStates.ENEMY_TURN
+        else:
+            required_game_state = GameStates.PLAYER_TURN
+
+        for target in self.targets:
+            if self.owner.action_points <= 0:
+                break
+
+            results.append({'new_projectile': (self.projectile, location, target, self.owner.action_points, required_game_state)})
+
+            self.owner.action_points -= TICKS_PER_TURN // self.rate_of_fire
         
         return results
 

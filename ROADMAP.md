@@ -53,6 +53,7 @@
   - [ ] Sort arugments in functions alphabetically
   - [ ] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
     * Have an "Arsenal" class that is made up of Weapon Components.
+  - [ ] Consider having weapon cooldown take into account how many projectiles were fired that turn. Maybe 2 + # of targets.
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower

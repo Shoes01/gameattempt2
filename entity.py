@@ -28,7 +28,10 @@ class Entity:
         if self.chassis:    self.chassis.owner = self
         if self.mech:       self.mech.owner = self
         if self.cursor:     self.cursor.owner = self
-        if self.arsenal:    self.arsenal.owner = self
+        if self.arsenal:    
+            self.arsenal.owner = self
+            for w in self.arsenal.weapons:
+                w.owner = self
         if self.ai:         self.ai.owner = self
         if self.location:   self.location.owner = self
         if self.projectile: self.projectile.owner = self
