@@ -53,7 +53,7 @@ def entity_factory(entity_type, location, entities):
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.white)
-        propulsion_component = Propulsion(6, 1)
+        propulsion_component = Propulsion(6, 6)
 
         entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, render=render_component, propulsion=propulsion_component)
 

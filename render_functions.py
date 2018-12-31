@@ -61,7 +61,7 @@ def render_all(
                 visible = libtcod.map_is_in_fov(fov_map, x, y)
                 wall = game_map.tiles[x][y].block_sight
                 explored = game_map.tiles[x][y].explored
-                highlighted = game_map.tiles[x][y].highlighted
+                highlighted = game_map.tiles[x][y].highlighted        
                 targeted = game_map.tiles[x][y].targeted
 
                 if visible:
@@ -78,7 +78,7 @@ def render_all(
                         libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
                 
                 if highlighted:
-                    libtcod.console_set_char_background(con, x, y, colors.get('highlight'), libtcod.BKGND_SET)
+                    libtcod.console_set_char_background(con, x, y, highlighted, libtcod.BKGND_SET)
 
                 if targeted:
                     libtcod.console_set_char_background(con, x, y, libtcod.light_red, libtcod.BKGND_SET)

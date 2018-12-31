@@ -6,7 +6,7 @@ from death_functions import kill_enemy, kill_player
 from fov_functions import initialize_fov, recompute_fov
 from game_messages import MessageLog, Message
 from game_states import GameStates, TurnStates
-from input_handlers import handle_keys
+from input_handlers import handle_keys, handle_mouse
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from map_objects.game_map import GameMap
 from render_functions import clear_all, erase_cell, render_all, RenderOrder
@@ -42,7 +42,7 @@ def main():
     fov_map = initialize_fov(game_map)
     
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
             recompute_fov(fov_map, player.location.x, player.location.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
@@ -65,6 +65,7 @@ def main():
         Handle the Player Actions.
         """
         action = handle_keys(key, game_state)
+        mouse_action = handle_mouse(mouse)
         impulse = None # This is to avoid logic problems.
 
         move = action.get('move')                               # Attempt to move.
@@ -76,7 +77,10 @@ def main():
         weapons_menu_index = action.get('weapons_menu_index')   # Choose an item from the weapons menu.
         look = action.get('look')                               # Enter the LOOK game state.
         exit = action.get('exit')                               # Exit whatever screen is open.
-        fullscreen = action.get('fullscreen')                   # Set game to full screen.        
+        fullscreen = action.get('fullscreen')                   # Set game to full screen.      
+
+        left_click = mouse_action.get('left_click')  
+        right_click = mouse_action.get('right_click')
 
 
         # TODO: Figure out where this should go.
@@ -104,7 +108,7 @@ def main():
             if turn_state == TurnStates.UPKEEP_PHASE:
                 if game_state == GameStates.PLAYER_TURN:
                     message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
-                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles())
+                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles(), color=libtcod.yellow)
                     fov_recompute = True
                 
                 for entity in entities:
@@ -122,12 +126,22 @@ def main():
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
                 # if active_entity is player and active_entity.required_game_state == game_state:
                 if impulse and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
-                    player.mech.change_impulse(impulse)
-                    message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
-                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles())
+                    player.propulsion.change_impulse(impulse)
+                    message_log.add_message(Message('Impulse set to {0}.'.format(player.propulsion.impulse), libtcod.orange))                    
+                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles_impulse(), color=libtcod.blue)
+                    fov_recompute = True
+                
+                if mouse:
+                    temp_path = player.propulsion.fetch_path_to_tile_mouse(mouse)
+                    game_map.set_highlighted(temp_path, color=libtcod.light_green)
                     fov_recompute = True
 
-                if move or next_turn_phase:
+                if left_click:
+                    temp_path = player.propulsion.fetch_path_to_tile(left_click)
+                    game_map.set_highlighted(temp_path, color=libtcod.light_green)
+                    fov_recompute = True
+
+                if next_turn_phase:
                     next_turn_phase = False
                     turn_state = TurnStates.MOVEMENT_PHASE   
                 
@@ -139,6 +153,8 @@ def main():
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if active_entity:
                     if active_entity is player:
+                        turn_results.extend(player.propulsion.move())
+                        
                         if active_entity.required_game_state == game_state:
                             if move:
                                 dx, dy = move

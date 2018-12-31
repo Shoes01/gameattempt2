@@ -86,3 +86,11 @@ def generic_move_keys(key):
     elif key.vk == libtcod.KEY_RIGHT:                   return {'move': (1, 0)}
     
     return {}
+
+def handle_mouse(mouse):
+    (x, y) = (mouse.cx, mouse.cy)
+
+    if mouse.lbutton_pressed:                           return {'left_click': (x, y)}
+    elif mouse.rbutton_pressed:                         return {'right_click': (x, y)}
+
+    return {}
