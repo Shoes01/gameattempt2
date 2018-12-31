@@ -7,6 +7,7 @@ from components.chassis import Chassis
 from components.location import Location
 from components.mech import Mech
 from components.projectile import Projectile
+from components.propulsion import Propulsion
 from components.render import Render
 from components.weapon import Weapon
 from entity import Entity
@@ -52,8 +53,9 @@ def entity_factory(entity_type, location, entities):
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.white)
+        propulsion_component = Propulsion(6, 1)
 
-        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, render=render_component)
+        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, render=render_component, propulsion=propulsion_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)

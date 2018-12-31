@@ -10,7 +10,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, name, uuid, required_game_state=GameStates.ENEMY_TURN, chassis=None, mech=None, cursor=None, arsenal=None, ai=None, location=None, projectile=None, render=None):
+    def __init__(self, name, uuid, required_game_state=GameStates.ENEMY_TURN, chassis=None, mech=None, cursor=None, arsenal=None, ai=None, location=None, projectile=None, render=None, propulsion=None):
         self.name = name
         self.uuid = uuid
         self.required_game_state = required_game_state
@@ -22,6 +22,7 @@ class Entity:
         self.location = location
         self.projectile = projectile
         self.render = render
+        self.propulsion = propulsion
         self.action_points = TICKS_PER_TURN
         self.render_order = RenderOrder.ACTOR
 
@@ -36,6 +37,7 @@ class Entity:
         if self.location:   self.location.owner = self
         if self.projectile: self.projectile.owner = self
         if self.render:     self.render.owner = self
+        if self.propulsion: self.propulsion.owner = self
 
     def reset(self, only_action_points=False):
         """

@@ -24,9 +24,11 @@ class GameMap:
 
         return False
 
-    def set_highlighted(self, x, y):
-        if self.tiles[x][y].blocked == False:
-            self.tiles[x][y].highlighted = True
+    def set_highlighted(self, coordinates):
+        for coordinate in coordinates:
+            x, y = coordinate
+            if self.tiles[x][y].blocked == False:
+                self.tiles[x][y].highlighted = True
 
     def set_targeted(self, x, y):
         self.tiles[x][y].targeted = True

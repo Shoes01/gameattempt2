@@ -9,7 +9,7 @@ from game_states import GameStates, TurnStates
 from input_handlers import handle_keys
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from map_objects.game_map import GameMap
-from render_functions import clear_all, erase_cell, highlight_legal_moves, render_all, RenderOrder
+from render_functions import clear_all, erase_cell, render_all, RenderOrder
 
 def main():
     constants = get_constants()
@@ -104,7 +104,7 @@ def main():
             if turn_state == TurnStates.UPKEEP_PHASE:
                 if game_state == GameStates.PLAYER_TURN:
                     message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
-                    highlight_legal_moves(player, game_map)
+                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles())
                     fov_recompute = True
                 
                 for entity in entities:
@@ -124,7 +124,7 @@ def main():
                 if impulse and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.mech.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.mech.impulse), libtcod.orange))                    
-                    highlight_legal_moves(player, game_map)
+                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles())
                     fov_recompute = True
 
                 if move or next_turn_phase:

@@ -159,35 +159,6 @@ def clear_entity(con, entity):
     if entity.location is not None:
         libtcod.console_put_char(con, entity.location.x, entity.location.y, ' ', libtcod.BKGND_NONE)
 
-def highlight_legal_moves(player, game_map):
-    game_map.reset_flags()
-    
-    h_mom = player.mech.maximum_horizontal_momentum
-    v_mom = player.mech.maximum_vertical_momentum
-    mech_momentum = player.mech.calculate_maximum_momentum()
-    mech_impulse = player.mech.impulse
-
-    minimum = 0 - abs(mech_momentum)
-    maximum = 0 + abs(mech_momentum) + 1
-
-    for x in range(minimum, maximum):
-        for y in range(minimum, maximum):
-            if (abs(x) + abs(y) >= mech_momentum and             # Ensure the tile exceeds the minimum.
-                abs(x) <= abs(h_mom) + abs(mech_impulse) and     # Ensure the x value is below the horizontal momentum.
-                abs(y) <= abs(v_mom) + abs(mech_impulse) and     # Ensure the y value is below the vertical momentum.
-                abs(x) + abs(y) <= mech_momentum):               # Ensure that the x and y values are below the mech momentum. (This is to avoid the +1 being counted each way)
-                # Now check to see that the direction matches the momentum.
-                if h_mom == 0:                                                                      # x can be anything.
-                    if v_mom == 0:                                                                      # y can be anything (this is the trivial case).
-                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
-                    elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
-                elif h_mom != 0 and ( x == 0 or math.copysign(1, x) == math.copysign(1, h_mom) ):   # x must be 0 or have the same sign as h_mom.
-                    if v_mom == 0:                                                                      # y can be anything.
-                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
-                    elif v_mom != 0 and ( y == 0 or math.copysign(1, y) == math.copysign(1, v_mom) ):   # y must be 0 or have the same sign as v_mom.
-                        game_map.set_highlighted(player.location.x + x, player.location.y + y)
-
 def erase_cell(con, x, y):
     """
     Some temporary cell fg and bg should stick around until the end of a phase.
