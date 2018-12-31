@@ -25,7 +25,7 @@ class GameMap:
         return False
 
     def set_highlighted(self, coordinates, color=(255, 255, 255)):
-        self.reset_flags()
+        #self.reset_flags()
 
         for coordinate in coordinates:
             x, y = coordinate

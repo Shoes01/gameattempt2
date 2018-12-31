@@ -8,9 +8,13 @@ class Propulsion:
     def __init__(self, peak_momentum, max_impulse):
         self.peak_momentum = peak_momentum
         self.max_impulse = max_impulse
-        self.impulse = 0
-        self.speed = 6  # TODO: This is place holder stuff.
+        self.speed_x = 0
+        self.speed_y = 0
         self.path = []
+    
+    @property
+    def speed(self):
+        return self.speed_x + self.speed_y
     
     def change_impulse(self, delta):
         """
@@ -107,3 +111,45 @@ class Propulsion:
     def fetch_path_to_tile_mouse(self, mouse):
         destination = (mouse.cx, mouse.cy)
         return self.fetch_path_to_tile(destination)
+    
+    def get_movement_range(self):
+        """
+        Find three lists of tiles the player may move to. 
+        First list is in case of speed increase.
+        Second list is in case of speed equilibrium.
+        Third list is in case of speed decrease.
+        """
+        
+        green_list = []
+        yellow_list = []
+        red_list = []
+
+        x = self.owner.location.x
+        y = self.owner.location.y
+
+        # Green
+        for i in range(self.max_impulse + 1):
+        #   Ensure that max_impulse is used in the same direction as the speed.
+            if self.speed_x != 0:
+                green_list.append((x + self.speed_x + int(math.copysign(i, self.speed_x)), y + self.speed_y))
+            else:
+                green_list.append((x + i, y + self.speed_y))
+                green_list.append((x - i, y + self.speed_y))
+            if self.speed_y != 0:
+                green_list.append((x + self.speed_x, y + self.speed_y + int(math.copysign(i, self.speed_y))))
+            else:
+                green_list.append((x + self.speed_x, y + i))
+                green_list.append((x + self.speed_x, y - i))
+
+        # Yellow
+        yellow_list.append((x + self.speed_x, y + self.speed_y))
+
+        # Red
+        for i in range(i + 1):
+        #   Ensure that max_impulse is used in the same direction as the speed.
+            if self.speed_x != 0:
+                red_list.append((x + self.speed_x + int(math.copysign(i, self.speed_x)), y + self.speed_y))
+            if self.speed_y != 0:
+                red_list.append((x + self.speed_x, y + self.speed_y + int(math.copysign(i, self.speed_y))))
+        
+        return green_list, yellow_list, red_list

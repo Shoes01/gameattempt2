@@ -106,11 +106,6 @@ def main():
 
             # This phase is not for the active_entity.
             if turn_state == TurnStates.UPKEEP_PHASE:
-                if game_state == GameStates.PLAYER_TURN:
-                    message_log.add_message(Message('Choose impulse. PAGEUP, PAGEDOWN or HOME.', libtcod.orange))
-                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles(), color=libtcod.yellow)
-                    fov_recompute = True
-                
                 for entity in entities:
                     if entity.required_game_state == game_state:
                         entity.reset()
@@ -121,15 +116,18 @@ def main():
                 turn_state = TurnStates.PRE_MOVEMENT_PHASE
 
             # This phase is for the player only.
-            # PROBLEM: The priority queue doesn't rotate through entities. The one at the top is always at the top. If it is not the player, we get locked here.
-            # I also want this solution to work for several player controlled entities.
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                # if active_entity is player and active_entity.required_game_state == game_state:
+                """
                 if impulse and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
                     player.propulsion.change_impulse(impulse)
                     message_log.add_message(Message('Impulse set to {0}.'.format(player.propulsion.impulse), libtcod.orange))                    
                     game_map.set_highlighted(player.propulsion.fetch_legal_tiles_impulse(), color=libtcod.blue)
                     fov_recompute = True
+                """
+                green_list, yellow_list, red_list = player.propulsion.get_movement_range()
+                game_map.set_highlighted(green_list, color=libtcod.light_green)
+                game_map.set_highlighted(yellow_list, color=libtcod.yellow)
+                game_map.set_highlighted(red_list, color=libtcod.dark_red)
                 
                 if mouse:
                     temp_path = player.propulsion.fetch_path_to_tile_mouse(mouse)
