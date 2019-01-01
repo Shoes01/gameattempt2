@@ -15,7 +15,7 @@ class Propulsion:
     
     @property
     def speed(self):
-        return self.speed_x + self.speed_y
+        return abs(self.speed_x) + abs(self.speed_y)
     
     def reset(self):
         self.chosen_tile = None
@@ -40,33 +40,24 @@ class Propulsion:
         # So I think I will need to work with something like for x in range(max + 1): for y in range(max + 1), if x + y <= max: then work from here.
         
         # Green
-        for xi in range(self.max_impulse + 1):
-            for yi in range(self.max_impulse + 1):
-                if (xi + yi) <= self.max_impulse:
-                    # Ensure that max_impulse is used in the same direction as the speed.
-                    # CASE 1: Both speeds are 0.
-                    if self.speed_x == 0 and self.speed_y == 0:
-                        green_list.append((x + xi, y + yi))
-                        green_list.append((x + xi, y - yi))
-                        green_list.append((x - xi, y + yi))
-                        green_list.append((x - xi, y - yi))
-                    # CASE 2: Horizontal speed is 0.
-                    if self.speed_x == 0 and self.speed_y != 0:
-                        green_list.append((x + xi, y + self.speed_y + int(math.copysign(yi, self.speed_y))))
-                        green_list.append((x - xi, y + self.speed_y + int(math.copysign(yi, self.speed_y))))
-                    # CASE 3: Veritcal speed is 0.
-                    if self.speed_x != 0 and self.speed_y == 0:
-                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + yi))
-                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y - y))
-                    # CASE 4: Neither speed is 0.
-                    if self.speed_x != 0 and self.speed_y != 0:
-                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + self.speed_y + int(math.copysign(yi, self.speed_y))))
-                         
-        # Yellow
-        yellow_list.append((x + self.speed_x, y + self.speed_y))
+        min = -self.max_impulse
+        max = self.max_impulse + 1
+        for xi in range(min, max):
+            for yi in range(min, max):
+                if (abs(xi) + abs(yi)) <= self.max_impulse:
+                    xo = self.owner.location.x
+                    xd = x + self.speed_x + xi
+                    yo = self.owner.location.y
+                    yd = y + self.speed_y + yi
 
-        # Red
-        # TODO: Fill this out once I have speed code...
+                    new_speed = abs(xd - xo) + abs(yd - yo)
+                    
+                    if new_speed > self.speed:
+                        green_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
+                    if new_speed == self.speed:
+                        yellow_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
+                    if new_speed < self.speed:
+                        red_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
 
         return green_list, yellow_list, red_list
 
@@ -142,8 +133,12 @@ class Propulsion:
         """
         Choose a tile. Remember the path and the destination.
         """
-        self.chosen_tile = destination
-        self.fetch_path_to_tile(destination=destination)
+        l1, l2, l3 = self.get_movement_range()
+        range = l1 + l2 + l3
+
+        if destination in range:
+            self.chosen_tile = destination
+            self.fetch_path_to_tile(destination=destination)
 
     def update_speed(self):
         self.speed_x = 0

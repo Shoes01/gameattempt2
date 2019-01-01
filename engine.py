@@ -119,10 +119,11 @@ def main():
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
 
                 # Highlight the legal tiles (persistently).
-                green_list, yellow_list, red_list = player.propulsion.get_movement_range()
+                game_map.reset_flags()
+                green_list, yellow_list, red_list = player.propulsion.get_movement_range()                        
+                game_map.set_highlighted(red_list, color=libtcod.dark_red)
                 game_map.set_highlighted(green_list, color=libtcod.light_green)
                 game_map.set_highlighted(yellow_list, color=libtcod.yellow)
-                game_map.set_highlighted(red_list, color=libtcod.dark_red)
                 if player.propulsion.chosen_tile:
                     game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
                     fov_recompute = True
@@ -135,7 +136,6 @@ def main():
 
                 # Clicking locks the path.
                 if left_click:
-                    # This should actually select the tile, and then
                     player.propulsion.reset()
                     player.propulsion.choose_tile(left_click)
                     game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
