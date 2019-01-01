@@ -117,30 +117,39 @@ def main():
 
             # This phase is for the player only.
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
-                """
-                if impulse and abs(player.mech.impulse) <= abs(player.mech.max_impulse): 
-                    player.propulsion.change_impulse(impulse)
-                    message_log.add_message(Message('Impulse set to {0}.'.format(player.propulsion.impulse), libtcod.orange))                    
-                    game_map.set_highlighted(player.propulsion.fetch_legal_tiles_impulse(), color=libtcod.blue)
-                    fov_recompute = True
-                """
+
+                # Highlight the legal tiles (persistently).
                 green_list, yellow_list, red_list = player.propulsion.get_movement_range()
                 game_map.set_highlighted(green_list, color=libtcod.light_green)
                 game_map.set_highlighted(yellow_list, color=libtcod.yellow)
                 game_map.set_highlighted(red_list, color=libtcod.dark_red)
+                if player.propulsion.chosen_tile:
+                    game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
                 
-                if mouse:
+                # Hovering the mouse draws a path to the cursor.
+                if mouse and not player.propulsion.chosen_tile:
                     temp_path = player.propulsion.fetch_path_to_tile_mouse(mouse)
-                    game_map.set_highlighted(temp_path, color=libtcod.light_green)
+                    game_map.set_highlighted(temp_path, color=libtcod.blue)
                     fov_recompute = True
 
+                # Clicking locks the path.
                 if left_click:
-                    temp_path = player.propulsion.fetch_path_to_tile(left_click)
-                    game_map.set_highlighted(temp_path, color=libtcod.light_green)
+                    # This should actually select the tile, and then
+                    player.propulsion.path = []
+                    player.propulsion.chosen_tile = None
+                    player.propulsion.choose_tile(left_click)
+                    game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                    fov_recompute = True
+                
+                # Right clicking unlocks the path.
+                if right_click:
+                    player.propulsion.path = []
+                    player.propulsion.chosen_tile = None
                     fov_recompute = True
 
                 if next_turn_phase:
                     next_turn_phase = False
+                    player.propulsion.update_speed()
                     turn_state = TurnStates.MOVEMENT_PHASE   
                 
                 elif game_state == GameStates.ENEMY_TURN:

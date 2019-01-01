@@ -11,19 +11,11 @@ class Propulsion:
         self.speed_x = 0
         self.speed_y = 0
         self.path = []
+        self.chosen_tile = None
     
     @property
     def speed(self):
         return self.speed_x + self.speed_y
-    
-    def change_impulse(self, delta):
-        """
-        Increase or decrease impulse, never exceeding the maximum.
-        """
-        self.impulse += delta
-
-        if abs(self.impulse) > self.max_impulse:
-            self.impulse = int(math.copysign(self.max_impulse, delta))
     
     def fetch_legal_tiles(self):
         """
@@ -34,18 +26,6 @@ class Propulsion:
         for x in range(-self.max_impulse, self.max_impulse + 1):
             for y in range(-self.max_impulse, self.max_impulse + 1):
                 if abs(x) + abs(y) <= self.max_impulse:
-                    results.append((self.owner.location.x + x, self.owner.location.y + y))
-        
-        return results
-
-    def fetch_legal_tiles_impulse(self):
-        """
-        Get a list of tiles the entity may move to given its current impulse.
-        """
-        results = []
-        for x in range(0, self.impulse + int(math.copysign(1, self.impulse))):
-            for y in range(0, self.impulse + int(math.copysign(1, self.impulse))):
-                if abs(x) + abs(y) == abs(self.impulse):
                     results.append((self.owner.location.x + x, self.owner.location.y + y))
         
         return results
@@ -86,6 +66,8 @@ class Propulsion:
             path = list(libtcod.line_iter(xo, yo, xd, yd))
             if path:
                 fixed_path.append(path.pop(0))
+        else:
+            return []
 
         while (len(path)):
             x1, y1 = fixed_path[-1]
@@ -127,29 +109,57 @@ class Propulsion:
         x = self.owner.location.x
         y = self.owner.location.y
 
+        # TODO: In order for this to work for an arbitrary impulse, the "impulse" needs to be able to go in two directions.
+        # So I think I will need to work with something like for x in range(max + 1): for y in range(max + 1), if x + y <= max: then work from here.
+        
         # Green
-        for i in range(self.max_impulse + 1):
-        #   Ensure that max_impulse is used in the same direction as the speed.
-            if self.speed_x != 0:
-                green_list.append((x + self.speed_x + int(math.copysign(i, self.speed_x)), y + self.speed_y))
-            else:
-                green_list.append((x + i, y + self.speed_y))
-                green_list.append((x - i, y + self.speed_y))
-            if self.speed_y != 0:
-                green_list.append((x + self.speed_x, y + self.speed_y + int(math.copysign(i, self.speed_y))))
-            else:
-                green_list.append((x + self.speed_x, y + i))
-                green_list.append((x + self.speed_x, y - i))
-
+        for xi in range(self.max_impulse + 1):
+            for yi in range(self.max_impulse + 1):
+                if (xi + yi) <= self.max_impulse:
+                    # Ensure that max_impulse is used in the same direction as the speed.
+                    # CASE 1: Both speeds are 0.
+                    if self.speed_x == 0 and self.speed_y == 0:
+                        green_list.append((x + xi, y + yi))
+                        green_list.append((x + xi, y - yi))
+                        green_list.append((x - xi, y + yi))
+                        green_list.append((x - xi, y - yi))
+                    # CASE 2: Horizontal speed is 0.
+                    if self.speed_x == 0 and self.speed_y != 0:
+                        green_list.append((x + xi, y + self.speed_y + int(math.copysign(yi, self.speed_y))))
+                        green_list.append((x - xi, y + self.speed_y + int(math.copysign(yi, self.speed_y))))
+                    # CASE 3: Veritcal speed is 0.
+                    if self.speed_x != 0 and self.speed_y == 0:
+                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + yi))
+                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y - y))
+                    # CASE 4: Neither speed is 0.
+                    if self.speed_x != 0 and self.speed_y == 0:
+                        green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + self.speed_y + int(math.copysign(yi, self.speed_y))))
+                         
         # Yellow
         yellow_list.append((x + self.speed_x, y + self.speed_y))
 
         # Red
-        for i in range(i + 1):
-        #   Ensure that max_impulse is used in the same direction as the speed.
-            if self.speed_x != 0:
-                red_list.append((x + self.speed_x + int(math.copysign(i, self.speed_x)), y + self.speed_y))
-            if self.speed_y != 0:
-                red_list.append((x + self.speed_x, y + self.speed_y + int(math.copysign(i, self.speed_y))))
-        
+        # TODO: Fill this out once I have speed code...
+
         return green_list, yellow_list, red_list
+    
+    def choose_tile(self, destination):
+        """
+        Choose a tile. Remember the path and the destination.
+        """
+        self.chosen_tile = destination
+        self.fetch_path_to_tile(destination)
+
+    def update_speed(self):
+        self.speed_x = 0
+        self.speed_y = 0
+
+        if self.path:
+            xo, yo = self.owner.location.x, self.owner.location.y
+            xd, yd = self.path[-1]
+            self.speed_x = xd - xo
+            self.speed_y = yd - yo
+
+    def reset(self):
+        self.chosen_tile = None
+        self.path = []

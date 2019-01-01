@@ -49,6 +49,7 @@ class Entity:
             return
         
         if self.mech:       self.mech.reset()
+        if self.propulsion: self.propulsion.reset()
         if self.arsenal:    self.arsenal.reset()
     
     def distance(self, x, y):
