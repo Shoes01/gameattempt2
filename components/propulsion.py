@@ -17,83 +17,10 @@ class Propulsion:
     def speed(self):
         return self.speed_x + self.speed_y
     
-    def fetch_legal_tiles(self):
-        """
-        Get a list of tiles the entity may move to.
-        """
-        results = []
+    def reset(self):
+        self.chosen_tile = None
+        self.path = []
 
-        for x in range(-self.max_impulse, self.max_impulse + 1):
-            for y in range(-self.max_impulse, self.max_impulse + 1):
-                if abs(x) + abs(y) <= self.max_impulse:
-                    results.append((self.owner.location.x + x, self.owner.location.y + y))
-        
-        return results
-    
-    def move(self):
-        """
-        Move the entity towards its legal tiles.
-        """
-        results = []
-
-        if not self.path:
-            self.owner.action_points = 0
-            results.append({'message': 'Player reached the end of path.'})
-        elif self.owner.action_points == 0:
-            results.append({'message': 'Player spent APs.'})
-        else:
-            x, y = self.path.pop(0)
-            dx, dy = x - self.owner.location.x, y - self.owner.location.y
-
-            self.owner.location.move(dx, dy)
-            
-            results.append({'message': 'Player moved.'})
-
-        return results
-
-    def fetch_path_to_tile(self, destination):
-        """
-        Build a path using only cardinal directions from self to destination.
-        """
-        
-        path = []
-        fixed_path = []
-
-        xo, yo = self.owner.location.x, self.owner.location.y
-        xd, yd = destination
-
-        if destination in self.fetch_legal_tiles():
-            path = list(libtcod.line_iter(xo, yo, xd, yd))
-            if path:
-                fixed_path.append(path.pop(0))
-        else:
-            return []
-
-        while (len(path)):
-            x1, y1 = fixed_path[-1]
-            x2, y2 = path[0]
-
-            if (x1 - x2)*(y1 - y2) == 0:
-                # These points are good.
-                fixed_path.append(path.pop(0))
-            else:
-                # These points are diagonal. Insert a new point, with a new x value but the same y value.
-                dx = x2 - x1
-                new_point = (x1 + dx, y1)
-                fixed_path.append(new_point)
-
-        # Remove the tile the entity is currently standing on.
-        if fixed_path:
-            fixed_path.pop(0)
-
-        self.path = fixed_path
-
-        return self.path
-    
-    def fetch_path_to_tile_mouse(self, mouse):
-        destination = (mouse.cx, mouse.cy)
-        return self.fetch_path_to_tile(destination)
-    
     def get_movement_range(self):
         """
         Find three lists of tiles the player may move to. 
@@ -132,7 +59,7 @@ class Propulsion:
                         green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + yi))
                         green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y - y))
                     # CASE 4: Neither speed is 0.
-                    if self.speed_x != 0 and self.speed_y == 0:
+                    if self.speed_x != 0 and self.speed_y != 0:
                         green_list.append((x + self.speed_x + int(math.copysign(xi, self.speed_x)), y + self.speed_y + int(math.copysign(yi, self.speed_y))))
                          
         # Yellow
@@ -142,13 +69,81 @@ class Propulsion:
         # TODO: Fill this out once I have speed code...
 
         return green_list, yellow_list, red_list
+
+    def fetch_path_to_tile(self, destination=None, mouse=None):
+        """
+        Build a path using only cardinal directions from self to destination.
+        """
+        
+        path = []
+        fixed_path = []
+
+        xo, yo = self.owner.location.x, self.owner.location.y
+
+        if mouse:
+            xd, yd = mouse.cx, mouse.cy
+            destination = (xd, yd)
+        if destination:
+            xd, yd = destination
+
+        l1, l2, l3 = self.get_movement_range()
+        range = l1 + l2 + l3
+
+        if destination in range:
+            path = list(libtcod.line_iter(xo, yo, xd, yd))
+            if path:
+                fixed_path.append(path.pop(0))
+        else:
+            return []
+
+        while (len(path)):
+            x1, y1 = fixed_path[-1]
+            x2, y2 = path[0]
+
+            if (x1 - x2)*(y1 - y2) == 0:
+                # These points are good.
+                fixed_path.append(path.pop(0))
+            else:
+                # These points are diagonal. Insert a new point, with a new x value but the same y value.
+                dx = x2 - x1
+                new_point = (x1 + dx, y1)
+                fixed_path.append(new_point)
+
+        # Remove the tile the entity is currently standing on.
+        if fixed_path:
+            fixed_path.pop(0)
+
+        self.path = fixed_path
+
+        return self.path
     
+    def move(self):
+        """
+        Move the entity towards its legal tiles.
+        """
+        results = []
+
+        if not self.path:
+            self.owner.action_points = 0
+            results.append({'message': 'Player reached the end of path.'})
+        elif self.owner.action_points == 0:
+            results.append({'message': 'Player spent APs.'})
+        else:
+            x, y = self.path.pop(0)
+            dx, dy = x - self.owner.location.x, y - self.owner.location.y
+
+            self.owner.location.move(dx, dy)
+            
+            results.append({'message': 'Player moved.'})
+
+        return results
+
     def choose_tile(self, destination):
         """
         Choose a tile. Remember the path and the destination.
         """
         self.chosen_tile = destination
-        self.fetch_path_to_tile(destination)
+        self.fetch_path_to_tile(destination=destination)
 
     def update_speed(self):
         self.speed_x = 0
@@ -159,7 +154,3 @@ class Propulsion:
             xd, yd = self.path[-1]
             self.speed_x = xd - xo
             self.speed_y = yd - yo
-
-    def reset(self):
-        self.chosen_tile = None
-        self.path = []

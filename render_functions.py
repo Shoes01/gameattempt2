@@ -126,8 +126,8 @@ def render_all(
     libtcod.console_clear(status)
 
     draw_card(status, 0, 0, status_width, status_height, libtcod.white, 
-        turn=game_state.name, phase=turn_state.name, impulse=player.mech.impulse,
-        momentum=player.mech.calculate_maximum_momentum(), h_mom=player.mech.maximum_horizontal_momentum, v_mom=player.mech.maximum_vertical_momentum)
+        turn=game_state.name, phase=turn_state.name,
+        speed=player.propulsion.speed, speed_x=player.propulsion.speed_x, speed_y=player.propulsion.speed_y)
 
     if player.arsenal:
         iterator = 1

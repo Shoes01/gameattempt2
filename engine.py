@@ -125,26 +125,25 @@ def main():
                 game_map.set_highlighted(red_list, color=libtcod.dark_red)
                 if player.propulsion.chosen_tile:
                     game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                    fov_recompute = True
                 
                 # Hovering the mouse draws a path to the cursor.
                 if mouse and not player.propulsion.chosen_tile:
-                    temp_path = player.propulsion.fetch_path_to_tile_mouse(mouse)
+                    temp_path = player.propulsion.fetch_path_to_tile(mouse=mouse)
                     game_map.set_highlighted(temp_path, color=libtcod.blue)
                     fov_recompute = True
 
                 # Clicking locks the path.
                 if left_click:
                     # This should actually select the tile, and then
-                    player.propulsion.path = []
-                    player.propulsion.chosen_tile = None
+                    player.propulsion.reset()
                     player.propulsion.choose_tile(left_click)
                     game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
                     fov_recompute = True
                 
                 # Right clicking unlocks the path.
                 if right_click:
-                    player.propulsion.path = []
-                    player.propulsion.chosen_tile = None
+                    player.propulsion.reset()
                     fov_recompute = True
 
                 if next_turn_phase:
