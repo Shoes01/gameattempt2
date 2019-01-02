@@ -66,10 +66,8 @@ def main():
         """
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
-        impulse = None # This is to avoid logic problems.
 
         move = action.get('move')                               # Attempt to move.
-        impulse = action.get('impulse')                         # Adjust mech impulse.
         next_turn_phase = action.get('next_turn_phase')         # Move to the next phase.
         reset_targets = action.get('reset_targets')             # Reset targets.
         select = action.get('select')                           # A target has been selected via keyboard.
@@ -118,68 +116,63 @@ def main():
             # This phase is for the player only.
             if turn_state == TurnStates.PRE_MOVEMENT_PHASE:
 
-                # Highlight the legal tiles (persistently).
-                game_map.reset_flags()
-                green_list, yellow_list, red_list = player.propulsion.get_movement_range()                        
-                game_map.set_highlighted(red_list, color=libtcod.dark_red)
-                game_map.set_highlighted(green_list, color=libtcod.light_green)
-                game_map.set_highlighted(yellow_list, color=libtcod.yellow)
-                if player.propulsion.chosen_tile:
-                    game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
-                    fov_recompute = True
-                
-                # Hovering the mouse draws a path to the cursor.
-                if mouse and not player.propulsion.chosen_tile:
-                    temp_path = player.propulsion.fetch_path_to_tile(mouse=mouse)
-                    game_map.set_highlighted(temp_path, color=libtcod.blue)
-                    fov_recompute = True
+                if game_state == GameStates.ENEMY_TURN:
+                    turn_state = TurnStates.MOVEMENT_PHASE
+                else:
 
-                # Clicking locks the path.
-                if left_click:
-                    player.propulsion.reset()
-                    player.propulsion.choose_tile(left_click)
-                    game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
-                    if not player.propulsion.path:
-                        message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
-                    fov_recompute = True
-                
-                # Right clicking unlocks the path.
-                if right_click:
-                    player.propulsion.reset()
-                    fov_recompute = True
-
-                if next_turn_phase:
+                    # Highlight the legal tiles (persistently).
+                    game_map.reset_flags()
+                    green_list, yellow_list, red_list = player.propulsion.get_movement_range()                        
+                    game_map.set_highlighted(red_list, color=libtcod.dark_red)
+                    game_map.set_highlighted(green_list, color=libtcod.light_green)
+                    game_map.set_highlighted(yellow_list, color=libtcod.yellow)
                     if player.propulsion.chosen_tile:
-                        next_turn_phase = False
-                        player.propulsion.update_speed()
-                        turn_state = TurnStates.MOVEMENT_PHASE
-                    else:
-                        destination = player.location.x, player.location.y
-                        player.propulsion.choose_tile(destination)
+                        game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                        fov_recompute = True
+                    
+                    # Hovering the mouse draws a path to the cursor.
+                    if mouse and not player.propulsion.chosen_tile:
+                        temp_path = player.propulsion.fetch_path_to_tile(mouse=mouse)
+                        game_map.set_highlighted(temp_path, color=libtcod.blue)
+                        fov_recompute = True
+
+                    # Clicking locks the path.
+                    if left_click:
+                        player.propulsion.reset()
+                        player.propulsion.choose_tile(left_click)
+                        game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                        if not player.propulsion.path:
+                            message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
+                        fov_recompute = True
+                    
+                    # Right clicking unlocks the path.
+                    if right_click:
+                        player.propulsion.reset()
+                        fov_recompute = True
+
+                    if next_turn_phase:
                         if player.propulsion.chosen_tile:
                             next_turn_phase = False
                             player.propulsion.update_speed()
                             turn_state = TurnStates.MOVEMENT_PHASE
                         else:
-                            message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red))
-                
-                elif game_state == GameStates.ENEMY_TURN:
-                    turn_state = TurnStates.MOVEMENT_PHASE
+                            destination = player.location.x, player.location.y
+                            player.propulsion.choose_tile(destination)
+                            if player.propulsion.chosen_tile:
+                                next_turn_phase = False
+                                player.propulsion.update_speed()
+                                turn_state = TurnStates.MOVEMENT_PHASE
+                            else:
+                                message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red))
 
             # This phase is the big one. All entities act, except for projectiles of this game_state.
             # This phase ends when all entities have spent their action_points.
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 if active_entity:
                     if active_entity is player:
-                        turn_results.extend(player.propulsion.move())
-                        
                         if active_entity.required_game_state == game_state:
-                            if move:
-                                dx, dy = move
-                                if not game_map.tiles[player.location.x + dx][player.location.y + dy].blocked:
-                                    player.mech.move(dx, dy)
-                                    fov_recompute = True
-                            
+                            turn_results.extend(player.propulsion.move())
+
                             if next_turn_phase:
                                 next_turn_phase = False
                                 player.action_points = 0

@@ -10,12 +10,11 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, name, uuid, required_game_state=GameStates.ENEMY_TURN, chassis=None, mech=None, cursor=None, arsenal=None, ai=None, location=None, projectile=None, render=None, propulsion=None):
+    def __init__(self, name, uuid, required_game_state=GameStates.ENEMY_TURN, chassis=None, cursor=None, arsenal=None, ai=None, location=None, projectile=None, render=None, propulsion=None):
         self.name = name
         self.uuid = uuid
         self.required_game_state = required_game_state
         self.chassis = chassis
-        self.mech = mech
         self.cursor = cursor
         self.arsenal = arsenal                # A list of weapons.
         self.ai = ai
@@ -27,7 +26,6 @@ class Entity:
         self.render_order = RenderOrder.ACTOR
 
         if self.chassis:    self.chassis.owner = self
-        if self.mech:       self.mech.owner = self
         if self.cursor:     self.cursor.owner = self
         if self.arsenal:    
             self.arsenal.owner = self
@@ -48,7 +46,6 @@ class Entity:
         if only_action_points:
             return
         
-        if self.mech:       self.mech.reset()
         if self.propulsion: self.propulsion.reset()
         if self.arsenal:    self.arsenal.reset()
     

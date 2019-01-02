@@ -37,7 +37,7 @@ Once the Q is empty, the turn changes, and the Q is refilled.
         Add an entity to the queue.
         """
         criteria_a = -1 * entity.action_points
-        criteria_b = -1 * entity.mech.speed
+        criteria_b = -1 * entity.propulsion.speed
         heapq.heappush(self.queue, (criteria_a, criteria_b, entity.uuid, entity.name)) # TODO: I used a UID instead of the actual entity last time... may need to do that here too.
     
     def release(self, entity):

@@ -5,7 +5,6 @@ from components.ai import DoNothing, MoveAlongPath
 from components.arsenal import Arsenal
 from components.chassis import Chassis
 from components.location import Location
-from components.mech import Mech
 from components.projectile import Projectile
 from components.propulsion import Propulsion
 from components.render import Render
@@ -47,50 +46,49 @@ def entity_factory(entity_type, location, entities):
     # Unit entities.
     if entity_type == EntityType.PLAYER:
         chassis_component = create_component(ChassisComponent.BASIC_CHASSIS)
-        mech_component = create_component(PropulsionComponent.BASIC_PROPULSION)
         arsenal_component = Arsenal()
         arsenal_component.weapons = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.white)
-        propulsion_component = Propulsion(6, 3)
+        propulsion_component = create_component(PropulsionComponent.BASIC_PROPULSION)
 
-        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, render=render_component, propulsion=propulsion_component)
+        entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, arsenal=arsenal_component, location=location_component, render=render_component, propulsion=propulsion_component)
 
     elif entity_type == EntityType.NPC:
         ai_component = create_component(AIComponent.DEBUG)
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
-        mech_component = create_component(PropulsionComponent.WEAK_PROPULSION)
         arsenal_component = Arsenal()
         arsenal_component.weapons = create_components({WeaponComponent.LASER: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.yellow)
+        propulsion_component = create_component(PropulsionComponent.WEAK_PROPULSION)
 
-        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, mech=mech_component, arsenal=arsenal_component, location=location_component, ai=ai_component, render=render_component)
+        entity = Entity('npc', uuid.uuid4(), chassis=chassis_component, propulsion=propulsion_component, arsenal=arsenal_component, location=location_component, ai=ai_component, render=render_component)
 
     # Projectile entities.
     elif entity_type == ProjectileType.BASIC_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
-        mech_component = Mech(peak_momentum=100, max_impulse=100)
-        mech_component.impulse = 4 # This essentially sets the speed of the projectile.
+        propulsion_component = Propulsion(100, 100)
+        propulsion_component.speed_x = 4 # TODO: Make the projectile actually move via propulsion.
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
         render_component = Render('o', libtcod.orange)
 
-        entity = Entity('ballistic projectile', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component, render=render_component)
+        entity = Entity('ballistic projectile', uuid.uuid4(), ai=ai_component, propulsion=propulsion_component, location=location_component, projectile=projectile_component, render=render_component)
 
     elif entity_type == ProjectileType.LASER_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
-        mech_component = Mech(peak_momentum=100, max_impulse=100)
-        mech_component.impulse = 10 # This essentially sets the speed of the projectile.
+        propulsion_component = Propulsion(100, 100)
+        propulsion_component.speed_x = 4 # TODO: Make the projectile actually move via propulsion.
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
         render_component = Render('-', libtcod.dark_green)
 
-        entity = Entity('laser pulse', uuid.uuid4(), ai=ai_component, mech=mech_component, location=location_component, projectile=projectile_component, render=render_component)
+        entity = Entity('laser pulse', uuid.uuid4(), ai=ai_component, propulsion=propulsion_component, location=location_component, projectile=projectile_component, render=render_component)
 
     if entity is not None:
         entities.append(entity)
@@ -133,9 +131,9 @@ def create_component(component):
     
     # Propulsion components.
     elif component == PropulsionComponent.BASIC_PROPULSION:
-        return Mech(peak_momentum=6, max_impulse=1)
+        return Propulsion(max_speed=6, max_impulse=2)
     elif component == PropulsionComponent.WEAK_PROPULSION:
-        return Mech(peak_momentum=4, max_impulse=1)
+        return Propulsion(max_speed=4, max_impulse=1)
     
     # AI components.
     elif component == AIComponent.DEBUG:
