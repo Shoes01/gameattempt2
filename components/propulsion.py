@@ -5,8 +5,8 @@ class Propulsion:
     """
     This class will house the movement logic, as well as location logic.
     """
-    def __init__(self, peak_momentum, max_impulse):
-        self.peak_momentum = peak_momentum
+    def __init__(self, max_speed, max_impulse):
+        self.max_speed = max_speed
         self.max_impulse = max_impulse
         self.speed_x = 0
         self.speed_y = 0
@@ -51,6 +51,9 @@ class Propulsion:
                     yd = y + self.speed_y + yi
 
                     new_speed = abs(xd - xo) + abs(yd - yo)
+
+                    if new_speed > self.max_speed:
+                        continue
                     
                     if new_speed > self.speed:
                         green_list.append((x + self.speed_x + xi, y + self.speed_y + yi))

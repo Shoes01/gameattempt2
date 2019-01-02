@@ -139,6 +139,8 @@ def main():
                     player.propulsion.reset()
                     player.propulsion.choose_tile(left_click)
                     game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                    if not player.propulsion.path:
+                        message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
                     fov_recompute = True
                 
                 # Right clicking unlocks the path.
@@ -147,9 +149,19 @@ def main():
                     fov_recompute = True
 
                 if next_turn_phase:
-                    next_turn_phase = False
-                    player.propulsion.update_speed()
-                    turn_state = TurnStates.MOVEMENT_PHASE   
+                    if player.propulsion.chosen_tile:
+                        next_turn_phase = False
+                        player.propulsion.update_speed()
+                        turn_state = TurnStates.MOVEMENT_PHASE
+                    else:
+                        destination = player.location.x, player.location.y
+                        player.propulsion.choose_tile(destination)
+                        if player.propulsion.chosen_tile:
+                            next_turn_phase = False
+                            player.propulsion.update_speed()
+                            turn_state = TurnStates.MOVEMENT_PHASE
+                        else:
+                            message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red))
                 
                 elif game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
