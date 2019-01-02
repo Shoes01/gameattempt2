@@ -39,20 +39,16 @@
   - [x] Handle projectiles
 - [x] Refactor ballistic code
   - [x] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
-  - [ ] Ensure that the Overseer fires the correct number of times..!
 - [ ] Improve code II
   - [ ] Lot's of messy features have been added that need to be made unmessy
   - [ ] Ensure all player "actions" use the results variable to track events
-  - [ ] Rename Mech class to Propulsion class
+  - [x] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
   - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
-    * Decide how else to handle the Cursor
   - [x] Rendering component
   - [ ] User input component
-    * The player controlled entities have this; it's like an AI that awaits input
   - [ ] Sort arugments in functions alphabetically
-  - [ ] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
-    * Have an "Arsenal" class that is made up of Weapon Components.
+  - [x] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
   - [ ] Consider having weapon cooldown take into account how many projectiles were fired that turn. Maybe 2 + # of targets.
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
@@ -69,12 +65,9 @@
   - [ ] Decide where staggering should happen
   - [ ] Decide where damage should happen
   - [x] Add a cleanup phase
-- [ ] Revisit momentum logic
-  - [ ] Should the player have fewer choices?
-  - [ ] Should the player have a harder time slowing time?
+- [-] Revisit momentum logic
   - [ ] Define how staggering, staggering badly and falling down will work
-  - [ ] Generalize the logic to allow for impulses greater than 1
-  - [ ] Use action points to decide this
+  - [x] Generalize the logic to allow for impulses greater than 1
 - [ ] Revisit UI
   - [ ] Consider changing fonts
   - [ ] Implement a more cohesive UI
@@ -85,7 +78,6 @@
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
-  - [ ] BUG: When the player has no momentum and impulse is set to -1, there are no highlighted tiles, but the player may still "pass" the turn and not move.
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
   - [ ] Decide if projectiles will travel indefinitely or not
@@ -113,3 +105,5 @@
   - [ ] MOVE phase: Choose the tile the entity will end on. AI will move it there.
   - [ ] POST_MOVE phase: move the entities to their target according to their speed, simultaneously and according to the path
   - [ ] COMBAT phase: choose and fire weapons for each entity
+- [ ] Pilots Skills
+  - [ ] Use a system like FFTA

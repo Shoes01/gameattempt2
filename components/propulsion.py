@@ -36,9 +36,6 @@ class Propulsion:
         x = self.owner.location.x
         y = self.owner.location.y
 
-        # TODO: In order for this to work for an arbitrary impulse, the "impulse" needs to be able to go in two directions.
-        # So I think I will need to work with something like for x in range(max + 1): for y in range(max + 1), if x + y <= max: then work from here.
-        
         # Green
         min = -self.max_impulse
         max = self.max_impulse + 1
@@ -119,16 +116,13 @@ class Propulsion:
 
         if not self.path:
             self.owner.action_points = 0
-            results.append({'message': 'Player reached the end of path.'})
         elif self.owner.action_points == 0:
-            results.append({'message': 'Player spent APs.'})
+            print('How did the user managed to move the entity so far that they spend all their APs?')
         else:
             x, y = self.path.pop(0)
             dx, dy = x - self.owner.location.x, y - self.owner.location.y
 
             self.owner.location.move(dx, dy)
-            
-            results.append({'message': 'Player moved.'})
 
         return results
 
