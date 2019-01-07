@@ -92,6 +92,11 @@
 - [ ] Sixth Weapon System: Denial of Area
   - [ ] May be fire, acid, EMP, or some other element
   - [ ] Is less effective against fast moving targets
+- [ ] Seventh Weapon System: Auxillary Systems
+  - [ ] Speed boosting system
+  - [ ] Speed halting system
+  - [ ] Smoke screen
+  - [ ] Active camouflage
 - [ ] Radar Based Stealth
 - [ ] Animation
 - [ ] City Generation
@@ -105,5 +110,5 @@
   - [ ] MOVE phase: Choose the tile the entity will end on. AI will move it there.
   - [ ] POST_MOVE phase: move the entities to their target according to their speed, simultaneously and according to the path
   - [ ] COMBAT phase: choose and fire weapons for each entity
-- [ ] Pilots Skills
+- [ ] Pilot Skills
   - [ ] Use a system like FFTA
