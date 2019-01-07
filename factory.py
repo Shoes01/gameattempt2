@@ -1,7 +1,7 @@
 import tcod as libtcod
 import uuid
 
-from components.ai import DoNothing, MoveAlongPath
+from components.ai import DoNothing, MoveAlongPath, TowerAI
 from components.arsenal import Arsenal
 from components.chassis import Chassis
 from components.location import Location
@@ -56,7 +56,7 @@ def entity_factory(entity_type, location, entities):
         entity = Entity('player', uuid.uuid4(), required_game_state=GameStates.PLAYER_TURN, chassis=chassis_component, arsenal=arsenal_component, location=location_component, render=render_component, propulsion=propulsion_component)
 
     elif entity_type == EntityType.NPC:
-        ai_component = create_component(AIComponent.DEBUG)
+        ai_component = TowerAI()
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
         arsenal_component = Arsenal()
         arsenal_component.weapons = create_components({WeaponComponent.LASER: 1})

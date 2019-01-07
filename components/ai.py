@@ -3,11 +3,32 @@ import tcod as libtcod
 from game_states import GameStates, TurnStates
 from global_variables import TICKS_PER_TURN
 
+class TowerAI:
+    """
+    This AI is used for towers.
+    """
+    def take_turn(self, game_state, turn_state, entities):
+        results = []
+
+        entity = self.owner
+
+        for target in entities:
+            if target.required_game_state == GameStates.PLAYER_TURN and not target.projectile:
+                # We have found an entity to fire at.
+                if entity.arsenal:
+                    # Choose first weapon. Always.
+                    w = entity.arsenal.weapons[0]
+                    
+                    w.targets.append((target.location.x, target.location.y))
+                    results.extend(w.fire())
+
+        return results
+
 class DoNothing:
     """
     This is a place holder AI.
     """
-    def take_turn(self, game_state, turn_state):
+    def take_turn(self, game_state, turn_state, entities):
         results = []
 
         enemy = self.owner
@@ -32,7 +53,7 @@ class MoveAlongPath:
     """
     This AI moves an entity along a given path.
     """
-    def take_turn(self, game_state, turn_state):
+    def take_turn(self, game_state, turn_state, entities):
         results = []
 
         projectile = self.owner

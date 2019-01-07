@@ -181,7 +181,7 @@ def main():
                             turn_results.extend(player.arsenal.fire_active_weapon())
                 
                     else:
-                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities))
                         fov_recompute = True
                 
                 if active_entity is None and event_queue.empty():
@@ -229,7 +229,7 @@ def main():
                             active_entity.action_points = 0
 
                     elif active_entity.ai:
-                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state))
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities))
                 
                 if active_entity is None and event_queue.empty():
                     turn_state = TurnStates.POST_ATTACK_PHASE
