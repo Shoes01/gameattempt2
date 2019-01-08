@@ -49,7 +49,7 @@
   - [ ] User input component
   - [ ] Sort arugments in functions alphabetically
   - [x] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
-  - [ ] Consider having weapon cooldown take into account how many projectiles were fired that turn. Maybe 2 + # of targets.
+  - [-] Cooldown is tied to rate_of_fire
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower
@@ -78,6 +78,7 @@
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
+  - [ ] Optimize projectile code.
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
   - [ ] Decide if projectiles will travel indefinitely or not

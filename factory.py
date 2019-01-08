@@ -59,7 +59,7 @@ def entity_factory(entity_type, location, entities):
         ai_component = TowerAI()
         chassis_component = create_component(ChassisComponent.WEAK_CHASSIS)
         arsenal_component = Arsenal()
-        arsenal_component.weapons = create_components({WeaponComponent.LASER: 1})
+        arsenal_component.weapons = create_components({WeaponComponent.LASER: 1, WeaponComponent.GUN: 1})
         x, y = location
         location_component = Location(x, y)
         render_component = Render('@', libtcod.yellow)
@@ -82,7 +82,7 @@ def entity_factory(entity_type, location, entities):
     elif entity_type == ProjectileType.LASER_PROJECTILE:
         ai_component = create_component(AIComponent.PROJECTILE)
         propulsion_component = Propulsion(100, 100)
-        propulsion_component.speed_x = 4 # TODO: Make the projectile actually move via propulsion.
+        propulsion_component.speed_x = 10 # TODO: Make the projectile actually move via propulsion.
         x, y = location
         location_component = Location(x, y)
         projectile_component = Projectile(damage=10, damage_type='direct')
@@ -131,7 +131,7 @@ def create_component(component):
     
     # Propulsion components.
     elif component == PropulsionComponent.BASIC_PROPULSION:
-        return Propulsion(max_speed=6, max_impulse=2)
+        return Propulsion(max_speed=6, max_impulse=3)
     elif component == PropulsionComponent.WEAK_PROPULSION:
         return Propulsion(max_speed=4, max_impulse=1)
     

@@ -27,19 +27,21 @@ class Weapon:
         self.targets = []
         self.active = False
         if self.cooldown > 0: 
-            self.cooldown -= 1
+            self.cooldown -= 4
+        if self.cooldown < 0:
+            self.cooldown = 0
     
     def activate(self):
         """
         Active the weapon, rendering it usable for targeting.
         """
         if self.active == True:
-            return {'message': '{0} is already online.'.format(self.name.capitalize())}
+            return {'message': '{0} attemps to activate their {1}, but it is already online.'.format(self.owner.name.capitalize(), self.name.capitalize())}
         elif self.cooldown > 0:
-            return {'message': '{0} has not cooled down yet.'.format(self.name.capitalize())}
+            return {'message': '{0} attemps to activate their {1}, but it has not cooled down.'.format(self.owner.name.capitalize(), self.name.capitalize())}
         else:
             self.active = True
-            return {'message': '{0} online.'.format(self.name.capitalize())}
+            return {'message': '{0} actviates their {1}.'.format(self.owner.name.capitalize(), self.name.capitalize())}
 
     def fire(self):
         """
@@ -60,16 +62,6 @@ class Weapon:
 
             results.append({'new_projectile': (self.projectile, location, target, self.owner.action_points, required_game_state)})
 
-            self.owner.action_points -= TICKS_PER_TURN // self.rate_of_fire
+            self.owner.action_points -= TICKS_PER_TURN // self.rate_of_fire            
         
         return results
-
-# TODO: Find a better place for this.
-def get_entity_at_location(location, entities):
-    x, y = location
-
-    for entity in entities:
-        if entity.location is not None and x == entity.location.x and y == entity.location.y:
-            return entity
-    
-    return None

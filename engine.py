@@ -253,17 +253,14 @@ def main():
                     game_state = GameStates.PLAYER_TURN
                 
                 turn_state = TurnStates.UPKEEP_PHASE
-            
-            # Refill the queue with the active_entity, if appropriate.
-            if active_entity and active_entity.action_points > 0:
-                event_queue.register(active_entity)
-
+    
             # Communicate turn_results.
             for result in turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
                 remove_entity = result.get('remove')
                 new_projectile = result.get('new_projectile')
+                end_turn = result.get('end_turn')
 
                 if dead_entity:
                     if dead_entity == player:
@@ -287,9 +284,17 @@ def main():
 
                 if remove_entity:
                     entities.remove(remove_entity)
+                
+                if end_turn:
+                    active_entity.action_points = 0
                                 
                 if message: 
                     message_log.add_message(Message(message, libtcod.yellow))
+                                
+            # Refill the queue with the active_entity, if appropriate.
+            if active_entity and active_entity.action_points > 0:
+                event_queue.register(active_entity)
+
                 
         """
         Handle the targeting cursor.

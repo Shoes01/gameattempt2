@@ -20,7 +20,7 @@ class Arsenal:
         
         for w in self.weapons:
             if w == weapon:
-                results.extend(w.activate())
+                results.append(w.activate())
                 
         return results
 

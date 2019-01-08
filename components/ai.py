@@ -1,7 +1,8 @@
 import tcod as libtcod
 
 from game_states import GameStates, TurnStates
-from global_variables import TICKS_PER_TURN
+from global_variables import distance_to, TICKS_PER_TURN
+from random import randrange
 
 class TowerAI:
     """
@@ -12,15 +13,38 @@ class TowerAI:
 
         entity = self.owner
 
-        for target in entities:
-            if target.required_game_state == GameStates.PLAYER_TURN and not target.projectile:
-                # We have found an entity to fire at.
-                if entity.arsenal:
-                    # Choose first weapon. Always.
-                    w = entity.arsenal.weapons[0]
-                    
-                    w.targets.append((target.location.x, target.location.y))
-                    results.extend(w.fire())
+        if entity.required_game_state == game_state:
+            if turn_state == TurnStates.ATTACK_PHASE:
+                """ The Entity may choose a weapon this phase. """
+
+                entity.action_points -= TICKS_PER_TURN
+
+                number_of_weapons = len(entity.arsenal.weapons)
+                random_number = randrange(number_of_weapons)
+                weapon = entity.arsenal.weapons[random_number]
+
+                results.extend(entity.arsenal.activate_weapon(weapon))
+
+        elif not entity.required_game_state == game_state:
+            if turn_state == TurnStates.MOVEMENT_PHASE:
+                """ The Entity may fire its chosen weapon this phase. """
+
+                for target in entities:
+                    if target.required_game_state == GameStates.PLAYER_TURN and not target.projectile:
+                        # We have found an entity to fire at.
+                        if entity.arsenal:
+                            location = (entity.location.x, entity.location.y)
+                            target = (target.location.x, target.location.y)
+                            w = entity.arsenal.get_active_weapon()
+                            
+                            if w and distance_to(location, target) <= w.range:
+                                w.targets = [target]
+                                results.extend(w.fire())
+                            else:
+                                entity.action_points -= TICKS_PER_TURN
+        
+        if len(results) == 0:
+            results.append({'end_turn': True})
 
         return results
 
@@ -35,16 +59,23 @@ class DoNothing:
 
         if enemy.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
-                enemy.action_points -= TICKS_PER_TURN // 2 # TODO: This is debug code.
+                """ The Entity may move during this phase. """
+                enemy.action_points -= TICKS_PER_TURN // 2
                 results.append({'message': '{0} does not move.'.format(enemy.name.capitalize())})
+
             if turn_state == TurnStates.ATTACK_PHASE:
-                enemy.action_points -= TICKS_PER_TURN      # TODO: This is debug code.
+                """ The Entity may choose a weapon this phase. """
+                enemy.action_points -= TICKS_PER_TURN
                 results.append({'message': '{0} does not choose a weapon.'.format(enemy.name.capitalize())})
+
         if not enemy.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
-                enemy.action_points -= TICKS_PER_TURN      # TODO: This is debug code.
+                """ The Entity may fire its chosen weapon this phase. """
+                enemy.action_points -= TICKS_PER_TURN
                 results.append({'message': '{0} does not fire its weapon.'.format(enemy.name.capitalize())})
+
             if turn_state == TurnStates.ATTACK_PHASE:
+                """ The Entity does nothing this phase. """
                 enemy.action_points = 0
 
         return results
