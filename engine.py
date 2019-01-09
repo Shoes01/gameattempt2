@@ -119,13 +119,16 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-
+                    game_map.reset_pathable()
                     # Highlight the legal tiles (persistently).
-                    game_map.reset_flags()
-                    green_list, yellow_list, red_list = player.propulsion.get_movement_range()                        
-                    game_map.set_highlighted(red_list, color=libtcod.dark_red)
-                    game_map.set_highlighted(green_list, color=libtcod.light_green)
-                    game_map.set_highlighted(yellow_list, color=libtcod.yellow)
+                    if not player.propulsion.legal_tiles:
+                        game_map.reset_highlighted()
+                        player.propulsion.calculate_movement_range()
+
+                        game_map.set_highlighted(player.propulsion.legal_tiles['red'], color=libtcod.dark_red)
+                        game_map.set_highlighted(player.propulsion.legal_tiles['green'], color=libtcod.light_green)
+                        game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)
+
                     if player.propulsion.chosen_tile:
                         game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
                         fov_recompute = True
@@ -133,14 +136,13 @@ def main():
                     # Hovering the mouse draws a path to the cursor.
                     if mouse and not player.propulsion.chosen_tile:
                         temp_path = player.propulsion.fetch_path_to_tile(mouse=mouse)
-                        game_map.set_highlighted(temp_path, color=libtcod.blue)
+                        game_map.set_pathable(temp_path, color=libtcod.blue)
                         fov_recompute = True
 
                     # Clicking locks the path.
                     if left_click:
-                        player.propulsion.reset()
                         player.propulsion.choose_tile(left_click)
-                        game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
+                        game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         if not player.propulsion.path:
                             message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
                         fov_recompute = True

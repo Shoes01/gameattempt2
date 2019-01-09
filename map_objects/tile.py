@@ -14,3 +14,4 @@ class Tile:
         self.explored = False
         self.highlighted = None
         self.targeted = False
+        self.pathable = None

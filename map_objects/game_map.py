@@ -25,13 +25,27 @@ class GameMap:
         return False
 
     def set_highlighted(self, coordinates, color=(255, 255, 255)):
-        #self.reset_flags()
-
         for coordinate in coordinates:
             x, y = coordinate
             if self.tiles[x][y].blocked == False:
                 self.tiles[x][y].highlighted = color
+    
+    def reset_highlighted(self):
+        # TODO: This will cause problems when the map is really big. It can be optimized to only reset tiles around the player.
+        for y in range(self.height):
+            for x in range(self.width):
+                self.tiles[x][y].highlighted = None
+    
+    def reset_pathable(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.tiles[x][y].pathable = None
 
+    def set_pathable(self, coordinates, color=(255, 255, 255)):
+        for coordinate in coordinates:
+            x, y = coordinate
+            if self.tiles[x][y].blocked == False:
+                self.tiles[x][y].pathable = color
 
     def set_targeted(self, x, y):
         self.tiles[x][y].targeted = True
@@ -43,3 +57,4 @@ class GameMap:
             for x in range(self.width):
                 self.tiles[x][y].highlighted = None
                 self.tiles[x][y].targeted  = False
+                self.tiles[x][y].pathable = None

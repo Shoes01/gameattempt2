@@ -63,6 +63,7 @@ def render_all(
                 explored = game_map.tiles[x][y].explored
                 highlighted = game_map.tiles[x][y].highlighted        
                 targeted = game_map.tiles[x][y].targeted
+                pathable = game_map.tiles[x][y].pathable
 
                 if visible:
                     if wall:
@@ -79,6 +80,9 @@ def render_all(
                 
                 if highlighted:
                     libtcod.console_set_char_background(con, x, y, highlighted, libtcod.BKGND_SET)
+
+                if pathable:
+                    libtcod.console_set_char_background(con, x, y, pathable, libtcod.BKGND_SET)
 
                 if targeted:
                     libtcod.console_set_char_background(con, x, y, libtcod.light_red, libtcod.BKGND_SET)

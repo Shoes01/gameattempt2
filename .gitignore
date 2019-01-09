@@ -2,6 +2,7 @@
 *.xlsx
 TODO.md
 SKILLS.md
+media/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

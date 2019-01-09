@@ -39,17 +39,12 @@
   - [x] Handle projectiles
 - [x] Refactor ballistic code
   - [x] All weapons should trigger Overseer entities that control the rate of fire during the next move phase.
-- [ ] Improve code II
-  - [ ] Lot's of messy features have been added that need to be made unmessy
-  - [ ] Ensure all player "actions" use the results variable to track events
+- [x] Improve code II
   - [x] Rename Mech class to Propulsion class
   - [x] Create global_variables.py to store some constants
-  - [ ] Remove Cursor from list of entities, and update the rendering code to reflect this
   - [x] Rendering component
-  - [ ] User input component
-  - [ ] Sort arugments in functions alphabetically
   - [x] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
-  - [-] Cooldown is tied to rate_of_fire
+  - [x] Cooldown is tied to rate_of_fire
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower
@@ -73,19 +68,28 @@
   - [ ] Implement a more cohesive UI
   - [ ] Cursor can't be seen in the fog of war
 - [ ] QoL Maintenance II
+  - [ ] Allow the player to choose a tile outside of their legal tiles to move to, and handle pathing to it over several turns.
   - [ ] Visually indicate to the user that a tile has been targeted multiple times (display a numeral on it)
   - [ ] Improve SHOW_WEAPONS_MENU 
     - [ ] Have names in color. RED: can't use, WHITE: usable, GREEN: online.
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
-  - [ ] Optimize projectile code.
+    - [ ] Include cooldown and descriptiono of weapons.
+- [ ] Revisit projectile code
+  - [ ] Optimize code
+  - [ ] Allow projectiles to move indefinitely
+  - [ ] Add variety to weapons by changing their properties when dealing with long distances
+    - [ ] Lasers: Damage loss over distance
+    - [ ] Ballistics: Accuracy loss over distance
 - [ ] Enemy NPC: Firing logic
   - [ ] Ensure the player is able to die correctly
-  - [ ] Decide if projectiles will travel indefinitely or not
+  - [ ] Ensure the NPC properly targets the player
 - [ ] Momentum based weapons
   - [ ] Weapons impart momentum on user and target
 - [ ] Radar Based Detection
 - [ ] Third Weapon System: Missiles
+  - [ ] Speed may change during flight
+  - [ ] Must target the ground
 - [ ] Fourth Weapon System: Artillery
 - [ ] Enemy NPC: Moving Logic
   - [ ] Having the AI move will require it lock in its momentum before starting, so that it's speed is constant
@@ -113,3 +117,7 @@
   - [ ] COMBAT phase: choose and fire weapons for each entity
 - [ ] Pilot Skills
   - [ ] Use a system like FFTA
+- [ ] Improve Code III
+  - [ ] User input component
+  - [ ] Ensure all player "actions" use the results variable to track events
+  - [ ] Consider not using the Entity class for the cursor

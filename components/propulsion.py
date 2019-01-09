@@ -12,6 +12,7 @@ class Propulsion:
         self.speed_y = 0
         self.path = []
         self.chosen_tile = None
+        self.legal_tiles = {}
     
     @property
     def speed(self):
@@ -20,8 +21,9 @@ class Propulsion:
     def reset(self):
         self.chosen_tile = None
         self.path = []
+        self.legal_tiles.clear()
 
-    def get_movement_range(self):
+    def calculate_movement_range(self):
         """
         Find three lists of tiles the player may move to. 
         First list is in case of speed increase.
@@ -36,9 +38,9 @@ class Propulsion:
         x = self.owner.location.x
         y = self.owner.location.y
 
-        # Green
         min = -self.max_impulse
         max = self.max_impulse + 1
+
         for xi in range(min, max):
             for yi in range(min, max):
                 if (abs(xi) + abs(yi)) <= self.max_impulse:
@@ -59,7 +61,9 @@ class Propulsion:
                     if new_speed < self.speed:
                         red_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
 
-        return green_list, yellow_list, red_list
+        self.legal_tiles['red'] = red_list
+        self.legal_tiles['yellow'] = yellow_list
+        self.legal_tiles['green'] = green_list
 
     def fetch_path_to_tile(self, destination=None, mouse=None):
         """
@@ -77,8 +81,10 @@ class Propulsion:
         if destination:
             xd, yd = destination
 
-        l1, l2, l3 = self.get_movement_range()
-        range = l1 + l2 + l3
+        range = []
+
+        for _, tiles in self.legal_tiles.items():
+            range.extend(tiles)
 
         if destination in range:
             path = list(libtcod.line_iter(xo, yo, xd, yd))
@@ -130,8 +136,10 @@ class Propulsion:
         """
         Choose a tile. Remember the path and the destination.
         """
-        l1, l2, l3 = self.get_movement_range()
-        range = l1 + l2 + l3
+        range = []
+
+        for _, tiles in self.legal_tiles.items():
+            range.extend(tiles)
 
         if destination in range:
             self.chosen_tile = destination
