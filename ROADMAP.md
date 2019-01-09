@@ -78,6 +78,7 @@
 - [ ] Revisit projectile code
   - [ ] Optimize code
   - [ ] Allow projectiles to move indefinitely
+  - [ ] Highlight the path projectiles are taking
   - [ ] Add variety to weapons by changing their properties when dealing with long distances
     - [ ] Lasers: Damage loss over distance
     - [ ] Ballistics: Accuracy loss over distance

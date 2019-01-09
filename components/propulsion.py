@@ -1,6 +1,8 @@
 import tcod as libtcod
 import math
 
+from global_variables import fill_in_line
+
 class Propulsion:
     """
     This class will house the movement logic, as well as location logic.
@@ -86,29 +88,15 @@ class Propulsion:
         for _, tiles in self.legal_tiles.items():
             range.extend(tiles)
 
-        if destination in range:
-            path = list(libtcod.line_iter(xo, yo, xd, yd))
-            if path:
-                fixed_path.append(path.pop(0))
+        path = list(libtcod.line_iter(xo, yo, xd, yd))
+
+        
+
+        if path:
+            fixed_path = fill_in_line(path)
+            
         else:
             return []
-
-        while (len(path)):
-            x1, y1 = fixed_path[-1]
-            x2, y2 = path[0]
-
-            if (x1 - x2)*(y1 - y2) == 0:
-                # These points are good.
-                fixed_path.append(path.pop(0))
-            else:
-                # These points are diagonal. Insert a new point, with a new x value but the same y value.
-                dx = x2 - x1
-                new_point = (x1 + dx, y1)
-                fixed_path.append(new_point)
-
-        # Remove the tile the entity is currently standing on.
-        if fixed_path:
-            fixed_path.pop(0)
 
         self.path = fixed_path
 
