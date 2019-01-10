@@ -1,7 +1,7 @@
 import tcod as libtcod
 import math
 
-from global_variables import fill_in_line
+from global_variables import distance_to, fill_in_line
 
 class Propulsion:
     """
@@ -14,7 +14,7 @@ class Propulsion:
         self.speed_y = 0
         self.path = []
         self.chosen_tile = None
-        self.legal_tiles = {}
+        self.legal_tiles = {}   # A dict holding 'green', 'yellow' and 'red'. TODO: Should this instead be a tuple (x, y, color)?
     
     @property
     def speed(self):
@@ -106,7 +106,7 @@ class Propulsion:
         if not self.path:
             self.owner.action_points = 0
         elif self.owner.action_points == 0:
-            print('How did the user managed to move the entity so far that they spend all their APs?')
+            print('How did the user manage to move the entity so far that they spent all their APs?')
         else:
             x, y = self.path.pop(0)
             dx, dy = x - self.owner.location.x, y - self.owner.location.y
@@ -120,7 +120,23 @@ class Propulsion:
         Choose a tile. Remember the path and the destination.
         """
         self.chosen_tile = destination
-        self.fetch_path_to_tile(destination=destination)
+
+        legal_tiles = []
+        legal_tiles.extend(self.legal_tiles.get('green'))
+        legal_tiles.extend(self.legal_tiles.get('yellow'))
+        legal_tiles.extend(self.legal_tiles.get('red'))
+        
+        if destination in legal_tiles:
+            self.fetch_path_to_tile(destination=destination)
+        else:
+            closest_tile = legal_tiles.pop()
+
+            for tile in legal_tiles:
+                if distance_to(tile, destination) < distance_to(closest_tile, destination):
+                    closest_tile = tile
+            
+            self.fetch_path_to_tile(destination=closest_tile)
+
 
     def update_speed(self):
         self.speed_x = 0
