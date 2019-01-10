@@ -108,8 +108,8 @@ def render_all(
 
             for tile in fixed_path:
                 x, y = tile
-
-                libtcod.console_set_char_background(con, x, y, libtcod.light_blue, libtcod.BKGND_SET)
+                if libtcod.map_is_in_fov(fov_map, x, y):
+                    libtcod.console_set_char_background(con, x, y, libtcod.light_blue, libtcod.BKGND_SET)
     
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 

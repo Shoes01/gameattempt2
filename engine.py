@@ -119,7 +119,8 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-                    fov_recompute = True
+                    fov_recompute = True # Is needed in order to always draw the path of the mouse.
+                    
                     # Highlight the legal tiles (persistently).
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
