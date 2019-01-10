@@ -119,7 +119,7 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-                    game_map.reset_pathable()
+                    fov_recompute = True
                     # Highlight the legal tiles (persistently).
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
@@ -127,20 +127,11 @@ def main():
 
                         game_map.set_highlighted(player.propulsion.legal_tiles['red'], color=libtcod.dark_red)
                         game_map.set_highlighted(player.propulsion.legal_tiles['green'], color=libtcod.light_green)
-                        game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)
-
-                    if player.propulsion.chosen_tile:
-                        game_map.set_highlighted(player.propulsion.path, color=libtcod.blue)
-                        fov_recompute = True
-                    
-                    # Hovering the mouse draws a path to the cursor.
-                    if mouse and not player.propulsion.chosen_tile:
-                        temp_path = player.propulsion.fetch_path_to_tile(mouse=mouse)
-                        game_map.set_pathable(temp_path, color=libtcod.blue)
-                        fov_recompute = True
+                        game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)    
 
                     # Clicking locks the path.
-                    if left_click:
+                    if left_click:                        
+                        game_map.reset_pathable()
                         player.propulsion.choose_tile(left_click)
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         if not player.propulsion.path:

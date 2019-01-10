@@ -44,8 +44,9 @@ class GameMap:
     def set_pathable(self, coordinates, color=(255, 255, 255)):
         for coordinate in coordinates:
             x, y = coordinate
-            if self.tiles[x][y].blocked == False:
-                self.tiles[x][y].pathable = color
+            if len(self.tiles) >= x and len(self.tiles[x]) >= y:
+                if self.tiles[x][y].blocked == False:
+                    self.tiles[x][y].pathable = color
 
     def set_targeted(self, x, y):
         self.tiles[x][y].targeted = True

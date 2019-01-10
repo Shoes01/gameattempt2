@@ -2,7 +2,8 @@ import math
 import tcod as libtcod
 
 from enum import auto, Enum
-from game_states import GameStates
+from game_states import GameStates, TurnStates
+from global_variables import fill_in_line
 from map_objects.game_map import GameMap
 from menus import weapon_menu
 from ui_functions import draw_card
@@ -81,7 +82,7 @@ def render_all(
                 if highlighted:
                     libtcod.console_set_char_background(con, x, y, highlighted, libtcod.BKGND_SET)
 
-                if pathable:
+                if pathable and visible:
                     libtcod.console_set_char_background(con, x, y, pathable, libtcod.BKGND_SET)
 
                 if targeted:
@@ -92,8 +93,24 @@ def render_all(
     
     for entity in entities_in_render_order:
         if entity.location is not None and entity.render:
-            draw_entity(con, entity, fov_map, game_map)
+            draw_entity(con, entity, fov_map, game_map)    
 
+    # Draw a line from the player-controlled entity to the mouse.
+    # TODO: Only works for player.
+    if game_state == GameStates.PLAYER_TURN and turn_state == TurnStates.PRE_MOVEMENT_PHASE:
+        xo, yo = player.location.x, player.location.y
+        xd, yd = mouse.cx, mouse.cy
+
+        path = list(libtcod.line_iter(xo, yo, xd, yd))
+
+        if path:
+            fixed_path = fill_in_line(path)
+
+            for tile in fixed_path:
+                x, y = tile
+
+                libtcod.console_set_char_background(con, x, y, libtcod.light_blue, libtcod.BKGND_SET)
+    
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
     """

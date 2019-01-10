@@ -21,7 +21,9 @@ class Propulsion:
         return abs(self.speed_x) + abs(self.speed_y)
     
     def reset(self):
-        self.chosen_tile = None
+        location = self.owner.location.x, self.owner.location.y
+        if self.choose_tile == location:
+            self.chosen_tile = None
         self.path = []
         self.legal_tiles.clear()
 
@@ -83,14 +85,7 @@ class Propulsion:
         if destination:
             xd, yd = destination
 
-        range = []
-
-        for _, tiles in self.legal_tiles.items():
-            range.extend(tiles)
-
         path = list(libtcod.line_iter(xo, yo, xd, yd))
-
-        
 
         if path:
             fixed_path = fill_in_line(path)
@@ -124,14 +119,8 @@ class Propulsion:
         """
         Choose a tile. Remember the path and the destination.
         """
-        range = []
-
-        for _, tiles in self.legal_tiles.items():
-            range.extend(tiles)
-
-        if destination in range:
-            self.chosen_tile = destination
-            self.fetch_path_to_tile(destination=destination)
+        self.chosen_tile = destination
+        self.fetch_path_to_tile(destination=destination)
 
     def update_speed(self):
         self.speed_x = 0
