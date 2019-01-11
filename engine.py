@@ -147,20 +147,16 @@ def main():
                         fov_recompute = True
 
                     if next_turn_phase:
-                        if player.propulsion.chosen_tile:
-                            # Phase is done, move on.
-                            next_turn_phase = False
-                            player.propulsion.update_speed()
-                            turn_state = TurnStates.MOVEMENT_PHASE
+                        next_turn_phase = False
+                        player_location = player.location.x, player.location.y
+
+                        if not player.propulsion.chosen_tile or player.propulsion.chosen_tile == player_location:
+                            player.propulsion.choose_tile(player_location)
                         else:
-                            destination = player.location.x, player.location.y
-                            player.propulsion.choose_tile(destination)
-                            if player.propulsion.chosen_tile:
-                                next_turn_phase = False
-                                player.propulsion.update_speed()
-                                turn_state = TurnStates.MOVEMENT_PHASE
-                            else:
-                                message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Also move to a result thing.
+                            player.propulsion.choose_tile(player.propulsion.chosen_tile)
+
+                        player.propulsion.update_speed()
+                        turn_state = TurnStates.MOVEMENT_PHASE
 
             # This phase is the big one. All entities act, except for projectiles of this game_state.
             # This phase ends when all entities have spent their action_points.
