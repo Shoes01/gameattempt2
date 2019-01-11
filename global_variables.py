@@ -1,14 +1,19 @@
+import math
+
 """
 This file contains global variables and methods.
 """
 
 TICKS_PER_TURN = 26771144400   # LCM(1:26)
 
-def distance_to(location, target):
+def distance_to(location, target, manhattan=True):
     xl, yl = location
     xt, yt = target
 
-    distance = abs(xl - xt) + abs(yl - yt)
+    if manhattan:
+        distance = abs(xl - xt) + abs(yl - yt)
+    else:
+        distance = math.sqrt( (xl - xt)*(xl - xt) + (yl - yt)*(yl - yt) )
 
     return distance
 

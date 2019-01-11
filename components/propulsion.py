@@ -21,9 +21,7 @@ class Propulsion:
         return abs(self.speed_x) + abs(self.speed_y)
     
     def reset(self):
-        location = self.owner.location.x, self.owner.location.y
-        if self.choose_tile == location:
-            self.chosen_tile = None
+        self.chosen_tile = None
         self.path = []
         self.legal_tiles.clear()
 
@@ -132,7 +130,7 @@ class Propulsion:
             closest_tile = legal_tiles.pop()
 
             for tile in legal_tiles:
-                if distance_to(tile, destination) < distance_to(closest_tile, destination):
+                if distance_to(tile, destination, manhattan=False) < distance_to(closest_tile, destination, manhattan=False):
                     closest_tile = tile
             
             self.fetch_path_to_tile(destination=closest_tile)

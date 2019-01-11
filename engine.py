@@ -119,8 +119,9 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-                    fov_recompute = True # Is needed in order to always draw the path of the mouse.
-                    
+                    if mouse:
+                        fov_recompute = True
+
                     # Highlight the legal tiles (persistently).
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
@@ -142,10 +143,12 @@ def main():
                     # Right clicking unlocks the path.
                     if right_click:
                         player.propulsion.reset()
+                        game_map.reset_pathable()
                         fov_recompute = True
 
                     if next_turn_phase:
                         if player.propulsion.chosen_tile:
+                            # Phase is done, move on.
                             next_turn_phase = False
                             player.propulsion.update_speed()
                             turn_state = TurnStates.MOVEMENT_PHASE
@@ -157,7 +160,7 @@ def main():
                                 player.propulsion.update_speed()
                                 turn_state = TurnStates.MOVEMENT_PHASE
                             else:
-                                message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red))
+                                message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Also move to a result thing.
 
             # This phase is the big one. All entities act, except for projectiles of this game_state.
             # This phase ends when all entities have spent their action_points.
