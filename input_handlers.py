@@ -27,9 +27,9 @@ def handle_player_turn_keys(key):
     if key.vk == libtcod.KEY_ENTER:                     result = {'next_turn_phase': True}
     
     # Change impulse
-    if key.vk == libtcod.KEY_PAGEUP:                    result = {'impulse':  1}
-    elif key.vk == libtcod.KEY_PAGEDOWN:                result = {'impulse': -1}
-    elif key.vk == libtcod.KEY_HOME:                    result = {'impulse':  0}
+    if key.vk == libtcod.KEY_PAGEUP:                    result = {'delta_speed':  1}
+    elif key.vk == libtcod.KEY_PAGEDOWN:                result = {'delta_speed': -1}
+    elif key.vk == libtcod.KEY_HOME:                    result = {'delta_speed':  999}
 
     # Other keys
     if key_char == 'f':                                 result = {'show_weapons_menu': True}
@@ -80,10 +80,12 @@ def handle_look_keys(key):
     return result
 
 def generic_move_keys(key):
-    if key.vk == libtcod.KEY_UP:                        return {'move': (0, -1)}
-    elif key.vk == libtcod.KEY_DOWN:                    return {'move': (0, 1)}
-    elif key.vk == libtcod.KEY_LEFT:                    return {'move': (-1, 0)}
-    elif key.vk == libtcod.KEY_RIGHT:                   return {'move': (1, 0)}
+    key_char = chr(key.c)
+
+    if key.vk == libtcod.KEY_UP or key_char == 'w':         return {'move': (0, -1)}
+    elif key.vk == libtcod.KEY_DOWN or key_char == 's':     return {'move': (0, 1)}
+    elif key.vk == libtcod.KEY_LEFT or key_char == 'a':     return {'move': (-1, 0)}
+    elif key.vk == libtcod.KEY_RIGHT or key_char == 'd':    return {'move': (1, 0)}
     
     return {}
 

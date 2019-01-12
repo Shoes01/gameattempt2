@@ -71,6 +71,7 @@ def main():
             fov_recompute = True
 
         move = action.get('move')                               # Attempt to move.
+        delta_speed = action.get('delta_speed')                 # Changes the max speed reached by the unit durnig autopathing movement.
         next_turn_phase = action.get('next_turn_phase')         # Move to the next phase.
         reset_targets = action.get('reset_targets')             # Reset targets.
         select = action.get('select')                           # A target has been selected via keyboard.
@@ -122,7 +123,11 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-                    # Highlight the legal tiles (persistently).
+                    # Change player max speed.
+                    if delta_speed:
+                        turn_results.append(player.propulsion.change_cruising_speed(delta_speed))
+
+                    # Highlight the legal tiles.
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
                         player.propulsion.calculate_movement_range()
@@ -131,35 +136,32 @@ def main():
                         game_map.set_highlighted(player.propulsion.legal_tiles['green'], color=libtcod.light_green)
                         game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)    
 
-                    # Clicking locks the path.
+                    # Left clicking choose path final destination.
                     if left_click:                        
-                        game_map.reset_pathable()
-                        player.propulsion.choose_tile(left_click)
-                        game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
-                        if not player.propulsion.path:
-                            message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
+                        player.propulsion.path = []
+                        player.propulsion.chosen_tile = (mouse.cx, mouse.cy)
                     
-                    # Right clicking unlocks the path.
+                    # Right clicking deconstructs path.
                     if right_click:
-                        player.propulsion.reset()
                         game_map.reset_pathable()
+                        player.propulsion.reset()
 
-                    if player.propulsion.chosen_tile and not left_click:
-                        player.propulsion.choose_tile(player.propulsion.chosen_tile)
+                    # Build and draw path.
+                    if (player.propulsion.chosen_tile and not player.propulsion.path):
+                        game_map.reset_pathable()
+                        player.propulsion.build_path()
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         fov_recompute = True
 
+                    # Attempt to end the turn.
                     if next_turn_phase:
-                        next_turn_phase = False
-                        player_location = player.location.x, player.location.y
-
-                        if not player.propulsion.chosen_tile or player.propulsion.chosen_tile == player_location:
-                            player.propulsion.choose_tile(player_location)
+                        if not player.propulsion.chosen_tile:
+                            # Phase doesn't end, but goes through one last time with a chosen tile.
+                            player.propulsion.chosen_tile = (player.location.x, player.location.y)
                         else:
-                            player.propulsion.choose_tile(player.propulsion.chosen_tile)
-
-                        player.propulsion.update_speed()
-                        turn_state = TurnStates.MOVEMENT_PHASE
+                            next_turn_phase = False
+                            player.propulsion.update_speed()
+                            turn_state = TurnStates.MOVEMENT_PHASE
 
             # This phase is the big one. All entities act, except for projectiles of this game_state.
             # This phase ends when all entities have spent their action_points.

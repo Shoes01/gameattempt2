@@ -15,6 +15,7 @@ class Propulsion:
         self.path = []
         self.chosen_tile = None
         self.legal_tiles = {}   # A dict holding 'green', 'yellow' and 'red'. TODO: Should this instead be a tuple (x, y, color)?
+        self.cruising_speed = max_speed
     
     @property
     def speed(self):
@@ -23,6 +24,21 @@ class Propulsion:
     def reset(self):
         self.path = []
         self.legal_tiles.clear()
+    
+    def change_cruising_speed(self, delta):
+        """
+        Change the maximum speed the entity will move at.
+        """
+        self.cruising_speed += delta
+
+        if self.cruising_speed > self.max_speed:
+            self.cruising_speed = self.max_speed
+        elif self.cruising_speed < 1:
+            self.cruising_speed = 1
+        
+        self.reset()
+
+        return {'message': 'Cruising speed set to {0}'.format(self.cruising_speed)}
 
     def calculate_movement_range(self):
         """
@@ -55,44 +71,47 @@ class Propulsion:
                     if new_speed > self.max_speed:
                         continue
                     
-                    if new_speed > self.speed:
+                    if new_speed > self.speed and new_speed <= self.cruising_speed:
                         green_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
-                    if new_speed == self.speed:
+                    if new_speed == self.speed and new_speed <= self.cruising_speed:
                         yellow_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
-                    if new_speed < self.speed:
+                    if new_speed < self.speed and new_speed <= self.cruising_speed:
                         red_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
 
         self.legal_tiles['red'] = red_list
         self.legal_tiles['yellow'] = yellow_list
         self.legal_tiles['green'] = green_list
 
-    def fetch_path_to_tile(self, destination=None, mouse=None):
+    def build_path(self):
         """
-        Build a path using only cardinal directions from self to destination.
+        Build a path using only cardinal directions from self to chosen_tile.
         """
-        
         path = []
-        fixed_path = []
+        legal_tiles = []
+        closest_tile = None
+
+        legal_tiles.extend(self.legal_tiles.get('green'))
+        legal_tiles.extend(self.legal_tiles.get('yellow'))
+        legal_tiles.extend(self.legal_tiles.get('red'))
+
+        if self.chosen_tile not in legal_tiles:
+            closest_tile = legal_tiles.pop()
+            for tile in legal_tiles:
+                if distance_to(tile, self.chosen_tile, manhattan=False) < distance_to(closest_tile, self.chosen_tile, manhattan=False):
+                    closest_tile = tile
 
         xo, yo = self.owner.location.x, self.owner.location.y
-
-        if mouse:
-            xd, yd = mouse.cx, mouse.cy
-            destination = (xd, yd)
-        if destination:
-            xd, yd = destination
+        xd, yd = self.chosen_tile
+        if closest_tile:
+            xd, yd = closest_tile
 
         path = list(libtcod.line_iter(xo, yo, xd, yd))
 
         if path:
-            fixed_path = fill_in_line(path)
-            
-        else:
-            return []
-
-        self.path = fixed_path
-
-        return self.path
+            self.path = fill_in_line(path)            
+            return self.path
+        
+        return []
     
     def move(self):
         """
@@ -111,29 +130,6 @@ class Propulsion:
             self.owner.location.move(dx, dy)
 
         return results
-
-    def choose_tile(self, destination):
-        """
-        Choose a tile. Remember the path and the destination.
-        """
-        self.chosen_tile = destination
-
-        legal_tiles = []
-        legal_tiles.extend(self.legal_tiles.get('green'))
-        legal_tiles.extend(self.legal_tiles.get('yellow'))
-        legal_tiles.extend(self.legal_tiles.get('red'))
-        
-        if destination in legal_tiles:
-            self.fetch_path_to_tile(destination=destination)
-        else:
-            closest_tile = legal_tiles.pop()
-
-            for tile in legal_tiles:
-                if distance_to(tile, destination, manhattan=False) < distance_to(closest_tile, destination, manhattan=False):
-                    closest_tile = tile
-            
-            self.fetch_path_to_tile(destination=closest_tile)
-
 
     def update_speed(self):
         self.speed_x = 0
