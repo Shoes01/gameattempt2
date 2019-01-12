@@ -67,6 +67,9 @@ def main():
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
 
+        if action or mouse_action or mouse.dx or mouse.dy:
+            fov_recompute = True
+
         move = action.get('move')                               # Attempt to move.
         next_turn_phase = action.get('next_turn_phase')         # Move to the next phase.
         reset_targets = action.get('reset_targets')             # Reset targets.
@@ -119,9 +122,6 @@ def main():
                 if game_state == GameStates.ENEMY_TURN:
                     turn_state = TurnStates.MOVEMENT_PHASE
                 else:
-                    if mouse:
-                        fov_recompute = True
-
                     # Highlight the legal tiles (persistently).
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
@@ -138,15 +138,13 @@ def main():
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         if not player.propulsion.path:
                             message_log.add_message(Message('You must choose a valid tile to move to.', libtcod.red)) # TODO: Move this into the turn result kind of thing.
-                        fov_recompute = True
                     
                     # Right clicking unlocks the path.
                     if right_click:
                         player.propulsion.reset()
                         game_map.reset_pathable()
-                        fov_recompute = True
 
-                    if player.propulsion.chosen_tile:
+                    if player.propulsion.chosen_tile and not left_click:
                         player.propulsion.choose_tile(player.propulsion.chosen_tile)
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         fov_recompute = True
@@ -180,7 +178,6 @@ def main():
                 
                     else:
                         turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities))
-                        fov_recompute = True
                 
                 if active_entity is None and event_queue.empty():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
@@ -259,6 +256,9 @@ def main():
                 remove_entity = result.get('remove')
                 new_projectile = result.get('new_projectile')
                 end_turn = result.get('end_turn')
+
+                if result:
+                    fov_recompute = True
 
                 if dead_entity:
                     if dead_entity == player:
