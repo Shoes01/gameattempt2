@@ -45,6 +45,11 @@
   - [x] Rendering component
   - [x] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
   - [x] Cooldown is tied to rate_of_fire
+- [ ] Pathing Improvements
+  - [ ] Allow the player to set the speed at which the entity moves
+  - [ ] Clean up code
+  - [ ] Highlight second order movements?
+  - [ ] Show the real path to the chosen tile?
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower

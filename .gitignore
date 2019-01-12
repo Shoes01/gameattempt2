@@ -1,8 +1,6 @@
 # Custome git ignore files
-*.xlsx
-TODO.md
-SKILLS.md
 media/
+backburner/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
