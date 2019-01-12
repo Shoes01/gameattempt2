@@ -45,11 +45,9 @@
   - [x] Rendering component
   - [x] The "weapon component" of the Entity is really just a list of Weapon Components. Fix this.
   - [x] Cooldown is tied to rate_of_fire
-- [ ] Pathing Improvements
-  - [ ] Allow the player to set the speed at which the entity moves
-  - [ ] Clean up code
-  - [ ] Highlight second order movements?
-  - [ ] Show the real path to the chosen tile?
+- [x] Pathing Improvements
+  - [x] Allow the player to set the speed at which the entity moves
+  - [x] Clean up code
 - [ ] Collision detection
   - [ ] Entities having their movement blocked
   - [ ] Ballistic projectiles are blocked, or penetrate and move slower
@@ -60,6 +58,9 @@
     - [ ] Move in one direction, then slow down to a stop, then change direction.
 - [ ] Terrain
   - [ ] Consider using NumPy arrays to store map information
+  - [ ] Create terrain that blocks movement
+  - [ ] Create terrain that slows movement
+  - [ ] Create terrain that makes turning difficult?
 - [ ] Revisit turn structure
   - [ ] Decide where radar detection should happen
   - [ ] Decide where staggering should happen
@@ -80,6 +81,10 @@
     - [ ] Allow to deactivate weapons.
     - [ ] Include the state of the weapon in its name.
     - [ ] Include cooldown and descriptiono of weapons.
+  - [ ] Show more pathing information to player
+    - [ ] Decouple legal tiles calculation by moving the function to global variables.
+    - [ ] Preview second order paths
+    - [ ] Draw the "real" path to final destination
 - [ ] Revisit projectile code
   - [ ] Optimize code
   - [ ] Allow projectiles to move indefinitely
