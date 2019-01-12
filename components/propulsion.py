@@ -21,7 +21,6 @@ class Propulsion:
         return abs(self.speed_x) + abs(self.speed_y)
     
     def reset(self):
-        #self.chosen_tile = None
         self.path = []
         self.legal_tiles.clear()
 

@@ -146,6 +146,11 @@ def main():
                         game_map.reset_pathable()
                         fov_recompute = True
 
+                    if player.propulsion.chosen_tile:
+                        player.propulsion.choose_tile(player.propulsion.chosen_tile)
+                        game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
+                        fov_recompute = True
+
                     if next_turn_phase:
                         next_turn_phase = False
                         player_location = player.location.x, player.location.y
