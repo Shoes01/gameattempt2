@@ -62,6 +62,7 @@
   - [ ] Create terrain that slows movement
   - [ ] Create terrain that makes turning difficult?
 - [ ] Revisit turn structure
+  - [ ] Consider using the Run & Gun Action/Planning turn structure
   - [ ] Decide where radar detection should happen
   - [ ] Decide where staggering should happen
   - [ ] Decide where damage should happen

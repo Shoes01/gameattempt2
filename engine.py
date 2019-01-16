@@ -144,10 +144,11 @@ def main():
                     # Right clicking deconstructs path.
                     if right_click:
                         game_map.reset_pathable()
+                        player.propulsion.chosen_tile = None
                         player.propulsion.reset()
 
                     # Build and draw path.
-                    if (player.propulsion.chosen_tile and not player.propulsion.path):
+                    if player.propulsion.chosen_tile and not player.propulsion.path and player.propulsion.legal_tiles:
                         game_map.reset_pathable()
                         player.propulsion.build_path()
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
