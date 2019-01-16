@@ -25,6 +25,28 @@ class Propulsion:
         self.path = []
         self.legal_tiles.clear()
     
+    def choose_tile(self, tile, game_map):
+        """
+        Attempt to choose a tile.
+        """
+        xo, yo = self.owner.location.x, self.owner.location.y
+        xd, yd = tile
+        
+        good_tile = True
+        line = list(libtcod.line_iter(xo, yo, xd, yd))
+
+        for t in line:
+            xt, yt = t
+            if game_map.tiles[xt][yt].blocked:
+                good_tile = False
+
+        if not game_map.tiles[xd][yd].blocked and good_tile:
+            self.chosen_tile = tile
+        else:
+            return {'message': 'Choose a valid tile.'}        
+        
+        return {}
+    
     def change_cruising_speed(self, delta):
         """
         Change the maximum speed the entity will move at.
@@ -40,7 +62,7 @@ class Propulsion:
 
         return {'message': 'Cruising speed set to {0}'.format(self.cruising_speed)}
 
-    def calculate_movement_range(self):
+    def calculate_movement_range(self, game_map):
         """
         Find three lists of tiles the player may move to. 
         First list is in case of speed increase.
@@ -67,15 +89,27 @@ class Propulsion:
                     yd = y + self.speed_y + yi
 
                     new_speed = abs(xd - xo) + abs(yd - yo)
+                    line = list(libtcod.line_iter(xo, yo, xd, yd))
+                    good_tile = True
 
                     if new_speed > self.max_speed:
+                        # Can't exceed max speed.
                         continue
+                    if game_map.tiles[xd][yd].blocked:
+                        # Can't path to blocked tiles.
+                        continue
+
+                    for tile in line:
+                        xt, yt = tile
+                        if game_map.tiles[xt][yt].blocked:
+                            # Can't path to tiles behind blocked tiles.
+                            good_tile = False
                     
-                    if new_speed > self.speed and new_speed <= self.cruising_speed:
+                    if new_speed > self.speed and new_speed <= self.cruising_speed and good_tile:
                         green_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
-                    if new_speed == self.speed and new_speed <= self.cruising_speed:
+                    if new_speed == self.speed and new_speed <= self.cruising_speed and good_tile:
                         yellow_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
-                    if new_speed < self.speed and new_speed <= self.cruising_speed:
+                    if new_speed < self.speed and new_speed <= self.cruising_speed and good_tile:
                         red_list.append((x + self.speed_x + xi, y + self.speed_y + yi))
 
         self.legal_tiles['red'] = red_list

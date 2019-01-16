@@ -130,7 +130,7 @@ def main():
                     # Highlight the legal tiles.
                     if not player.propulsion.legal_tiles:
                         game_map.reset_highlighted()
-                        player.propulsion.calculate_movement_range()
+                        player.propulsion.calculate_movement_range(game_map)
 
                         game_map.set_highlighted(player.propulsion.legal_tiles['red'], color=libtcod.dark_red)
                         game_map.set_highlighted(player.propulsion.legal_tiles['green'], color=libtcod.light_green)
@@ -139,7 +139,7 @@ def main():
                     # Left clicking choose path final destination.
                     if left_click:                        
                         player.propulsion.path = []
-                        player.propulsion.chosen_tile = (mouse.cx, mouse.cy)
+                        turn_results.append(player.propulsion.choose_tile((mouse.cx, mouse.cy), game_map))
                     
                     # Right clicking deconstructs path.
                     if right_click:
