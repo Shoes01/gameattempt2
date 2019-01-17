@@ -48,10 +48,13 @@
 - [x] Pathing Improvements
   - [x] Allow the player to set the speed at which the entity moves
   - [x] Clean up code
-- [ ] Collision detection
-  - [ ] Entities having their movement blocked
-  - [ ] Ballistic projectiles are blocked, or penetrate and move slower
-  - [ ] Laser "projectiles" are blocked
+- [x] Collision detection
+  - [x] Entities having their movement blocked
+  - [x] Projectiles are blocked
+  - [x] Projectiles continue indefinitely until blocked or outside map
+- [ ] Damage Model
+  - [ ] Entities take damage from projectiles
+  - [ ] Entities inherit some momentum from projectiles
 - [ ] Enemy NPC: Unintelligent movement
   - [ ] Make enemy entities spend their action points on moving.
   - [ ] Make enemy entities attempt to move in a square.
