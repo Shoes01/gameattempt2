@@ -18,12 +18,6 @@ class GameMap:
 
         return tiles
 
-    def is_blocked(self, x, y):
-        if self.tiles[x][y].blocked:
-            return True
-
-        return False
-
     def set_highlighted(self, coordinates, color=(255, 255, 255)):
         for coordinate in coordinates:
             x, y = coordinate

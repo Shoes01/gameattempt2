@@ -96,7 +96,8 @@ def render_all(
             draw_entity(con, entity, fov_map, game_map)    
 
     # Draw a line from the player-controlled entity to the mouse.
-    # TODO: Only works for player.
+    # This has been commented out, as it's a little distracting... and ugly.
+    """
     if game_state == GameStates.PLAYER_TURN and turn_state == TurnStates.PRE_MOVEMENT_PHASE:
         xo, yo = player.location.x, player.location.y
         xd, yd = mouse.cx, mouse.cy
@@ -110,6 +111,7 @@ def render_all(
                 x, y = tile
                 if libtcod.map_is_in_fov(fov_map, x, y):
                     libtcod.console_set_char_background(con, x, y, libtcod.light_blue, libtcod.BKGND_SET)
+    """
     
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 

@@ -1,7 +1,7 @@
 import tcod as libtcod
 import uuid
 
-from components.ai import DoNothing, MoveAlongPath, TowerAI
+from components.ai import DoNothing, ProjectileAI, TowerAI
 from components.arsenal import Arsenal
 from components.chassis import Chassis
 from components.location import Location
@@ -139,6 +139,6 @@ def create_component(component):
     elif component == AIComponent.DEBUG:
         return DoNothing()
     elif component == AIComponent.PROJECTILE:
-        return MoveAlongPath()
+        return ProjectileAI()
     
     return None

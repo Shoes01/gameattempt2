@@ -180,7 +180,7 @@ def main():
                             turn_results.extend(player.arsenal.fire_active_weapon())
                 
                     else:
-                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities))
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities, game_map))
                 
                 if active_entity is None and event_queue.empty():
                     turn_state = TurnStates.POST_MOVEMENT_PHASE
@@ -227,7 +227,7 @@ def main():
                             active_entity.action_points = 0
 
                     elif active_entity.ai:
-                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities))
+                        turn_results.extend(active_entity.ai.take_turn(game_state, turn_state, entities, game_map))
                 
                 if active_entity is None and event_queue.empty():
                     turn_state = TurnStates.POST_ATTACK_PHASE
@@ -254,11 +254,11 @@ def main():
     
             # Communicate turn_results.
             for result in turn_results:
-                message = result.get('message')
-                dead_entity = result.get('dead')
-                remove_entity = result.get('remove')
-                new_projectile = result.get('new_projectile')
-                end_turn = result.get('end_turn')
+                message = result.get('message')                 # Push a message to the message log.
+                dead_entity = result.get('dead')                # Kill the entity.
+                remove_entity = result.get('remove')            # Remove the entity (leaves no corpse behind).
+                new_projectile = result.get('new_projectile')   # Creates a new projectile.
+                end_turn = result.get('end_turn')               # End the turn.
 
                 if result:
                     fov_recompute = True
@@ -277,8 +277,39 @@ def main():
                     projectile.action_points = APs
                     xo, yo = location
                     xd, yd = target
-                    projectile.projectile.path = list(libtcod.line_iter(xd, yd, xo, yo))
-                    projectile.projectile.path.pop()
+
+                    ### Path extending code.
+                    # Determine maximums, based on direction.
+                    if xd - xo > 0:
+                        max_x = game_map.width
+                    else:
+                        max_x = 0
+                    if yd  - yo > 0:
+                        max_y = game_map.height
+                    else:
+                        max_y = 0
+
+                    # Determine the endpoints.
+                    if xo - xd == 0:
+                        # The projectile moves vertically.
+                        y_end = max_y
+                    else:
+                        y_end = yo - (xo - max_x) * (yo - yd) // (xo - xd)
+                    if yo - yd == 0:
+                        # The projectile moves horizontally.
+                        x_end = max_x
+                    else:
+                        x_end = xo - (yo - max_y) * (xo - xd) // (yo - yd)
+
+                    # Ensure the enpoints are in the map.
+                    if not 0 < y_end < game_map.width:
+                        y_end = max_y
+                    if not 0 < x_end < game_map.height:
+                        x_end = max_x
+
+                    projectile.projectile.path = list(libtcod.line_iter(int(x_end), int(y_end), xo, yo))
+                    projectile.projectile.path.pop() # Don't start where the shooter is standing.
+                    projectile.projectile.path.pop(0) # Don't end out of bounds.
                     projectile.required_game_state = required_game_state
 
                     event_queue.register(projectile)

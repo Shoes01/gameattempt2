@@ -8,7 +8,7 @@ class TowerAI:
     """
     This AI is used for towers.
     """
-    def take_turn(self, game_state, turn_state, entities):
+    def take_turn(self, game_state, turn_state, entities, game_map=None):
         results = []
 
         entity = self.owner
@@ -52,7 +52,7 @@ class DoNothing:
     """
     This is a place holder AI.
     """
-    def take_turn(self, game_state, turn_state, entities):
+    def take_turn(self, game_state, turn_state, entities, game_map=None):
         results = []
 
         enemy = self.owner
@@ -80,11 +80,11 @@ class DoNothing:
 
         return results
 
-class MoveAlongPath:
+class ProjectileAI:
     """
     This AI moves an entity along a given path.
     """
-    def take_turn(self, game_state, turn_state, entities):
+    def take_turn(self, game_state, turn_state, entities, game_map):
         results = []
 
         projectile = self.owner
@@ -94,6 +94,10 @@ class MoveAlongPath:
                 # Move.
                 if len(projectile.projectile.path) > 0:
                     x, y = projectile.projectile.path.pop()
+                    if game_map.tiles[x][y].blocked:
+                        results.append({'remove': projectile})
+                        return results
+                        
                     dx = x - projectile.location.x
                     dy = y - projectile.location.y
 
