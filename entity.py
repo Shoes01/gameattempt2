@@ -11,9 +11,11 @@ class Entity:
     A generic object to represent players, enemies, items, etc.
     """
     def __init__(self, name, uuid, required_game_state=GameStates.ENEMY_TURN, chassis=None, cursor=None, arsenal=None, ai=None, location=None, projectile=None, render=None, propulsion=None):
+        """ Data """
         self.name = name
         self.uuid = uuid
         self.required_game_state = required_game_state
+        """ Components """
         self.chassis = chassis
         self.cursor = cursor
         self.arsenal = arsenal                # A list of weapons.

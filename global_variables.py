@@ -39,3 +39,11 @@ def fill_in_line(line):
         new_line.pop(0)
     
     return new_line
+
+def get_blocking_entity(entities, location):
+    x, y = location
+    for entity in entities:
+        if entity.chassis and entity.location and entity.location.x == x and entity.location.y == y:
+            return entity
+    else:
+        return None
