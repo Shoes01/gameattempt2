@@ -1,4 +1,5 @@
 from components.location import Location
+from systems.movement import cursor_movement
 
 class Cursor:
     def turn_on(self, player, targets=[]):
@@ -21,14 +22,14 @@ class Cursor:
         # Ensure the first target is in firing range.
         if len(weapon.targets) == 0:
             if player.distance(self.owner.location.x + dx, self.owner.location.y + dy) <= weapon.range:
-                self.owner.location.move(dx, dy)
+                cursor_movement(self.owner, dx, dy)
             else:
                 result = {'message': 'Target out of range.'}
         # Ensure that the next targets are adjacent to the previous target
         elif len(weapon.targets) > 0:
             tar_x, tar_y = weapon.targets[-1] # Get the most recent target added.
             if abs(tar_x - (self.owner.location.x + dx)) + abs(tar_y - (self.owner.location.y + dy)) <= 1:
-                self.owner.location.move(dx, dy)
+                cursor_movement(self.owner, dx, dy)
             else:
                 result = {'message': 'Invalid target.'}
         

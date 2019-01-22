@@ -3,6 +3,7 @@ import tcod as libtcod
 from game_states import GameStates, TurnStates
 from global_variables import distance_to, get_blocking_entity, TICKS_PER_TURN
 from random import randrange
+from systems.movement import movement
 
 class TowerAI:
     """
@@ -92,19 +93,7 @@ class ProjectileAI:
         if projectile.required_game_state == game_state:
             if turn_state == TurnStates.MOVEMENT_PHASE:
                 # Move.
-                if len(projectile.projectile.path) > 0:
-                    x, y = projectile.projectile.path.pop()
-                    if game_map.tiles[x][y].blocked or get_blocking_entity(entities, (x, y)):
-                        results.append({'remove': projectile})
-                        return results
-                        
-                    dx = x - projectile.location.x
-                    dy = y - projectile.location.y
-
-                    projectile.location.move(dx, dy)
-                else:
-                    results.append({'remove': projectile})
-
+                results.extend(movement(projectile, entities, game_map))
             if turn_state == TurnStates.ATTACK_PHASE:
                 projectile.action_points = 0
         if not projectile.required_game_state == game_state:

@@ -10,6 +10,7 @@ from input_handlers import handle_keys, handle_mouse
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from map_objects.game_map import GameMap
 from render_functions import clear_all, erase_cell, render_all, RenderOrder
+from systems.movement import cursor_movement, movement
 
 def main():
     constants = get_constants()
@@ -170,7 +171,7 @@ def main():
                 if active_entity:
                     if active_entity is player:
                         if active_entity.required_game_state == game_state:
-                            turn_results.extend(player.propulsion.move())
+                            turn_results.extend(movement(player, entities, game_map))
 
                             if next_turn_phase:
                                 next_turn_phase = False
@@ -374,7 +375,7 @@ def main():
         if game_state == GameStates.LOOK:
             if move:
                 dx, dy = move
-                cursor.location.move(dx, dy)
+                cursor_movement(cursor, dx, dy)
        
         """
         Handle the death of the player.

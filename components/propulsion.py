@@ -146,24 +146,6 @@ class Propulsion:
             return self.path
         
         return []
-    
-    def move(self):
-        """
-        Move the entity towards its legal tiles.
-        """
-        results = []
-
-        if not self.path:
-            self.owner.action_points = 0
-        elif self.owner.action_points == 0:
-            print('How did the user manage to move the entity so far that they spent all their APs?')
-        else:
-            x, y = self.path.pop(0)
-            dx, dy = x - self.owner.location.x, y - self.owner.location.y
-
-            self.owner.location.move(dx, dy)
-
-        return results
 
     def update_speed(self):
         self.speed_x = 0
