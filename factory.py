@@ -131,7 +131,7 @@ def create_component(component):
     
     # Propulsion components.
     elif component == PropulsionComponent.BASIC_PROPULSION:
-        return Propulsion(max_speed=10, max_impulse=3)
+        return Propulsion(max_speed=12, max_impulse=2)
     elif component == PropulsionComponent.WEAK_PROPULSION:
         return Propulsion(max_speed=4, max_impulse=1)
     

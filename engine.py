@@ -139,7 +139,7 @@ def main():
 
                     # Left clicking choose path final destination.
                     if left_click:                        
-                        player.propulsion.path = []
+                        player.propulsion.path.clear()
                         turn_results.append(player.propulsion.choose_tile((mouse.cx, mouse.cy), game_map))
                     
                     # Right clicking deconstructs path.

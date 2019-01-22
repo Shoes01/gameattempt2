@@ -22,16 +22,21 @@ class Propulsion:
         return abs(self.speed_x) + abs(self.speed_y)
     
     def reset(self):
-        self.path = []
+        self.path.clear()
         self.legal_tiles.clear()
     
     def choose_tile(self, tile, game_map):
         """
         Attempt to choose a tile.
         """
+        self.chosen_tile = tile
+        
+        """
         xo, yo = self.owner.location.x, self.owner.location.y
         xd, yd = tile
         
+        
+
         good_tile = True
         line = list(libtcod.line_iter(xo, yo, xd, yd))
 
@@ -44,6 +49,7 @@ class Propulsion:
             self.chosen_tile = tile
         else:
             return {'message': 'Choose a valid tile.'}        
+        """
         
         return {}
     
@@ -128,7 +134,7 @@ class Propulsion:
         legal_tiles.extend(self.legal_tiles.get('yellow'))
         legal_tiles.extend(self.legal_tiles.get('red'))
 
-        if self.chosen_tile not in legal_tiles:
+        if len(legal_tiles) > 0 and self.chosen_tile not in legal_tiles:
             closest_tile = legal_tiles.pop()
             for tile in legal_tiles:
                 if distance_to(tile, self.chosen_tile, manhattan=False) < distance_to(closest_tile, self.chosen_tile, manhattan=False):
@@ -148,11 +154,33 @@ class Propulsion:
         return []
 
     def update_speed(self):
-        self.speed_x = 0
-        self.speed_y = 0
-
         if self.path:
             xo, yo = self.owner.location.x, self.owner.location.y
             xd, yd = self.path[-1]
-            self.speed_x = xd - xo
-            self.speed_y = yd - yo
+
+            if (xd, yd) in self.legal_tiles.get('yellow'):
+                # Speed doesn't change.
+                pass
+            elif (xd, yd) in self.legal_tiles.get('green'):
+                # Speed does change.
+                self.speed_x = xd - xo
+                self.speed_y = yd - yo
+            elif (xd, yd) in self.legal_tiles.get('red'):
+                # Speed does change.
+                self.speed_x = xd - xo
+                self.speed_y = yd - yo
+            else:
+                # If the path doesn't end inside the red tile range, it's because the player is unable to path safely.
+                # Their speed should drop as low as possible as a precaution.
+                if self.speed_x > 0:
+                    self.speed_x -= self.max_impulse // 2
+                elif self.speed_x < 0:
+                    self.speed_x += self.max_impulse // 2
+                if self.speed_y > 0:
+                    self.speed_y -= self.max_impulse // 2
+                elif self.speed_y < 0:
+                    self.speed_y += self.max_impulse // 2
+        else:
+            self.speed_x = 0
+            self.speed_y = 0
+            print('There was no path in the update_speed function.')

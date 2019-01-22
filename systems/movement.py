@@ -1,4 +1,5 @@
 from global_variables import get_blocking_entity, TICKS_PER_TURN
+from systems.damage import obstacle_damage
 
 """
 The Movement System governs how an entity may move.
@@ -17,9 +18,7 @@ def movement(entity, entities, game_map):
             else:
                 entity.location.x = xd
                 entity.location.y = yd
-
-                if entity.cursor is None:
-                    entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
+                entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
         else:
             results.append({'remove': entity})
 
@@ -29,10 +28,12 @@ def movement(entity, entities, game_map):
         print('How did the user manage to move the entity so far that they spent all their APs?')
     elif entity.location:
         xd, yd = entity.propulsion.path.pop(0)
-        entity.location.x = xd
-        entity.location.y = yd
+        if game_map.tiles[xd][yd].blocked:
+            results.extend(obstacle_damage(entity, (xd, yd)))
 
-        if entity.cursor is None:
+        else:
+            entity.location.x = xd
+            entity.location.y = yd
             entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
     
     return results
