@@ -13,5 +13,7 @@ def obstacle_damage(entity, obstacle):
     entity.propulsion.speed_x = 0
     entity.propulsion.speed_y = 0
 
+    return {'message': 'The {0} ran into an obstacle.'.format(entity.name.capitalize())}
+
 def take_damage(entity, projectile=None):
     pass

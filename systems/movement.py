@@ -29,7 +29,7 @@ def movement(entity, entities, game_map):
     elif entity.location:
         xd, yd = entity.propulsion.path.pop(0)
         if game_map.tiles[xd][yd].blocked:
-            results.extend(obstacle_damage(entity, (xd, yd)))
+            results.append(obstacle_damage(entity, (xd, yd)))
 
         else:
             entity.location.x = xd
