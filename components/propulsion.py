@@ -29,28 +29,66 @@ class Propulsion:
         """
         Attempt to choose a tile.
         """
+        ### Choose tile.
         self.chosen_tile = tile
-        
-        """
         xo, yo = self.owner.location.x, self.owner.location.y
         xd, yd = tile
-        
-        
 
-        good_tile = True
-        line = list(libtcod.line_iter(xo, yo, xd, yd))
+        ### Check to see if it's in the legal tile range.
+        legal_tiles = []
+        legal_tiles.extend(self.legal_tiles.get('green'))
+        legal_tiles.extend(self.legal_tiles.get('yellow'))
+        legal_tiles.extend(self.legal_tiles.get('red'))
 
-        for t in line:
-            xt, yt = t
-            if game_map.tiles[xt][yt].blocked:
-                good_tile = False
+        if legal_tiles and tile in legal_tiles:
+            path = list(libtcod.line_iter(xo, yo, xd, yd))
 
-        if not game_map.tiles[xd][yd].blocked and good_tile:
-            self.chosen_tile = tile
-        else:
-            return {'message': 'Choose a valid tile.'}        
-        """
+            if path:
+                self.path = fill_in_line(path)
+                        
+            return {}
+
+        ### Adjust speed.
+        # Calculate true_angle
+        xc, yc = xo + self.speed_x, yo + self.speed_y   # This is the center of the legal_tiles grid.
+
+        dx = xd - xc
+        dy = yd - yc
         
+        true_angle = math.atan2(dy, dx)
+        true_angle = int(true_angle * 180 / math.pi) + 180
+        # Now loop over all possible impulses in order to find the closest angle.
+        available_impulse = self.max_speed - self.speed
+        if available_impulse > self.max_impulse:
+            available_impulse = self.max_impulse
+
+        closest_angle = 999
+        closest_impulse = 0
+
+        for impulse_x in range(-available_impulse, available_impulse + 1):
+            for impulse_y in range(-available_impulse, available_impulse + 1):
+                # Try every combo of impulse available.
+                if ( abs(impulse_x) + abs(impulse_y) <= available_impulse and
+                     abs(self.speed_x + impulse_x) + abs(self.speed_y + impulse_y) <= self.cruising_speed):
+                    # If it's not more than what's available, see what the angle would be.
+                    new_angle = math.atan2(impulse_y, impulse_x)
+                    new_angle = int(new_angle * 180 / math.pi) + 180
+
+                    if ( abs(new_angle - true_angle) < abs(closest_angle - true_angle) or 
+                        (abs(new_angle - true_angle) == abs(closest_angle - true_angle) and abs(impulse_x) + abs(impulse_y) > closest_impulse)):
+                        # If the angle is close, then we have a new coordinate.
+                        closest_angle = new_angle
+                        closest_impulse = abs(impulse_x) + abs(impulse_y)
+                        dx = impulse_x
+                        dy = impulse_y
+
+        new_xd, new_yd = xo + dx + self.speed_x, yo + dy + self.speed_y
+
+        path = list(libtcod.line_iter(xo, yo, new_xd, new_yd))
+
+        if path:
+            self.path = fill_in_line(path)            
+
         return {}
     
     def change_cruising_speed(self, delta):
@@ -64,9 +102,15 @@ class Propulsion:
         elif self.cruising_speed < 1:
             self.cruising_speed = 1
         
+        if self.cruising_speed + self.max_impulse < self.speed:
+            self.cruising_speed -= delta
+            return {'message': 'Cruising speed cannot go lower than {0}.'.format(self.cruising_speed)}
+
+
+        
         self.reset()
 
-        return {'message': 'Cruising speed set to {0}'.format(self.cruising_speed)}
+        return {'message': 'Cruising speed set to {0}.'.format(self.cruising_speed)}
 
     def calculate_movement_range(self, game_map):
         """

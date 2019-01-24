@@ -135,12 +135,16 @@ def main():
 
                         game_map.set_highlighted(player.propulsion.legal_tiles['red'], color=libtcod.dark_red)
                         game_map.set_highlighted(player.propulsion.legal_tiles['green'], color=libtcod.light_green)
-                        game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)    
+                        game_map.set_highlighted(player.propulsion.legal_tiles['yellow'], color=libtcod.yellow)
+                        fov_recompute = True
 
                     # Left clicking choose path final destination.
-                    if left_click:                        
+                    if left_click:                    
+                        game_map.reset_pathable()    
                         player.propulsion.path.clear()
                         turn_results.append(player.propulsion.choose_tile((mouse.cx, mouse.cy), game_map))
+                        game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
+                        fov_recompute = True
                     
                     # Right clicking deconstructs path.
                     if right_click:
@@ -149,11 +153,13 @@ def main():
                         player.propulsion.reset()
 
                     # Build and draw path.
+                    """
                     if player.propulsion.chosen_tile and not player.propulsion.path and player.propulsion.legal_tiles:
                         game_map.reset_pathable()
                         player.propulsion.build_path()
                         game_map.set_pathable(player.propulsion.path, color=libtcod.blue)
                         fov_recompute = True
+                    """
 
                     # Attempt to end the turn.
                     if next_turn_phase:
