@@ -145,13 +145,13 @@ class Propulsion:
                     if new_speed > self.max_speed:
                         # Can't exceed max speed.
                         continue
-                    if game_map.tiles[xd][yd].blocked:
+                    if game_map.is_blocked(xd, yd):
                         # Can't path to blocked tiles.
                         continue
 
                     for tile in line:
                         xt, yt = tile
-                        if game_map.tiles[xt][yt].blocked:
+                        if game_map.is_blocked(xt, yt):
                             # Can't path to tiles behind blocked tiles.
                             good_tile = False
                     

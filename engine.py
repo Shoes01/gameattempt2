@@ -15,7 +15,7 @@ from systems.movement import cursor_movement, movement
 def main():
     constants = get_constants()
 
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font('rexpaint_cp437_10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
 
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'], title='MVP v0.0')
 

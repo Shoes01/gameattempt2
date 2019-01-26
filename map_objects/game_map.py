@@ -62,3 +62,10 @@ class GameMap:
                 self.tiles[x][y].highlighted = None
                 self.tiles[x][y].targeted  = False
                 self.tiles[x][y].pathable = None
+    
+    def is_blocked(self, x, y):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            if self.tiles[x][y].blocked:
+                return True 
+        
+        return False

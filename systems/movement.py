@@ -7,35 +7,51 @@ The Movement System governs how an entity may move.
 
 def movement(entity, entities, game_map):
     results = []
+    xd, yd = -1, -1
+    is_projectile = False
 
-    # TODO: Put collision detection here.
+    if entity.action_points == 0:
+        print('How did this entity get a chance to move?')
+        return results
 
-    if entity.projectile: # TODO: Is it odd that projectiles get special treatement?
+    if entity.projectile:
         if len(entity.projectile.path) > 0:
             xd, yd = entity.projectile.path.pop()
-            if game_map.tiles[xd][yd].blocked or get_blocking_entity(entities, (xd, yd)):
-                results.append({'remove': entity})
-            else:
-                entity.location.x = xd
-                entity.location.y = yd
-                entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
+            is_projectile = True
         else:
             results.append({'remove': entity})
-
-    elif not entity.propulsion or not entity.propulsion.path:
-        entity.action_points = 0
-    elif entity.action_points == 0:
-        print('How did the user manage to move the entity so far that they spent all their APs?')
-    elif entity.location:
+            return results
+    elif entity.propulsion and len(entity.propulsion.path) > 0:
         xd, yd = entity.propulsion.path.pop(0)
-        if game_map.tiles[xd][yd].blocked:
-            results.append(obstacle_damage(entity, (xd, yd)))
+    else:
+        entity.action_points = 0
+        return results
 
+    # Running into a wall.
+    if game_map.is_blocked(xd, yd):
+        if is_projectile:
+            results.append({'remove': entity})
         else:
-            entity.location.x = xd
-            entity.location.y = yd
-            entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
+            results.append(obstacle_damage(entity, (xd, yd)))
+        
+        return results
     
+    # Running into another entity.
+    blocking_entity = get_blocking_entity(entities, (xd, yd))
+    if blocking_entity:
+        print('{0} walked into {1}.'.format(entity.name, blocking_entity.name))
+        if is_projectile:
+            results.append({'remove': entity})
+        else:
+            if blocking_entity.projectile:
+                results.append({'remove': blocking_entity})
+        
+        #return results
+    
+    entity.location.x = xd
+    entity.location.y = yd
+    entity.action_points -= TICKS_PER_TURN // entity.propulsion.speed
+
     return results
 
 def cursor_movement(cursor, dx, dy):

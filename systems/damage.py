@@ -16,4 +16,6 @@ def obstacle_damage(entity, obstacle):
     return {'message': 'The {0} ran into an obstacle.'.format(entity.name.capitalize())}
 
 def take_damage(entity, projectile=None):
+    " Damage here is taken due to being hit by a projectile. "
+    " Momentum is also transfered. "
     pass
