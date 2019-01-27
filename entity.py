@@ -15,6 +15,7 @@ class Entity:
         self.name = name
         self.uuid = uuid
         self.required_game_state = required_game_state
+        self.age = 0
         """ Components """
         self.chassis = chassis
         self.cursor = cursor

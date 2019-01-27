@@ -38,7 +38,8 @@ Once the Q is empty, the turn changes, and the Q is refilled.
         """
         criteria_a = -1 * entity.action_points
         criteria_b = -1 * entity.propulsion.speed
-        heapq.heappush(self.queue, (criteria_a, criteria_b, entity.uuid, entity.name)) # TODO: I used a UID instead of the actual entity last time... may need to do that here too.
+        criteria_c = -1 * entity.age
+        heapq.heappush(self.queue, (criteria_a, criteria_b, criteria_c, entity.name, entity.uuid))
     
     def release(self, entity):
         """
@@ -54,6 +55,6 @@ Once the Q is empty, the turn changes, and the Q is refilled.
         This removes them from the queue.
         """
         if len(self.queue) > 0:
-            return heapq.heappop(self.queue)[2]
+            return heapq.heappop(self.queue)[-1]
 
         return None

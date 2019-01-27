@@ -105,7 +105,9 @@ def main():
                 entity_uuid = event_queue.fetch()
                 for entity in entities:
                     if entity.uuid == entity_uuid:
+                        entity.age += 1
                         active_entity = entity
+                        
 
             # This phase is not for the active_entity.
             if turn_state == TurnStates.UPKEEP_PHASE:
